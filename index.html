@@ -11,353 +11,149 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{
-      --or:#FF6B00;
-      --or-lt:#FFF3E8;
-      --or-dk:#E05A00;
-      --bg:#F4F5F7;
-      --card:#FFFFFF;
-      --text:#1A1A1A;
-      --sub:#999999;
-      --border:#EBEBEB;
-      --blue:#2B6CB0;
-      --red:#E53E3E;
-      --green:#2F855A;
+      --or:#FF6B00; --or-lt:#FFF3E8; --or-dk:#E05A00;
+      --bg:#F4F5F7; --card:#FFFFFF;
+      --text:#1A1A1A; --sub:#999; --border:#EBEBEB;
+      --blue:#2B6CB0; --red:#C53030; --green:#276749;
       --nav-h:58px;
     }
     html,body{height:100%;-webkit-font-smoothing:antialiased;}
-    body{
-      font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;
-      background:var(--bg);color:var(--text);
-      max-width:430px;margin:0 auto;min-height:100vh;
-    }
+    body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh;}
 
-    /* ─── LOCK SCREEN ─── */
-    .lock{
-      position:fixed;inset:0;z-index:2000;
-      background:#FFFFFF;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      padding:40px 40px;
-    }
-    .lock-logo{margin-bottom:32px;text-align:center;}
-    .lock-logo-icon{
-      width:72px;height:72px;border-radius:20px;
-      background:var(--or);
-      display:flex;align-items:center;justify-content:center;
-      font-size:38px;margin:0 auto 14px;
-      box-shadow:0 4px 16px rgba(255,107,0,.3);
-    }
-    .lock-logo-name{font-size:20px;font-weight:700;color:var(--text);}
-    .lock-logo-sub{font-size:12px;color:var(--sub);margin-top:3px;}
-    .lock-label{font-size:14px;color:var(--sub);margin-bottom:24px;}
+    /* ── LOCK ── */
+    .lock{position:fixed;inset:0;z-index:2000;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;}
+    .lock-icon{width:72px;height:72px;border-radius:20px;background:var(--or);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 14px;box-shadow:0 4px 16px rgba(255,107,0,.3);}
+    .lock-name{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px;}
+    .lock-sub-txt{font-size:12px;color:var(--sub);text-align:center;margin-bottom:32px;}
+    .lock-label{font-size:14px;color:var(--sub);margin-bottom:20px;}
     .lock-dots{display:flex;gap:18px;margin-bottom:32px;}
-    .lock-dot{
-      width:13px;height:13px;border-radius:50%;
-      border:2px solid #D0D0D0;background:transparent;
-      transition:all .15s;
-    }
+    .lock-dot{width:13px;height:13px;border-radius:50%;border:2px solid #D0D0D0;background:transparent;transition:all .15s;}
     .lock-dot.on{background:var(--or);border-color:var(--or);}
     .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;}
-    .nk{
-      aspect-ratio:1;border:none;border-radius:50%;
-      background:#F5F5F5;color:var(--text);
-      font-size:22px;font-weight:500;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      transition:background .1s;
-    }
+    .nk{aspect-ratio:1;border:none;border-radius:50%;background:#F5F5F5;color:var(--text);font-size:22px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s;}
     .nk:active{background:#E5E5E5;}
     .lock-err{color:var(--red);font-size:13px;margin-top:16px;text-align:center;min-height:18px;}
 
-    /* ─── HEADER ─── */
-    .hdr{
-      background:var(--or);
-      padding:14px 16px 12px;
-      display:flex;align-items:center;justify-content:space-between;
-      position:sticky;top:0;z-index:50;
-    }
-    .hdr-left{display:flex;align-items:center;gap:10px;}
-    .hdr-logo-sm{
-      width:28px;height:28px;border-radius:8px;
-      background:rgba(255,255,255,.25);
-      display:flex;align-items:center;justify-content:center;font-size:16px;
-    }
+    /* ── HEADER ── */
+    .hdr{background:var(--or);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+    .hdr-left{display:flex;align-items:center;gap:8px;}
+    .hdr-logo{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:15px;}
     .hdr-title{font-size:16px;font-weight:700;color:#fff;}
-    .hdr-right{display:flex;gap:8px;align-items:center;}
-    .hdr-mode{
-      font-size:11px;font-weight:700;
-      padding:4px 10px;border-radius:20px;
-      background:rgba(255,255,255,.25);color:#fff;
-    }
-    .hdr-mode.parent{background:#fff;color:var(--or);}
-    .hdr-btn{
-      border:none;background:rgba(255,255,255,.2);color:#fff;
-      border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;
-    }
-    .parent-timer{
-      font-size:10px;font-weight:700;color:var(--or);
-      background:#fff;padding:3px 8px;border-radius:10px;display:none;
-    }
+    .hdr-right{display:flex;align-items:center;gap:6px;}
+    .mode-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.25);color:#fff;}
+    .mode-chip.parent{background:#fff;color:var(--or);}
+    .hdr-btn{border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;}
+    .parent-timer{font-size:10px;font-weight:700;color:var(--or);background:#fff;padding:3px 8px;border-radius:10px;display:none;}
 
-    /* ─── NAV ─── */
-    #nav{
-      position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-      width:100%;max-width:430px;
-      background:#fff;border-top:1px solid var(--border);
-      height:var(--nav-h);display:flex;z-index:100;
-    }
-    .ni{
-      flex:1;display:flex;flex-direction:column;align-items:center;
-      justify-content:center;gap:2px;cursor:pointer;
-      color:#BBBBBB;font-size:10px;font-weight:500;
-    }
+    /* ── NAV ── */
+    #nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--border);height:var(--nav-h);display:flex;z-index:100;}
+    .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:#BBB;font-size:10px;font-weight:500;}
     .ni.on{color:var(--or);}
     .ni-ico{font-size:22px;line-height:1;}
 
-    /* ─── PAGES ─── */
+    /* ── PAGES ── */
     .page{display:none;}.page.on{display:block;}
-    .pg{padding-bottom:calc(var(--nav-h) + 16px);}
+    .pg{padding-bottom:calc(var(--nav-h)+16px);}
 
-    /* ─── HOME ─── */
-    /* Month selector */
-    .month-bar{
-      background:var(--or);
-      display:flex;align-items:center;justify-content:center;gap:20px;
-      padding:10px 0 14px;
-    }
-    .month-arrow{
-      border:none;background:none;color:rgba(255,255,255,.7);
-      font-size:22px;cursor:pointer;padding:4px 10px;
-    }
-    .month-label{font-size:16px;font-weight:700;color:#fff;}
+    /* ── HOME HERO ── */
+    .hero-wrap{background:var(--or);padding:0 16px 20px;}
+    .hero-month{display:flex;align-items:center;justify-content:center;gap:18px;padding:10px 0 14px;}
+    .month-arr{border:none;background:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;padding:4px 10px;}
+    .month-lbl{font-size:15px;font-weight:700;color:#fff;}
+    .hero-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .hero-card{background:rgba(255,255,255,.18);border-radius:14px;padding:14px 14px 12px;backdrop-filter:blur(4px);}
+    .hero-card-lbl{font-size:11px;color:rgba(255,255,255,.8);margin-bottom:6px;font-weight:500;}
+    .hero-card-amt{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;}
+    .hero-card-unit{font-size:14px;font-weight:600;margin-right:1px;}
+    .hero-card-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:4px;}
+    .hero-card.wide{grid-column:span 2;}
 
-    /* Summary card */
-    .summary-card{
-      background:#fff;margin:0;
-      padding:20px 20px 16px;
-      border-bottom:1px solid var(--border);
-    }
-    .summary-period{font-size:11px;color:var(--sub);margin-bottom:14px;}
-    .summary-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-    .summary-row:last-child{margin-bottom:0;}
-    .summary-lbl{font-size:13px;color:var(--sub);width:36px;flex-shrink:0;}
-    .summary-bar-wrap{flex:1;height:6px;background:#F0F0F0;border-radius:3px;overflow:hidden;}
-    .summary-bar{height:100%;border-radius:3px;}
-    .summary-bar.inc{background:var(--blue);}
-    .summary-bar.exp{background:var(--red);}
-    .summary-amt{font-size:15px;font-weight:700;width:96px;text-align:right;flex-shrink:0;}
-    .summary-amt.inc{color:var(--blue);}
-    .summary-amt.exp{color:var(--red);}
-    .summary-divider{border:none;border-top:1px dashed var(--border);margin:12px 0;}
-    .summary-balance-row{display:flex;align-items:center;justify-content:space-between;}
-    .summary-balance-lbl{font-size:13px;color:var(--sub);}
-    .summary-balance-val{font-size:22px;font-weight:800;color:var(--text);}
-    .summary-balance-val.minus{color:var(--red);}
+    /* ── RANK CARD ── */
+    .rank-strip{background:#fff;margin-top:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+    .rank-badge{width:42px;height:42px;border-radius:12px;background:var(--or-lt);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .rank-body{flex:1;}
+    .rank-lbl{font-size:11px;color:var(--sub);}
+    .rank-val{font-size:16px;font-weight:700;}
+    .rank-sub{font-size:11px;color:var(--or);font-weight:600;margin-top:2px;}
+    .rank-times{display:flex;gap:12px;}
+    .rank-time-item{text-align:right;}
+    .rank-time-lbl{font-size:10px;color:var(--sub);}
+    .rank-time-val{font-size:13px;font-weight:700;}
 
-    /* Chart section */
-    .chart-section{background:#fff;margin-top:8px;padding:18px 16px;}
-    .chart-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-    .chart-title{font-size:14px;font-weight:700;}
-    .chart-tabs{display:flex;gap:0;border:1px solid var(--or);border-radius:6px;overflow:hidden;}
-    .chart-tab{
-      border:none;background:#fff;color:var(--or);
-      padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;
-    }
-    .chart-tab.on{background:var(--or);color:#fff;}
-    .donut-wrap{display:flex;align-items:center;gap:16px;}
-    .donut-canvas-wrap{position:relative;width:130px;height:130px;flex-shrink:0;}
-    .donut-center{
-      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      text-align:center;pointer-events:none;
-    }
-    .donut-center-amt{font-size:15px;font-weight:800;color:var(--text);}
-    .donut-center-lbl{font-size:10px;color:var(--sub);margin-top:1px;}
-    .donut-legend{flex:1;}
-    .legend-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
-    .legend-item:last-child{border-bottom:none;}
-    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-    .legend-name{font-size:12px;flex:1;color:var(--text);}
-    .legend-pct{font-size:11px;color:var(--sub);margin-right:4px;}
-    .legend-amt{font-size:12px;font-weight:700;color:var(--text);}
-
-    /* Rank + allowance info */
-    .info-banner{
-      background:#fff;margin-top:8px;padding:14px 16px;
-      display:flex;align-items:center;gap:12px;
-    }
-    .info-badge{
-      width:46px;height:46px;border-radius:12px;
-      background:var(--or-lt);
-      display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
-    }
-    .info-main{flex:1;}
-    .info-title{font-size:12px;color:var(--sub);margin-bottom:2px;}
-    .info-val{font-size:16px;font-weight:700;}
-    .info-sub{font-size:11px;color:var(--or);margin-top:2px;font-weight:600;}
-    .info-right{text-align:right;}
-    .info-right-lbl{font-size:10px;color:var(--sub);}
-    .info-right-val{font-size:13px;font-weight:700;color:var(--text);}
-
-    /* Quick actions (parent only) */
-    .quick-sec{background:#fff;margin-top:8px;padding:14px 16px;}
-    .quick-title{font-size:13px;font-weight:700;color:var(--sub);margin-bottom:12px;letter-spacing:.3px;}
-    .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-    .qbtn{
-      display:flex;flex-direction:column;align-items:center;gap:6px;
-      cursor:pointer;border:none;background:none;padding:0;
-    }
-    .qbtn-ico{
-      width:48px;height:48px;border-radius:14px;
-      display:flex;align-items:center;justify-content:center;font-size:22px;
-    }
+    /* ── QUICK ACTIONS ── */
+    .qsec{background:#fff;margin-top:8px;padding:14px 16px;}
+    .qsec-title{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.3px;margin-bottom:12px;}
+    .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+    .qbtn{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border:none;background:none;padding:0;}
+    .qbtn-ico{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;}
     .qbtn-lbl{font-size:10px;font-weight:600;color:var(--text);text-align:center;line-height:1.3;}
-    .qbtn-ico.lunch{background:#FFF3E8;}
-    .qbtn-ico.at{background:#FFF8E1;}
-    .qbtn-ico.rank{background:#E8F4FD;}
-    .qbtn-ico.income{background:#E8F5E9;}
-    .qbtn-ico.expense{background:#FFEBEE;}
-    .qbtn-ico.asset{background:#F3E8FF;}
-    .qbtn-ico.kotest{background:#E8F5E9;}
-    .qbtn-ico.logout{background:#F5F5F5;}
+    .ico-bento{background:#FFF3E8;}
+    .ico-at{background:#FFF8E1;}
+    .ico-rank{background:#E3F2FD;}
+    .ico-pay{background:#FFEBEE;}
+    .ico-asset{background:#F3E8FF;}
+    .ico-kotest{background:#E8F5E9;}
 
-    /* Recent TX */
-    .tx-sec{background:#fff;margin-top:8px;}
-    .tx-sec-hdr{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:14px 16px 10px;
-      border-bottom:1px solid var(--border);
-    }
-    .tx-sec-title{font-size:14px;font-weight:700;}
-    .tx-more{font-size:12px;color:var(--or);font-weight:600;border:none;background:none;cursor:pointer;}
-    .tx-item{
-      display:flex;align-items:center;gap:12px;padding:12px 16px;
-      border-bottom:1px solid var(--border);
-    }
-    .tx-item:last-child{border-bottom:none;}
-    .tx-cat-ico{
-      width:38px;height:38px;border-radius:50%;
-      display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
-    }
-    .tx-body{flex:1;min-width:0;}
-    .tx-name{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .tx-date{font-size:11px;color:var(--sub);margin-top:1px;}
-    .tx-right{text-align:right;flex-shrink:0;}
-    .tx-amt{font-size:15px;font-weight:700;}
-    .tx-amt.inc{color:var(--blue);}
-    .tx-amt.exp{color:var(--red);}
-    .tx-acts{display:flex;gap:4px;margin-top:3px;}
-    .txbtn{border:none;background:var(--bg);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600;}
-    .txbtn.edit{color:var(--or);}
-    .txbtn.del{color:var(--red);}
+    /* ── LEDGER (出納帳) ── */
+    .ledger-hdr{background:var(--or);padding:10px 0 14px;}
+    .ledger-month{display:flex;align-items:center;justify-content:center;gap:18px;}
+    .ledger-month .month-arr{color:rgba(255,255,255,.7);}
+    .ledger-month .month-lbl{font-size:15px;font-weight:700;color:#fff;}
+    .ledger-summary{display:flex;gap:0;background:rgba(0,0,0,.1);margin:10px 16px 0;border-radius:10px;overflow:hidden;}
+    .ls-item{flex:1;padding:10px;text-align:center;}
+    .ls-lbl{font-size:10px;color:rgba(255,255,255,.75);}
+    .ls-val{font-size:14px;font-weight:700;color:#fff;margin-top:2px;}
+    .ls-div{width:1px;background:rgba(255,255,255,.2);}
 
-    /* ─── TX PAGE ─── */
-    .month-summary-bar{
-      background:var(--or);padding:10px 16px;
-      display:flex;justify-content:space-between;align-items:center;
-    }
-    .ms-item{text-align:center;}
-    .ms-lbl{font-size:10px;color:rgba(255,255,255,.75);}
-    .ms-val{font-size:15px;font-weight:700;color:#fff;}
-    .ms-div{width:1px;background:rgba(255,255,255,.3);height:30px;}
-    .mfilter{
-      background:#fff;display:flex;gap:0;overflow-x:auto;
-      border-bottom:1px solid var(--border);
-      -webkit-overflow-scrolling:touch;scrollbar-width:none;
-    }
-    .mfilter::-webkit-scrollbar{display:none;}
-    .mtab{
-      flex-shrink:0;padding:10px 16px;border:none;background:#fff;
-      font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;
-      border-bottom:2px solid transparent;white-space:nowrap;
-    }
-    .mtab.on{color:var(--or);border-bottom-color:var(--or);}
-    .tx-list-wrap{background:#fff;margin-top:8px;}
-    .tx-date-hdr{
-      background:#F9F9F9;padding:8px 16px;
-      font-size:12px;font-weight:600;color:var(--sub);
-      border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-    }
+    /* Table */
+    .ledger-table-wrap{background:#fff;margin-top:8px;overflow:hidden;}
+    .ledger-date-hdr{background:#F9F9F9;padding:8px 14px;font-size:11px;font-weight:600;color:var(--sub);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    table.ledger{width:100%;border-collapse:collapse;}
+    table.ledger thead th{background:#FFF3E8;padding:9px 8px;font-size:11px;font-weight:700;color:var(--sub);text-align:right;border-bottom:2px solid var(--or);}
+    table.ledger thead th:first-child{text-align:left;padding-left:14px;}
+    table.ledger thead th:nth-child(2){text-align:left;}
+    table.ledger tbody tr{border-bottom:1px solid var(--border);}
+    table.ledger tbody tr:last-child{border-bottom:none;}
+    table.ledger tbody td{padding:10px 8px;font-size:13px;vertical-align:middle;}
+    table.ledger tbody td:first-child{padding-left:14px;color:var(--sub);font-size:11px;white-space:nowrap;}
+    table.ledger tbody td.memo{font-size:13px;font-weight:600;}
+    table.ledger tbody td.inc{color:var(--blue);font-weight:700;text-align:right;}
+    table.ledger tbody td.dec{color:var(--red);font-weight:700;text-align:right;}
+    table.ledger tbody td.empty-cell{color:#CCC;text-align:right;}
+    table.ledger tbody td.bal{font-weight:700;text-align:right;font-size:13px;}
+    .ledger-acts{display:flex;gap:4px;margin-top:4px;}
+    .lbtn{border:none;background:var(--bg);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600;}
+    .lbtn.edit{color:var(--or);}
+    .lbtn.del{color:var(--red);}
 
-    /* ─── CALENDAR ─── */
-    .cal-nav{
-      background:var(--or);
-      display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px;
-    }
-    .cal-nav-btn{border:none;background:none;color:rgba(255,255,255,.8);font-size:24px;cursor:pointer;padding:4px 10px;}
-    .cal-month-lbl{font-size:16px;font-weight:700;color:#fff;}
-    .cal-wrap{background:#fff;padding:8px 12px 16px;}
-    .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px;}
-    .cal-dow span{font-size:11px;font-weight:600;color:var(--sub);padding:4px 0;}
-    .cal-dow span:first-child{color:var(--red);}
-    .cal-dow span:last-child{color:var(--blue);}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-    .cal-day{
-      aspect-ratio:1;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
-      font-size:13px;border-radius:50%;position:relative;cursor:default;
-    }
-    .cal-day.today{background:var(--or);color:#fff;font-weight:700;}
-    .cal-day.has-lunch{background:var(--or-lt);}
-    .cal-day.has-lunch::after{content:'🍱';position:absolute;bottom:-1px;right:-1px;font-size:8px;}
-    .cal-day.sun{color:var(--red);}
-    .cal-day.sat{color:var(--blue);}
-    .cal-legend{padding:10px 16px;font-size:12px;color:var(--sub);background:#fff;border-top:1px solid var(--border);}
-
-    /* ─── ASSETS ─── */
-    .asset-hdr{
-      background:#fff;padding:14px 16px;
-      display:flex;align-items:center;justify-content:space-between;
-      border-bottom:1px solid var(--border);
-    }
-    .asset-title{font-size:14px;font-weight:700;}
-    .asset-note{font-size:11px;color:var(--sub);}
-    .asset-item{
-      display:flex;align-items:center;gap:12px;padding:12px 16px;
-      background:#fff;border-bottom:1px solid var(--border);
-    }
-    .asset-ico{
-      width:38px;height:38px;border-radius:10px;
-      background:#F3E8FF;
-      display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
-    }
+    /* ── ASSETS ── */
+    .asset-pg-hdr{background:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+    .asset-pg-title{font-size:14px;font-weight:700;}
+    .asset-pg-total{font-size:13px;font-weight:700;color:var(--or);}
+    .asset-item{background:#fff;display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border);}
+    .asset-ico{width:40px;height:40px;border-radius:12px;background:#F3E8FF;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
     .asset-body{flex:1;min-width:0;}
     .asset-name{font-size:14px;font-weight:600;}
     .asset-meta{font-size:11px;color:var(--sub);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .asset-price{font-size:14px;font-weight:700;color:var(--green);flex-shrink:0;}
+    .asset-price{font-size:15px;font-weight:700;color:var(--green);flex-shrink:0;}
     .asset-acts{display:flex;gap:4px;flex-shrink:0;}
 
-    /* ─── GRAPH ─── */
-    .graph-card{background:#fff;margin:8px;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-    .graph-title{font-size:14px;font-weight:700;margin-bottom:14px;}
-
-    /* ─── SETTINGS ─── */
-    .set-hdr-card{
-      background:var(--or);padding:20px 16px;color:#fff;
-      display:flex;align-items:center;gap:14px;
-    }
-    .set-avatar{
-      width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.3);
-      display:flex;align-items:center;justify-content:center;font-size:26px;
-    }
+    /* ── SETTINGS ── */
+    .set-hdr-card{background:var(--or);padding:20px 16px;color:#fff;display:flex;align-items:center;gap:14px;}
+    .set-avatar{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:26px;}
     .set-hdr-name{font-size:17px;font-weight:700;}
     .set-hdr-sub{font-size:12px;opacity:.8;margin-top:2px;}
     .set-sec{background:#fff;margin-top:8px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
     .set-sec-title{font-size:12px;color:var(--sub);padding:12px 16px 6px;font-weight:600;letter-spacing:.3px;}
-    .set-item{
-      display:flex;align-items:center;padding:14px 16px;
-      border-bottom:1px solid var(--border);
-    }
+    .set-item{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);}
     .set-item:last-child{border-bottom:none;}
-    .set-item-ico{
-      width:32px;height:32px;border-radius:8px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:16px;margin-right:12px;flex-shrink:0;
-    }
+    .set-item-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-right:12px;flex-shrink:0;}
     .set-item-body{flex:1;}
     .set-item-lbl{font-size:14px;}
-    .set-item-val{font-size:12px;color:var(--sub);margin-top:1px;}
-    .set-item-right{display:flex;align-items:center;gap:6px;}
+    .set-item-sub{font-size:11px;color:var(--sub);margin-top:1px;}
+    .set-right{display:flex;align-items:center;gap:8px;}
     .set-val{font-size:14px;color:var(--or);font-weight:600;}
     .set-btn{border:none;background:var(--or-lt);color:var(--or);font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;}
-    .set-arr{color:#CCCCCC;font-size:18px;}
     .tier-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
     .tier-row:last-child{border-bottom:none;}
     .tier-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--or-lt);color:var(--or);white-space:nowrap;flex-shrink:0;}
@@ -365,21 +161,12 @@
     .tier-info{flex:1;}
     .tier-amt{font-size:14px;font-weight:700;}
     .tier-time{font-size:11px;color:var(--sub);margin-top:2px;}
-    .logout-btn{
-      width:calc(100% - 32px);margin:16px;padding:14px;border:none;
-      background:#fff;color:var(--red);border-radius:10px;
-      font-size:15px;font-weight:600;cursor:pointer;
-      border:1px solid var(--border);
-    }
+    .logout-btn{width:calc(100%-32px);margin:16px;padding:14px;border:1px solid var(--border);background:#fff;color:var(--red);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;width:calc(100% - 32px);}
 
-    /* ─── MODALS ─── */
+    /* ── MODALS ── */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:flex-end;justify-content:center;}
     .overlay.hide{display:none;}
-    .modal{
-      background:#fff;border-radius:18px 18px 0 0;
-      width:100%;max-width:430px;padding:20px 20px 36px;
-      max-height:90vh;overflow-y:auto;
-    }
+    .modal{background:#fff;border-radius:18px 18px 0 0;width:100%;max-width:430px;padding:20px 20px 36px;max-height:90vh;overflow-y:auto;}
     .modal-handle{width:36px;height:4px;background:#E0E0E0;border-radius:2px;margin:0 auto 18px;}
     .modal-title{font-size:17px;font-weight:700;margin-bottom:18px;text-align:center;}
     .modal-close{position:absolute;top:14px;right:14px;border:none;background:#F0F0F0;border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
@@ -400,7 +187,7 @@
     .at-btn:active{border-color:var(--or);background:var(--or-lt);}
     .at-sub{font-size:11px;color:var(--sub);font-weight:400;}
 
-    /* PIN in modal */
+    /* Pin in modal */
     .pin-dots{display:flex;gap:16px;justify-content:center;margin-bottom:26px;}
     .pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid #D0D0D0;background:transparent;transition:all .15s;}
     .pin-dot.on{background:var(--or);border-color:var(--or);}
@@ -410,18 +197,9 @@
     /* FAB */
     .fab-overlay{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.25);display:none;}
     .fab-overlay.open{display:block;}
-    .fab-wrap{
-      position:fixed;bottom:calc(var(--nav-h)+14px);
-      right:calc(max(0px,(100vw - 430px)/2) + 14px);
-      z-index:90;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;
-    }
+    .fab-wrap{position:fixed;bottom:calc(var(--nav-h)+14px);right:calc(max(0px,(100vw - 430px)/2) + 14px);z-index:90;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;}
     .fab-wrap.hidden{display:none;}
-    .fab-main{
-      width:54px;height:54px;border-radius:50%;background:var(--or);color:#fff;
-      border:none;font-size:26px;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 4px 16px rgba(255,107,0,.4);transition:transform .2s;
-    }
+    .fab-main{width:54px;height:54px;border-radius:50%;background:var(--or);color:#fff;border:none;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,107,0,.4);transition:transform .2s;}
     .fab-main:active{transform:scale(.92);}
     .fab-main.open{transform:rotate(45deg);}
     .fab-items{display:none;flex-direction:column-reverse;gap:8px;align-items:flex-end;}
@@ -435,33 +213,25 @@
     #toast{position:fixed;bottom:calc(var(--nav-h)+16px);left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2);}
     #toast.show{opacity:1;}
 
-    /* Empty */
     .empty{text-align:center;padding:48px 20px;color:var(--sub);}
     .empty-ico{font-size:44px;margin-bottom:10px;}
     .empty-txt{font-size:14px;}
     .hide{display:none!important;}
 
-    /* Setup day overlay */
-    #setup-day-overlay .modal{padding-top:28px;}
-
-    /* Category colors */
-    .cat-orange{background:#FFF3E8;}
-    .cat-yellow{background:#FFF8E1;}
-    .cat-blue{background:#E3F2FD;}
-    .cat-green{background:#E8F5E9;}
-    .cat-red{background:#FFEBEE;}
-    .cat-purple{background:#F3E8FF;}
+    /* Month filter tabs */
+    .mfilter{background:#fff;display:flex;overflow-x:auto;border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+    .mfilter::-webkit-scrollbar{display:none;}
+    .mtab{flex-shrink:0;padding:10px 16px;border:none;background:#fff;font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+    .mtab.on{color:var(--or);border-bottom-color:var(--or);}
   </style>
 </head>
 <body>
 
 <!-- ── LOCK ── -->
 <div id="lock-screen" class="lock">
-  <div class="lock-logo">
-    <div class="lock-logo-icon">💰</div>
-    <div class="lock-logo-name">こづかい管理</div>
-    <div class="lock-logo-sub">家族の家計・資産管理アプリ</div>
-  </div>
+  <div class="lock-icon">💰</div>
+  <div class="lock-name">こづかい管理</div>
+  <div class="lock-sub-txt">家族の預り金・資産管理</div>
   <div class="lock-label" id="lock-label">パスコードを入力してください</div>
   <div class="lock-dots" id="lock-dots"></div>
   <div class="numpad" id="lock-pad"></div>
@@ -470,10 +240,9 @@
 
 <!-- ── APP ── -->
 <div id="app" style="display:none;">
-
   <div class="hdr">
     <div class="hdr-left">
-      <div class="hdr-logo-sm">💰</div>
+      <div class="hdr-logo">💰</div>
       <span class="hdr-title" id="hdr-title">こづかい管理</span>
     </div>
     <div class="hdr-right">
@@ -485,157 +254,119 @@
 
   <!-- HOME -->
   <div class="page on pg" id="page-home">
-    <div class="month-bar">
-      <button class="month-arrow" onclick="homeMonthPrev()">‹</button>
-      <span class="month-label" id="home-month-lbl"></span>
-      <button class="month-arrow" onclick="homeMonthNext()">›</button>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-period" id="home-period"></div>
-      <div class="summary-row">
-        <span class="summary-lbl" style="color:var(--blue);">収入</span>
-        <div class="summary-bar-wrap"><div class="summary-bar inc" id="inc-bar" style="width:0%"></div></div>
-        <span class="summary-amt inc" id="home-inc">¥0</span>
+    <div class="hero-wrap">
+      <div class="hero-month">
+        <button class="month-arr" onclick="homeMonthShift(-1)">‹</button>
+        <span class="month-lbl" id="home-month-lbl"></span>
+        <button class="month-arr" onclick="homeMonthShift(1)">›</button>
       </div>
-      <div class="summary-row">
-        <span class="summary-lbl" style="color:var(--red);">支出</span>
-        <div class="summary-bar-wrap"><div class="summary-bar exp" id="exp-bar" style="width:0%"></div></div>
-        <span class="summary-amt exp" id="home-exp">¥0</span>
-      </div>
-      <hr class="summary-divider">
-      <div class="summary-balance-row">
-        <span class="summary-balance-lbl">収支</span>
-        <span class="summary-balance-val" id="home-balance">¥0</span>
-      </div>
-    </div>
-
-    <div class="chart-section">
-      <div class="chart-title-row">
-        <span class="chart-title">支出内訳</span>
-        <div class="chart-tabs">
-          <button class="chart-tab on" onclick="setChartMode('exp',this)">支出</button>
-          <button class="chart-tab" onclick="setChartMode('inc',this)">収入</button>
+      <div class="hero-cards">
+        <div class="hero-card">
+          <div class="hero-card-lbl">📦 預り金残高</div>
+          <div class="hero-card-amt"><span class="hero-card-unit">¥</span><span id="home-held"></span></div>
+          <div class="hero-card-sub">パパが預かっている金額</div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-lbl">🎒 資産合計</div>
+          <div class="hero-card-amt"><span class="hero-card-unit">¥</span><span id="home-asset-total"></span></div>
+          <div class="hero-card-sub">モノの合計金額</div>
         </div>
       </div>
-      <div class="donut-wrap">
-        <div class="donut-canvas-wrap">
-          <canvas id="donut-chart" width="130" height="130"></canvas>
-          <div class="donut-center">
-            <div class="donut-center-amt" id="donut-center-amt">¥0</div>
-            <div class="donut-center-lbl" id="donut-center-lbl">合計</div>
-          </div>
+    </div>
+
+    <div class="rank-strip">
+      <div class="rank-badge">🏆</div>
+      <div class="rank-body">
+        <div class="rank-lbl">直近テスト順位</div>
+        <div class="rank-val" id="home-rank">未設定</div>
+        <div class="rank-sub" id="home-rank-sub">順位を入力するとお小遣い額が決まります</div>
+      </div>
+      <div class="rank-times">
+        <div class="rank-time-item">
+          <div class="rank-time-lbl">📱スマホ</div>
+          <div class="rank-time-val" id="home-phone">—</div>
         </div>
-        <div class="donut-legend" id="donut-legend"></div>
+        <div class="rank-time-item">
+          <div class="rank-time-lbl">🎮PS5</div>
+          <div class="rank-time-val" id="home-ps5">—</div>
+        </div>
       </div>
     </div>
 
-    <div class="info-banner">
-      <div class="info-badge">🏆</div>
-      <div class="info-main">
-        <div class="info-title">直近テスト順位</div>
-        <div class="info-val" id="home-rank">未設定</div>
-        <div class="info-sub" id="home-rank-sub">順位を入力するとお小遣い額が決まります</div>
-      </div>
-      <div class="info-right">
-        <div class="info-right-lbl">📱 スマホ</div>
-        <div class="info-right-val" id="home-phone">—</div>
-        <div class="info-right-lbl" style="margin-top:4px;">🎮 PS5</div>
-        <div class="info-right-val" id="home-ps5">—</div>
-      </div>
-    </div>
-
-    <div class="quick-sec" id="quick-sec" style="display:none;">
-      <div class="quick-title">クイックアクション</div>
-      <div class="quick-grid">
-        <button class="qbtn" onclick="doLunch()">
-          <div class="qbtn-ico lunch">🍱</div>
-          <span class="qbtn-lbl">弁当代<br>+500円</span>
+    <!-- Quick actions: parent only -->
+    <div class="qsec" id="qsec" style="display:none;">
+      <div class="qsec-title">クイックアクション</div>
+      <div class="qgrid">
+        <button class="qbtn" onclick="doBento()">
+          <div class="qbtn-ico ico-bento">🍱</div>
+          <span class="qbtn-lbl">弁当代<br>+¥500</span>
         </button>
         <button class="qbtn" onclick="openATModal()">
-          <div class="qbtn-ico at">📝</div>
+          <div class="qbtn-ico ico-at">📝</div>
           <span class="qbtn-lbl">ATテスト</span>
         </button>
         <button class="qbtn" onclick="openRankModal()">
-          <div class="qbtn-ico rank">🏆</div>
+          <div class="qbtn-ico ico-rank">🏆</div>
           <span class="qbtn-lbl">順位入力</span>
         </button>
-        <button class="qbtn" onclick="openTxModal('income')">
-          <div class="qbtn-ico income">💰</div>
-          <span class="qbtn-lbl">収入追加</span>
-        </button>
-        <button class="qbtn" onclick="openTxModal('expense')">
-          <div class="qbtn-ico expense">💸</div>
-          <span class="qbtn-lbl">支出追加</span>
+        <button class="qbtn" onclick="openPayModal()">
+          <div class="qbtn-ico ico-pay">💵</div>
+          <span class="qbtn-lbl">現金を<br>渡した</span>
         </button>
         <button class="qbtn" onclick="openAssetModal()">
-          <div class="qbtn-ico asset">📦</div>
+          <div class="qbtn-ico ico-asset">📦</div>
           <span class="qbtn-lbl">資産追加</span>
         </button>
         <button class="qbtn" onclick="doKotest()">
-          <div class="qbtn-ico kotest">✅</div>
+          <div class="qbtn-ico ico-kotest">✅</div>
           <span class="qbtn-lbl">小テスト<br>満点</span>
         </button>
-        <button class="qbtn" onclick="doLogout()">
-          <div class="qbtn-ico logout">🚪</div>
-          <span class="qbtn-lbl">ログアウト</span>
-        </button>
       </div>
     </div>
 
-    <div class="tx-sec">
-      <div class="tx-sec-hdr">
-        <span class="tx-sec-title">最近の取引</span>
-        <button class="tx-more" onclick="go('tx')">すべて見る ›</button>
+    <!-- Recent ledger entries -->
+    <div style="background:#fff;margin-top:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--border);">
+        <span style="font-size:14px;font-weight:700;">最近の出納</span>
+        <button onclick="go('ledger')" style="font-size:12px;color:var(--or);font-weight:600;border:none;background:none;cursor:pointer;">すべて見る ›</button>
       </div>
-      <div id="home-tx-list"></div>
+      <div id="home-ledger"></div>
     </div>
   </div>
 
-  <!-- TX -->
-  <div class="page pg" id="page-tx">
-    <div class="month-summary-bar">
-      <div class="ms-item"><div class="ms-lbl">収入</div><div class="ms-val" id="tx-inc">¥0</div></div>
-      <div class="ms-div"></div>
-      <div class="ms-item"><div class="ms-lbl">支出</div><div class="ms-val" id="tx-exp">¥0</div></div>
-      <div class="ms-div"></div>
-      <div class="ms-item"><div class="ms-lbl">収支</div><div class="ms-val" id="tx-bal">¥0</div></div>
+  <!-- LEDGER 出納帳 -->
+  <div class="page pg" id="page-ledger">
+    <div class="ledger-hdr">
+      <div class="ledger-month">
+        <button class="month-arr" onclick="ledgerMonthShift(-1)">‹</button>
+        <span class="month-lbl" id="ledger-month-lbl"></span>
+        <button class="month-arr" onclick="ledgerMonthShift(1)">›</button>
+      </div>
+      <div class="ledger-summary">
+        <div class="ls-item"><div class="ls-lbl">増加（入金）</div><div class="ls-val" id="led-inc">¥0</div></div>
+        <div class="ls-div"></div>
+        <div class="ls-item"><div class="ls-lbl">減少（払出）</div><div class="ls-val" id="led-dec">¥0</div></div>
+        <div class="ls-div"></div>
+        <div class="ls-item"><div class="ls-lbl">月末残高</div><div class="ls-val" id="led-bal">¥0</div></div>
+      </div>
     </div>
-    <div class="mfilter" id="tx-filter"></div>
-    <div id="tx-list-wrap"></div>
-    <div class="empty hide" id="tx-empty"><div class="empty-ico">💴</div><div class="empty-txt">取引記録がありません</div></div>
+    <div id="ledger-table-area"></div>
+    <div class="empty hide" id="ledger-empty">
+      <div class="empty-ico">📒</div>
+      <div class="empty-txt">この月の記録がありません</div>
+    </div>
   </div>
 
-  <!-- CALENDAR -->
-  <div class="page pg" id="page-cal">
-    <div class="cal-nav">
-      <button class="cal-nav-btn" onclick="calPrev()">‹</button>
-      <span class="cal-month-lbl" id="cal-month-lbl"></span>
-      <button class="cal-nav-btn" onclick="calNext()">›</button>
-    </div>
-    <div class="cal-wrap">
-      <div class="cal-dow"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div>
-      <div class="cal-grid" id="cal-grid"></div>
-    </div>
-    <div class="cal-legend">🍱 弁当代を渡した日</div>
-  </div>
-
-  <!-- ASSETS -->
+  <!-- ASSETS 資産 -->
   <div class="page pg" id="page-asset">
-    <div class="asset-hdr">
-      <span class="asset-title">モノ資産一覧</span>
-      <span class="asset-note">現金残高には含まない</span>
+    <div class="asset-pg-hdr">
+      <span class="asset-pg-title">モノ資産一覧</span>
+      <span class="asset-pg-total" id="asset-total-disp">合計 ¥0</span>
     </div>
     <div id="asset-list"></div>
-    <div class="empty hide" id="asset-empty"><div class="empty-ico">📦</div><div class="empty-txt">資産が登録されていません</div></div>
-  </div>
-
-  <!-- GRAPH -->
-  <div class="page pg" id="page-graph">
-    <div class="graph-card" style="margin-top:8px;">
-      <div class="graph-title">残高推移</div>
-      <canvas id="balance-chart"></canvas>
-      <div class="empty hide" id="graph-empty"><div class="empty-ico">📈</div><div class="empty-txt">まだ取引記録がありません</div></div>
+    <div class="empty hide" id="asset-empty">
+      <div class="empty-ico">📦</div>
+      <div class="empty-txt">資産が登録されていません</div>
     </div>
   </div>
 
@@ -643,10 +374,7 @@
   <div class="page pg" id="page-settings">
     <div class="set-hdr-card">
       <div class="set-avatar">👨‍👩‍👦</div>
-      <div>
-        <div class="set-hdr-name">こづかい管理</div>
-        <div class="set-hdr-sub">親モードでログイン中</div>
-      </div>
+      <div><div class="set-hdr-name">こづかい管理</div><div class="set-hdr-sub">親モードでログイン中</div></div>
     </div>
 
     <div class="set-sec">
@@ -654,59 +382,50 @@
       <div class="set-item">
         <div class="set-item-ico" style="background:#FFF3E8;">🍱</div>
         <div class="set-item-body"><div class="set-item-lbl">弁当代金額</div></div>
-        <div class="set-item-right">
-          <span class="set-val" id="set-lunch">¥500</span>
-          <button class="set-btn" onclick="openSetModal('lunch')">変更</button>
-        </div>
+        <div class="set-right"><span class="set-val" id="set-bento">¥500</span><button class="set-btn" onclick="openSetModal('bento')">変更</button></div>
       </div>
       <div class="set-item">
         <div class="set-item-ico" style="background:#E3F2FD;">📅</div>
         <div class="set-item-body"><div class="set-item-lbl">月次お小遣い追加日</div></div>
-        <div class="set-item-right">
-          <span class="set-val" id="set-day">毎月1日</span>
-          <button class="set-btn" onclick="openSetModal('day')">変更</button>
-        </div>
+        <div class="set-right"><span class="set-val" id="set-day">毎月1日</span><button class="set-btn" onclick="openSetModal('day')">変更</button></div>
       </div>
     </div>
 
     <div class="set-sec">
-      <div class="set-sec-title">本テスト 順位帯とお小遣い</div>
+      <div class="set-sec-title">本テスト 順位帯とお小遣い額</div>
       <div id="tier-table"></div>
     </div>
-
     <div class="set-sec">
       <div class="set-sec-title">ATテスト 臨時お小遣い</div>
       <div id="at-tier-table"></div>
     </div>
-
     <div class="set-sec">
       <div class="set-sec-title">セキュリティ</div>
       <div class="set-item">
         <div class="set-item-ico" style="background:#F3E8FF;">🔑</div>
         <div class="set-item-body"><div class="set-item-lbl">アプリパスコード変更</div></div>
-        <div class="set-item-right"><button class="set-btn" onclick="openChangePass('passcode')">変更</button><span class="set-arr">›</span></div>
+        <div class="set-right"><button class="set-btn" onclick="openChangePass('passcode')">変更</button></div>
       </div>
       <div class="set-item">
         <div class="set-item-ico" style="background:#FFF3E8;">🔐</div>
         <div class="set-item-body"><div class="set-item-lbl">親PIN変更</div></div>
-        <div class="set-item-right"><button class="set-btn" onclick="openChangePass('pin')">変更</button><span class="set-arr">›</span></div>
+        <div class="set-right"><button class="set-btn" onclick="openChangePass('pin')">変更</button></div>
       </div>
     </div>
-
     <button class="logout-btn" onclick="doLogout()">ログアウト</button>
   </div>
 
   <nav id="nav">
     <div class="ni on" data-tab="home" onclick="go('home')"><span class="ni-ico">🏠</span>ホーム</div>
-    <div class="ni" data-tab="tx" onclick="go('tx')"><span class="ni-ico">💴</span>取引</div>
-    <div class="ni" data-tab="cal" onclick="go('cal')"><span class="ni-ico">📅</span>カレンダー</div>
+    <div class="ni" data-tab="ledger" onclick="go('ledger')"><span class="ni-ico">📒</span>出納帳</div>
     <div class="ni" data-tab="asset" onclick="go('asset')"><span class="ni-ico">📦</span>資産</div>
-    <div class="ni" data-tab="graph" onclick="go('graph')"><span class="ni-ico">📈</span>グラフ</div>
     <div class="ni hide" id="nav-settings" data-tab="settings" onclick="go('settings')"><span class="ni-ico">⚙️</span>設定</div>
   </nav>
 </div>
 
 <!-- ── MODALS ── -->
+
+<!-- Parent PIN -->
 <div class="overlay hide" id="pin-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
@@ -718,21 +437,57 @@
   </div>
 </div>
 
-<div class="overlay hide" id="tx-overlay">
+<!-- 弁当代確認 (duplicate check) -->
+<div class="overlay hide" id="bento-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('tx-overlay')">✕</button>
-    <div class="modal-title" id="tx-modal-title">収入を追加</div>
-    <div class="fg"><label class="fl">種別</label><select class="fi" id="tx-type"><option value="income">収入</option><option value="expense">支出</option></select></div>
-    <div class="fg"><label class="fl">日付</label><input class="fi" type="date" id="tx-date"></div>
-    <div class="fg"><label class="fl">金額（円）</label><input class="fi" type="number" id="tx-amount" inputmode="numeric" placeholder="例：1000"></div>
-    <div class="fg"><label class="fl">項目名</label><input class="fi" type="text" id="tx-category" placeholder="例：お小遣い"></div>
-    <div class="fg"><label class="fl">メモ（任意）</label><input class="fi" type="text" id="tx-memo" placeholder="任意"></div>
-    <button class="btn-p" onclick="saveTx()">保存する</button>
-    <button class="btn-s" onclick="closeModal('tx-overlay')">キャンセル</button>
+    <button class="modal-close" onclick="closeModal('bento-overlay')">✕</button>
+    <div class="modal-title">弁当代を追加</div>
+    <p style="font-size:14px;color:var(--sub);text-align:center;margin-bottom:18px;">今日の弁当代 <strong id="bento-amount-disp">¥500</strong> を預り金に追加しますか？</p>
+    <p style="font-size:12px;color:var(--sub);text-align:center;margin-bottom:20px;" id="bento-date-disp"></p>
+    <button class="btn-p" onclick="confirmBento()">追加する</button>
+    <button class="btn-s" onclick="closeModal('bento-overlay')">キャンセル</button>
   </div>
 </div>
 
+<!-- 現金を渡した -->
+<div class="overlay hide" id="pay-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('pay-overlay')">✕</button>
+    <div class="modal-title">現金を渡した</div>
+    <p style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:18px;">パパが息子に現金を支払った金額を入力してください。預り金が減少します。</p>
+    <div class="fg"><label class="fl">日付</label><input class="fi" type="date" id="pay-date"></div>
+    <div class="fg"><label class="fl">支払い金額（円）</label><input class="fi" type="number" id="pay-amount" inputmode="numeric" placeholder="例：3000"></div>
+    <div class="fg"><label class="fl">メモ（任意）</label><input class="fi" type="text" id="pay-memo" placeholder="例：ゲーム代など"></div>
+    <button class="btn-p" onclick="savePay()">記録する</button>
+    <button class="btn-s" onclick="closeModal('pay-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- 出納帳 手動入力 -->
+<div class="overlay hide" id="ledger-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('ledger-overlay')">✕</button>
+    <div class="modal-title" id="ledger-modal-title">出納帳に追加</div>
+    <div class="fg">
+      <label class="fl">種別</label>
+      <select class="fi" id="led-type">
+        <option value="in">増加（入金）</option>
+        <option value="out">減少（払出）</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">日付</label><input class="fi" type="date" id="led-date"></div>
+    <div class="fg"><label class="fl">金額（円）</label><input class="fi" type="number" id="led-amount" inputmode="numeric" placeholder="例：1000"></div>
+    <div class="fg"><label class="fl">摘要</label><input class="fi" type="text" id="led-memo" placeholder="例：お小遣い、現金払いなど"></div>
+    <button class="btn-p" onclick="saveLedgerEntry()">保存する</button>
+    <button class="btn-d hide" id="led-del-btn" onclick="deleteLedgerEntry()">削除する</button>
+    <button class="btn-s" onclick="closeModal('ledger-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- AT Test -->
 <div class="overlay hide" id="at-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
@@ -746,12 +501,13 @@
   </div>
 </div>
 
+<!-- Rank -->
 <div class="overlay hide" id="rank-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeModal('rank-overlay')">✕</button>
     <div class="modal-title">テスト順位を入力</div>
-    <p style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:18px;">入力すると来月からのお小遣い・スマホ・PS5時間が自動更新されます</p>
+    <p style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:18px;">来月からのお小遣い・スマホ・PS5時間が自動更新されます</p>
     <div class="fg"><label class="fl">学年順位（位）</label><input class="fi" type="number" id="rank-input" inputmode="numeric" placeholder="例：15"></div>
     <div class="fg"><label class="fl">テスト名（任意）</label><input class="fi" type="text" id="rank-name" placeholder="例：1学期中間テスト"></div>
     <button class="btn-p" onclick="saveRank()">保存する</button>
@@ -759,21 +515,23 @@
   </div>
 </div>
 
+<!-- Asset -->
 <div class="overlay hide" id="asset-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
     <button class="modal-close" onclick="closeModal('asset-overlay')">✕</button>
     <div class="modal-title" id="asset-modal-title">資産を追加</div>
     <div class="fg"><label class="fl">品目名</label><input class="fi" type="text" id="asset-name" placeholder="例：ポケモンカード、PS5"></div>
-    <div class="fg"><label class="fl">購入日</label><input class="fi" type="date" id="asset-date"></div>
-    <div class="fg"><label class="fl">購入額（円・0でも可）</label><input class="fi" type="number" id="asset-price" inputmode="numeric" placeholder="0"></div>
+    <div class="fg"><label class="fl">取得日</label><input class="fi" type="date" id="asset-date"></div>
+    <div class="fg"><label class="fl">金額（円・0でも可）</label><input class="fi" type="number" id="asset-price" inputmode="numeric" placeholder="0"></div>
     <div class="fg"><label class="fl">メモ（任意）</label><input class="fi" type="text" id="asset-memo" placeholder="任意"></div>
     <button class="btn-p" onclick="saveAsset()">保存する</button>
-    <button class="btn-d hide" id="asset-del-btn" onclick="deleteAssetById(null)">削除する</button>
+    <button class="btn-d hide" id="asset-del-btn">削除する</button>
     <button class="btn-s" onclick="closeModal('asset-overlay')">キャンセル</button>
   </div>
 </div>
 
+<!-- Settings value change -->
 <div class="overlay hide" id="set-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
@@ -785,6 +543,7 @@
   </div>
 </div>
 
+<!-- Change passcode/PIN -->
 <div class="overlay hide" id="chpass-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
@@ -798,6 +557,7 @@
   </div>
 </div>
 
+<!-- Setup: allowance day -->
 <div class="overlay hide" id="setup-day-overlay">
   <div class="modal modal-wrap">
     <div class="modal-handle"></div>
@@ -810,7 +570,7 @@
 
 <div id="toast"></div>
 
-<!-- ── FAB ── -->
+<!-- FAB -->
 <div class="fab-overlay" id="fab-overlay" onclick="closeFab()"></div>
 <div class="fab-wrap hidden" id="fab-wrap">
   <button class="fab-main" id="fab-main" onclick="toggleFab()">＋</button>
@@ -842,589 +602,456 @@ const DEFAULT_AT_TIERS = [
   {label:'46〜94位', min:46, max:94,  amount:0,    poke:true },
 ];
 
-// Category color/icon mapping
-const CAT_STYLE = {
-  '弁当代':    {ico:'🍱', bg:'cat-orange'},
-  'ATテスト':  {ico:'📝', bg:'cat-yellow'},
-  '小テスト':  {ico:'✅', bg:'cat-green'},
-  '月次お小遣い':{ico:'💴', bg:'cat-blue'},
-  '臨時':      {ico:'🎁', bg:'cat-yellow'},
-  'ポケモン':  {ico:'🃏', bg:'cat-purple'},
-  'ゲーム':    {ico:'🎮', bg:'cat-purple'},
-  '収入':      {ico:'💰', bg:'cat-green'},
-  '支出':      {ico:'💸', bg:'cat-red'},
-};
-function getCatStyle(cat, type) {
-  for(const [key, val] of Object.entries(CAT_STYLE)) {
-    if(cat.includes(key)) return val;
-  }
-  return type === 'income'
-    ? {ico:'💰', bg:'cat-green'}
-    : {ico:'💸', bg:'cat-red'};
-}
-
 let db;
 const S = {
-  isParent:false, cfg:null, txs:[], assets:[], lunchDates:new Set(),
-  calY:new Date().getFullYear(), calM:new Date().getMonth(),
-  homeY:new Date().getFullYear(), homeM:new Date().getMonth(),
-  txFilter:null, chart:null, donutChart:null, donutMode:'exp',
-  editTxId:null, editAssetId:null, currentTab:'home',
+  isParent:false, cfg:null,
+  entries:[], // 出納帳 entries: {id, date, type:'in'|'out', amount, memo, auto?}
+  assets:[],
+  homeY: new Date().getFullYear(), homeM: new Date().getMonth(),
+  ledY:  new Date().getFullYear(), ledM:  new Date().getMonth(),
+  editEntryId: null, editAssetId: null,
+  currentTab:'home',
   parentTimer:null, parentTimerSecs:0,
   setupStep:'passcode', setupHash:'', setupPinHash:'',
 };
 
 // ─── UTILS ───
-async function sha256(s) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 const fmt = n => Math.abs(n).toLocaleString('ja-JP');
-const fmtD = d => d.replace(/-/g, '/');
-function today() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function thisMonth() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-}
-function fmtTime(m) {
-  if(m === 0) return '0分';
-  if(m % 60 === 0) return `${m/60}時間`;
-  return `${Math.floor(m/60)}時間${m%60}分`;
-}
-function getTier(rank, tiers) {
-  return (tiers || S.cfg.tiers).find(t => rank >= t.min && rank <= t.max) || null;
-}
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
-}
-const openModal = id => document.getElementById(id).classList.remove('hide');
-const closeModal = id => document.getElementById(id).classList.add('hide');
+const fmtD = d => d.replace(/-/g,'/');
+function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function thisMonth(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function fmtTime(m){if(m===0)return '0分';if(m%60===0)return `${m/60}時間`;return `${Math.floor(m/60)}時間${m%60}分`;}
+function getTier(rank,tiers){return (tiers||S.cfg.tiers).find(t=>rank>=t.min&&rank<=t.max)||null;}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+const openModal=id=>document.getElementById(id).classList.remove('hide');
+const closeModal=id=>document.getElementById(id).classList.add('hide');
 
 // ─── FIREBASE OPS ───
-async function loadCfg() {
-  const s = await db.collection('app').doc('config').get();
-  return s.exists ? s.data() : null;
-}
-async function saveCfg(c) {
-  await db.collection('app').doc('config').set(c, {merge:true});
-  S.cfg = {...S.cfg, ...c};
-}
-async function loadTxs() {
-  const s = await db.collection('transactions').orderBy('date','desc').get();
-  S.txs = s.docs.map(d => ({id:d.id,...d.data()}));
-}
-async function loadAssets() {
-  const s = await db.collection('assets').orderBy('createdAt','desc').get();
-  S.assets = s.docs.map(d => ({id:d.id,...d.data()}));
-}
-async function loadLunch() {
-  const s = await db.collection('lunchDates').get();
-  S.lunchDates = new Set(s.docs.map(d => d.id));
-}
-const TS = () => firebase.firestore.FieldValue.serverTimestamp();
-async function addTx(tx) { await db.collection('transactions').add({...tx, createdAt:TS()}); }
-async function updTx(id, tx) { await db.collection('transactions').doc(id).update(tx); }
-async function delTx(id) { await db.collection('transactions').doc(id).delete(); }
-async function addAssetDoc(a) { await db.collection('assets').add({...a, createdAt:TS()}); }
-async function updAssetDoc(id, a) { await db.collection('assets').doc(id).update(a); }
-async function delAssetDoc(id) { await db.collection('assets').doc(id).delete(); }
+const TS=()=>firebase.firestore.FieldValue.serverTimestamp();
+async function loadCfg(){const s=await db.collection('app').doc('config').get();return s.exists?s.data():null;}
+async function saveCfg(c){await db.collection('app').doc('config').set(c,{merge:true});S.cfg={...S.cfg,...c};}
+async function loadEntries(){const s=await db.collection('ledger').orderBy('date','desc').orderBy('createdAt','desc').get();S.entries=s.docs.map(d=>({id:d.id,...d.data()}));}
+async function loadAssets(){const s=await db.collection('assets').orderBy('createdAt','desc').get();S.assets=s.docs.map(d=>({id:d.id,...d.data()}));}
+
+async function addEntry(e){await db.collection('ledger').add({...e,createdAt:TS()});}
+async function updEntry(id,e){await db.collection('ledger').doc(id).update(e);}
+async function delEntry(id){await db.collection('ledger').doc(id).delete();}
+async function addAssetDoc(a){await db.collection('assets').add({...a,createdAt:TS()});}
+async function updAssetDoc(id,a){await db.collection('assets').doc(id).update(a);}
+async function delAssetDoc(id){await db.collection('assets').doc(id).delete();}
+
+// ─── BALANCE ───
+// 出納帳残高 = 全エントリの累計（in - out）
+function calcBalance(entries){return entries.reduce((s,e)=>e.type==='in'?s+e.amount:s-e.amount,0);}
+
+// 月絞り込み
+function filterMonth(entries,y,m){const key=`${y}-${String(m+1).padStart(2,'0')}`;return entries.filter(e=>e.date.startsWith(key));}
 
 // ─── MONTHLY ALLOWANCE ───
-async function checkMonthly() {
-  const cfg = S.cfg;
-  if(!cfg || !cfg.currentRank) return;
-  if(new Date().getDate() < cfg.allowanceDay) return;
-  const month = thisMonth();
-  if(cfg.lastAllowanceMonth === month) return;
-  const tier = getTier(cfg.currentRank, cfg.tiers);
-  if(!tier) return;
-  const cfgRef = db.collection('app').doc('config');
-  let added = false;
-  await db.runTransaction(async t => {
-    const snap = await t.get(cfgRef);
-    if((snap.data()||{}).lastAllowanceMonth === month) return;
-    const txRef = db.collection('transactions').doc();
-    t.set(txRef, {date:today(),amount:tier.amount,type:'income',category:'月次お小遣い',memo:`${month} 自動追加（${tier.label}）`,createdAt:TS()});
-    t.update(cfgRef, {lastAllowanceMonth:month});
-    added = true;
+async function checkMonthly(){
+  const cfg=S.cfg;
+  if(!cfg||!cfg.currentRank)return;
+  if(new Date().getDate()<cfg.allowanceDay)return;
+  const month=thisMonth();
+  if(cfg.lastAllowanceMonth===month)return;
+  const tier=getTier(cfg.currentRank,cfg.tiers);
+  if(!tier)return;
+  const cfgRef=db.collection('app').doc('config');
+  let added=false;
+  await db.runTransaction(async t=>{
+    const snap=await t.get(cfgRef);
+    if((snap.data()||{}).lastAllowanceMonth===month)return;
+    const ref=db.collection('ledger').doc();
+    t.set(ref,{date:today(),type:'in',amount:tier.amount,memo:`月次お小遣い（${tier.label}）`,auto:true,createdAt:TS()});
+    t.update(cfgRef,{lastAllowanceMonth:month});
+    added=true;
   });
-  if(added) {
-    S.cfg.lastAllowanceMonth = month;
-    showToast(`💴 ¥${fmt(tier.amount)} 月次お小遣いを追加しました`);
-  }
+  if(added){S.cfg.lastAllowanceMonth=month;showToast(`💴 ¥${fmt(tier.amount)} 月次お小遣いを追加しました`);}
 }
 
-// ─── NUMPAD ───
-function buildNumpad(padId, handler, digits, dotsId, dotClass='lock-dot') {
-  const pad = document.getElementById(padId);
-  if(!pad) return;
-  pad.innerHTML = '';
-  [1,2,3,4,5,6,7,8,9,null,0,'⌫'].forEach(k => {
-    const btn = document.createElement('button');
-    btn.className = 'nk';
-    if(k === null) { btn.style.visibility='hidden'; pad.appendChild(btn); return; }
-    btn.textContent = String(k);
-    btn.onclick = () => handler(k);
-    pad.appendChild(btn);
+// ─── NUMPAD / LOCK ───
+function buildNumpad(padId,handler,digits,dotsId,dotCls='lock-dot'){
+  const pad=document.getElementById(padId);if(!pad)return;
+  pad.innerHTML='';
+  [1,2,3,4,5,6,7,8,9,null,0,'⌫'].forEach(k=>{
+    const btn=document.createElement('button');btn.className='nk';
+    if(k===null){btn.style.visibility='hidden';pad.appendChild(btn);return;}
+    btn.textContent=String(k);btn.onclick=()=>handler(k);pad.appendChild(btn);
   });
-  renderDots(dotsId, '', digits, dotClass);
+  renderDots(dotsId,'',digits,dotCls);
 }
-function renderDots(id, buf, total, cls='lock-dot') {
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.innerHTML = '';
-  for(let i=0;i<total;i++){
-    const d = document.createElement('div');
-    d.className = cls + (i < buf.length ? ' on' : '');
-    el.appendChild(d);
+function renderDots(id,buf,total,cls='lock-dot'){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML='';
+  for(let i=0;i<total;i++){const d=document.createElement('div');d.className=cls+(i<buf.length?' on':'');el.appendChild(d);}
+}
+
+let lockBuf='',setupBuf='',setupHash='';
+
+function showLock(){
+  document.getElementById('lock-screen').style.display='flex';
+  lockBuf='';buildNumpad('lock-pad',onLockKey,6,'lock-dots');
+  document.getElementById('lock-err').textContent='';
+  document.getElementById('lock-label').textContent='パスコードを入力してください';
+}
+function startSetup(){
+  S.setupStep='passcode';setupBuf='';setupHash='';
+  document.getElementById('lock-label').textContent='パスコードを設定してください（6桁）';
+  document.getElementById('lock-err').textContent='';
+  buildNumpad('lock-pad',onSetupKey,6,'lock-dots');
+}
+async function onLockKey(k){
+  if(k==='⌫')lockBuf=lockBuf.slice(0,-1);else lockBuf+=String(k);
+  renderDots('lock-dots',lockBuf,6);
+  document.getElementById('lock-err').textContent='';
+  if(lockBuf.length===6){
+    const h=await sha256(lockBuf);lockBuf='';renderDots('lock-dots','',6);
+    if(h===S.cfg.passcodeHash){document.getElementById('lock-screen').style.display='none';await startApp();}
+    else document.getElementById('lock-err').textContent='パスコードが違います';
   }
 }
-
-// ─── LOCK / SETUP ───
-let lockBuf = '', setupBuf = '', setupHash = '';
-
-function showLock() {
-  document.getElementById('lock-screen').style.display = 'flex';
-  lockBuf = '';
-  buildNumpad('lock-pad', onLockKey, 6, 'lock-dots');
-  document.getElementById('lock-err').textContent = '';
-  document.getElementById('lock-label').textContent = 'パスコードを入力してください';
-}
-
-function startSetup() {
-  S.setupStep = 'passcode'; setupBuf = ''; setupHash = '';
-  document.getElementById('lock-label').textContent = 'パスコードを設定してください（6桁）';
-  document.getElementById('lock-err').textContent = '';
-  buildNumpad('lock-pad', onSetupKey, 6, 'lock-dots');
-}
-
-async function onLockKey(k) {
-  if(k === '⌫') lockBuf = lockBuf.slice(0,-1); else lockBuf += String(k);
-  renderDots('lock-dots', lockBuf, 6);
-  document.getElementById('lock-err').textContent = '';
-  if(lockBuf.length === 6) {
-    const h = await sha256(lockBuf); lockBuf = ''; renderDots('lock-dots','',6);
-    if(h === S.cfg.passcodeHash) {
-      document.getElementById('lock-screen').style.display = 'none';
-      await startApp();
-    } else { document.getElementById('lock-err').textContent = 'パスコードが違います'; }
-  }
-}
-
-async function onSetupKey(k) {
-  const digits = S.setupStep === 'pin' ? 4 : 6;
-  if(k === '⌫') setupBuf = setupBuf.slice(0,-1); else setupBuf += String(k);
-  renderDots('lock-dots', setupBuf, digits);
-  document.getElementById('lock-err').textContent = '';
-
-  if(S.setupStep === 'passcode' && setupBuf.length === 6) {
-    setupHash = await sha256(setupBuf); setupBuf = '';
-    S.setupStep = 'passcode2';
-    document.getElementById('lock-label').textContent = '確認のため、もう一度入力してください';
+async function onSetupKey(k){
+  const digits=S.setupStep==='pin'?4:6;
+  if(k==='⌫')setupBuf=setupBuf.slice(0,-1);else setupBuf+=String(k);
+  renderDots('lock-dots',setupBuf,digits);
+  document.getElementById('lock-err').textContent='';
+  if(S.setupStep==='passcode'&&setupBuf.length===6){
+    setupHash=await sha256(setupBuf);setupBuf='';S.setupStep='passcode2';
+    document.getElementById('lock-label').textContent='確認のため、もう一度入力してください';
     renderDots('lock-dots','',6);
-  } else if(S.setupStep === 'passcode2' && setupBuf.length === 6) {
-    const h = await sha256(setupBuf);
-    if(h !== setupHash) {
-      document.getElementById('lock-err').textContent = 'パスコードが一致しません。最初からやり直してください';
-      setupBuf = ''; setupHash = ''; S.setupStep = 'passcode';
-      document.getElementById('lock-label').textContent = 'パスコードを設定してください（6桁）';
-      renderDots('lock-dots','',6); return;
-    }
-    setupBuf = ''; S.setupStep = 'pin';
-    document.getElementById('lock-label').textContent = '親用PIN（4桁）を設定してください';
-    buildNumpad('lock-pad', onSetupKey, 4, 'lock-dots');
-  } else if(S.setupStep === 'pin' && setupBuf.length === 4) {
-    S.setupPinHash = await sha256(setupBuf); setupBuf = '';
-    document.getElementById('setup-day-val').value = '1';
-    openModal('setup-day-overlay');
+  }else if(S.setupStep==='passcode2'&&setupBuf.length===6){
+    const h=await sha256(setupBuf);
+    if(h!==setupHash){document.getElementById('lock-err').textContent='パスコードが一致しません。最初からやり直してください';setupBuf='';setupHash='';S.setupStep='passcode';document.getElementById('lock-label').textContent='パスコードを設定してください（6桁）';renderDots('lock-dots','',6);return;}
+    setupBuf='';S.setupStep='pin';
+    document.getElementById('lock-label').textContent='親用PIN（4桁）を設定してください';
+    buildNumpad('lock-pad',onSetupKey,4,'lock-dots');
+  }else if(S.setupStep==='pin'&&setupBuf.length===4){
+    S.setupPinHash=await sha256(setupBuf);setupBuf='';
+    document.getElementById('setup-day-val').value='1';openModal('setup-day-overlay');
   }
 }
-
-async function finishSetup() {
-  const day = Math.min(28, Math.max(1, parseInt(document.getElementById('setup-day-val').value)||1));
+async function finishSetup(){
+  const day=Math.min(28,Math.max(1,parseInt(document.getElementById('setup-day-val').value)||1));
   closeModal('setup-day-overlay');
-  const cfg = {
-    passcodeHash:setupHash, pinHash:S.setupPinHash,
-    lunchAmount:500, allowanceDay:day,
-    tiers:DEFAULT_TIERS, atTiers:DEFAULT_AT_TIERS,
-    currentRank:null, currentTier:null, lastAllowanceMonth:null,
-  };
-  await db.collection('app').doc('config').set(cfg);
-  S.cfg = cfg;
-  document.getElementById('lock-screen').style.display = 'none';
-  await startApp();
+  const cfg={passcodeHash:setupHash,pinHash:S.setupPinHash,bentoAmount:500,allowanceDay:day,tiers:DEFAULT_TIERS,atTiers:DEFAULT_AT_TIERS,currentRank:null,currentTier:null,lastAllowanceMonth:null};
+  await db.collection('app').doc('config').set(cfg);S.cfg=cfg;
+  document.getElementById('lock-screen').style.display='none';await startApp();
 }
 
 // ─── PARENT PIN ───
-let pinBuf = '';
-function openPinModal() {
-  pinBuf = '';
-  buildNumpad('pin-pad', onPinKey, 4, 'pin-dots', 'pin-dot');
-  document.getElementById('pin-err').textContent = '';
-  openModal('pin-overlay');
-}
-async function onPinKey(k) {
-  if(k === '⌫') pinBuf = pinBuf.slice(0,-1); else pinBuf += String(k);
-  renderDots('pin-dots', pinBuf, 4, 'pin-dot');
-  document.getElementById('pin-err').textContent = '';
-  if(pinBuf.length === 4) {
-    const h = await sha256(pinBuf); pinBuf = ''; renderDots('pin-dots','',4,'pin-dot');
-    if(h === S.cfg.pinHash) {
-      S.isParent = true; closeModal('pin-overlay');
-      startParentTimer(); updateModeUI();
-      showToast('🔐 親モードに切り替えました');
-    } else { document.getElementById('pin-err').textContent = 'PINが違います'; }
+let pinBuf='';
+function openPinModal(){pinBuf='';buildNumpad('pin-pad',onPinKey,4,'pin-dots','pin-dot');document.getElementById('pin-err').textContent='';openModal('pin-overlay');}
+async function onPinKey(k){
+  if(k==='⌫')pinBuf=pinBuf.slice(0,-1);else pinBuf+=String(k);
+  renderDots('pin-dots',pinBuf,4,'pin-dot');
+  document.getElementById('pin-err').textContent='';
+  if(pinBuf.length===4){
+    const h=await sha256(pinBuf);pinBuf='';renderDots('pin-dots','',4,'pin-dot');
+    if(h===S.cfg.pinHash){S.isParent=true;closeModal('pin-overlay');startParentTimer();updateModeUI();showToast('🔐 親モードに切り替えました');}
+    else document.getElementById('pin-err').textContent='PINが違います';
   }
 }
-function toggleMode() { S.isParent ? exitParent() : openPinModal(); }
-function exitParent() {
-  S.isParent = false; clearParentTimer(); updateModeUI();
-  showToast('👦 子どもモードに切り替えました');
-}
+function toggleMode(){S.isParent?exitParent():openPinModal();}
+function exitParent(){S.isParent=false;clearParentTimer();updateModeUI();showToast('👦 子どもモードに切り替えました');}
 
 // ─── PARENT TIMER ───
-function startParentTimer() {
-  clearParentTimer(); S.parentTimerSecs = 300;
-  const el = document.getElementById('parent-timer'); el.style.display = 'block';
-  S.parentTimer = setInterval(() => {
+function startParentTimer(){
+  clearParentTimer();S.parentTimerSecs=300;
+  const el=document.getElementById('parent-timer');el.style.display='block';
+  S.parentTimer=setInterval(()=>{
     S.parentTimerSecs--;
-    const m = Math.floor(S.parentTimerSecs/60), s = S.parentTimerSecs%60;
-    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
-    if(S.parentTimerSecs <= 0) exitParent();
-  }, 1000);
+    const m=Math.floor(S.parentTimerSecs/60),s=S.parentTimerSecs%60;
+    el.textContent=`${m}:${String(s).padStart(2,'0')}`;
+    if(S.parentTimerSecs<=0)exitParent();
+  },1000);
 }
-function clearParentTimer() {
-  if(S.parentTimer) { clearInterval(S.parentTimer); S.parentTimer = null; }
-  const el = document.getElementById('parent-timer');
-  if(el) el.style.display = 'none';
-}
-function resetParentTimer() { if(S.isParent) startParentTimer(); }
+function clearParentTimer(){if(S.parentTimer){clearInterval(S.parentTimer);S.parentTimer=null;}const el=document.getElementById('parent-timer');if(el)el.style.display='none';}
+function resetParentTimer(){if(S.isParent)startParentTimer();}
 
 // ─── MODE UI ───
-function updateModeUI() {
-  const chip = document.getElementById('mode-chip');
-  const qs = document.getElementById('quick-sec');
-  const ns = document.getElementById('nav-settings');
-  if(S.isParent) {
-    chip.textContent = '親モード'; chip.className = 'mode-chip parent';
-    qs.style.display = 'block'; ns.classList.remove('hide');
-  } else {
-    chip.textContent = '子どもモード'; chip.className = 'mode-chip';
-    qs.style.display = 'none'; ns.classList.add('hide');
-    if(S.currentTab === 'settings') go('home');
-  }
-  updateFab();
-  renderHome(); renderTxList(); renderAssets();
+function updateModeUI(){
+  const chip=document.getElementById('mode-chip'),qs=document.getElementById('qsec'),ns=document.getElementById('nav-settings');
+  if(S.isParent){chip.textContent='親モード';chip.className='mode-chip parent';qs.style.display='block';ns.classList.remove('hide');}
+  else{chip.textContent='子どもモード';chip.className='mode-chip';qs.style.display='none';ns.classList.add('hide');if(S.currentTab==='settings')go('home');}
+  updateFab();renderHome();renderAssets();
 }
 
 // ─── START ───
-async function startApp() {
-  await Promise.all([loadTxs(), loadAssets(), loadLunch()]);
-  await checkMonthly(); await loadTxs();
-  document.getElementById('app').style.display = 'block';
-  document.getElementById('mode-btn').onclick = toggleMode;
-  buildFab();
-  S.isParent = false; updateModeUI(); go('home');
+async function startApp(){
+  await Promise.all([loadEntries(),loadAssets()]);
+  await checkMonthly();await loadEntries();
+  document.getElementById('app').style.display='block';
+  document.getElementById('mode-btn').onclick=toggleMode;
+  buildFab();S.isParent=false;updateModeUI();go('home');
 }
 
-// ─── NAVIGATION ───
-function go(tab) {
-  S.currentTab = tab; closeFab();
-  ['home','tx','cal','asset','graph','settings'].forEach(t => {
-    document.getElementById(`page-${t}`).classList.toggle('on', t===tab);
-  });
-  document.querySelectorAll('#nav .ni').forEach(el => el.classList.toggle('on', el.dataset.tab===tab));
-  const titles = {home:'こづかい管理',tx:'取引履歴',cal:'カレンダー',asset:'モノ資産',graph:'残高グラフ',settings:'設定'};
-  document.getElementById('hdr-title').textContent = titles[tab]||'こづかい管理';
-  if(tab==='tx') renderTxList();
-  if(tab==='cal') renderCalendar();
-  if(tab==='asset') renderAssets();
-  if(tab==='graph') renderGraph();
-  if(tab==='settings') renderSettings();
+// ─── NAV ───
+function go(tab){
+  S.currentTab=tab;closeFab();
+  ['home','ledger','asset','settings'].forEach(t=>document.getElementById(`page-${t}`).classList.toggle('on',t===tab));
+  document.querySelectorAll('#nav .ni').forEach(el=>el.classList.toggle('on',el.dataset.tab===tab));
+  const titles={home:'こづかい管理',ledger:'預り金出納帳',asset:'モノ資産',settings:'設定'};
+  document.getElementById('hdr-title').textContent=titles[tab]||'こづかい管理';
+  if(tab==='ledger')renderLedger();
+  if(tab==='asset')renderAssets();
+  if(tab==='settings')renderSettings();
   resetParentTimer();
 }
 
-// ─── HOME ───
-let homeChartMode = 'exp';
-function setChartMode(mode, el) {
-  homeChartMode = mode;
-  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('on'));
-  el.classList.add('on');
-  renderDonut();
-}
-
-let homeY = new Date().getFullYear(), homeM = new Date().getMonth();
-function homeMonthPrev() { if(homeM===0){homeM=11;homeY--;}else homeM--; renderHome(); }
-function homeMonthNext() { if(homeM===11){homeM=0;homeY++;}else homeM++; renderHome(); }
-
-function filterByHomeMonth(txs) {
-  const key = `${homeY}-${String(homeM+1).padStart(2,'0')}`;
-  return txs.filter(t => t.date.startsWith(key));
-}
-
-function renderHome() {
-  const mLabel = `${homeY}年${homeM+1}月`;
-  document.getElementById('home-month-lbl').textContent = mLabel;
-  const d1 = `${homeY}/${String(homeM+1).padStart(2,'0')}/01`;
-  const lastD = new Date(homeY,homeM+1,0).getDate();
-  const d2 = `${homeY}/${String(homeM+1).padStart(2,'0')}/${lastD}`;
-  document.getElementById('home-period').textContent = `${d1}〜${d2}`;
-
-  const monthTxs = filterByHomeMonth(S.txs);
-  const inc = monthTxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const exp = monthTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  const bal = inc - exp;
-  const maxAmt = Math.max(inc,exp,1);
-
-  document.getElementById('home-inc').textContent = `¥${fmt(inc)}`;
-  document.getElementById('home-exp').textContent = `¥${fmt(exp)}`;
-  document.getElementById('inc-bar').style.width = `${(inc/maxAmt)*100}%`;
-  document.getElementById('exp-bar').style.width = `${(exp/maxAmt)*100}%`;
-  const balEl = document.getElementById('home-balance');
-  balEl.textContent = (bal >= 0 ? '+' : '-') + `¥${fmt(bal)}`;
-  balEl.className = 'summary-balance-val' + (bal < 0 ? ' minus' : '');
-
-  renderDonut(monthTxs);
-
-  const cfg = S.cfg;
-  if(cfg && cfg.currentRank) {
-    const tier = getTier(cfg.currentRank, cfg.tiers);
-    document.getElementById('home-rank').textContent = `${cfg.currentRank}位`;
-    if(tier) {
-      document.getElementById('home-rank-sub').textContent = `${tier.label}：月額 ¥${fmt(tier.amount)}`;
-      document.getElementById('home-phone').textContent = fmtTime(tier.phone);
-      document.getElementById('home-ps5').textContent = fmtTime(tier.ps5);
-    }
-  } else {
-    document.getElementById('home-rank').textContent = '未設定';
-    document.getElementById('home-rank-sub').textContent = '順位を入力するとお小遣い額が決まります';
-    document.getElementById('home-phone').textContent = '—';
-    document.getElementById('home-ps5').textContent = '—';
-  }
-
-  const recent = S.txs.slice(0,6);
-  const listEl = document.getElementById('home-tx-list');
-  listEl.innerHTML = recent.length === 0
-    ? '<div class="empty"><div class="empty-ico">💴</div><div class="empty-txt">まだ取引記録がありません</div></div>'
-    : recent.map(tx => txItemHTML(tx, false)).join('');
-}
-
-const DONUT_COLORS = ['#FF6B00','#FF9D45','#FFC107','#4CAF50','#2196F3','#9C27B0','#F44336','#00BCD4'];
-
-function renderDonut(monthTxs) {
-  if(!monthTxs) monthTxs = filterByHomeMonth(S.txs);
-  const filtered = monthTxs.filter(t => homeChartMode === 'exp' ? t.type==='expense' : t.type==='income');
-  // Group by category
-  const map = {};
-  filtered.forEach(t => { map[t.category] = (map[t.category]||0) + t.amount; });
-  const entries = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,6);
-  const total = entries.reduce((s,[,v])=>s+v,0);
-
-  document.getElementById('donut-center-amt').textContent = `¥${fmt(total)}`;
-  document.getElementById('donut-center-lbl').textContent = homeChartMode==='exp'?'支出合計':'収入合計';
-
-  if(S.donutChart) S.donutChart.destroy();
-  const ctx = document.getElementById('donut-chart').getContext('2d');
-
-  if(entries.length === 0) {
-    document.getElementById('donut-legend').innerHTML = '<div style="font-size:12px;color:#999;padding:16px 0;">記録がありません</div>';
-    S.donutChart = new Chart(ctx, {type:'doughnut',data:{labels:['なし'],datasets:[{data:[1],backgroundColor:['#EBEBEB'],borderWidth:0}]},options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
-    return;
-  }
-
-  S.donutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: entries.map(([k])=>k),
-      datasets: [{data:entries.map(([,v])=>v), backgroundColor:DONUT_COLORS, borderWidth:2, borderColor:'#fff'}]
-    },
-    options: {
-      cutout: '72%',
-      plugins: {legend:{display:false}, tooltip:{callbacks:{label:c=>`¥${fmt(c.raw)}`}}},
-    }
-  });
-
-  document.getElementById('donut-legend').innerHTML = entries.map(([name,amt],i) =>
-    `<div class="legend-item">
-      <div class="legend-dot" style="background:${DONUT_COLORS[i]};"></div>
-      <span class="legend-name">${name}</span>
-      <span class="legend-pct">${Math.round(amt/total*100)}%</span>
-      <span class="legend-amt">¥${fmt(amt)}</span>
+// ─── FAB ───
+const FAB_ACTIONS=[
+  {ico:'🍱',lbl:'弁当代 +¥500',bg:'#FF6B00',fn:'doBento()'},
+  {ico:'📝',lbl:'ATテスト結果',bg:'#F59E0B',fn:'openATModal()'},
+  {ico:'🏆',lbl:'テスト順位入力',bg:'#2196F3',fn:'openRankModal()'},
+  {ico:'💵',lbl:'現金を渡した',bg:'#C53030',fn:'openPayModal()'},
+  {ico:'📦',lbl:'資産を追加',bg:'#9C27B0',fn:'openAssetModal()'},
+  {ico:'📒',lbl:'出納帳に手入力',bg:'#4CAF50',fn:"openLedgerModal('in')"},
+];
+function buildFab(){
+  const items=document.getElementById('fab-items');
+  items.innerHTML=FAB_ACTIONS.map((a,i)=>
+    `<div class="fab-item" style="animation-delay:${i*.04}s">
+      <span class="fab-lbl">${a.lbl}</span>
+      <button class="fab-btn" style="background:${a.bg};color:#fff;" onclick="closeFab();${a.fn};">${a.ico}</button>
     </div>`
   ).join('');
 }
+function toggleFab(){const o=document.getElementById('fab-items').classList.toggle('open');document.getElementById('fab-main').classList.toggle('open',o);document.getElementById('fab-overlay').classList.toggle('open',o);resetParentTimer();}
+function closeFab(){document.getElementById('fab-items').classList.remove('open');document.getElementById('fab-main').classList.remove('open');document.getElementById('fab-overlay').classList.remove('open');}
+function updateFab(){const w=document.getElementById('fab-wrap');if(S.isParent)w.classList.remove('hidden');else{w.classList.add('hidden');closeFab();}}
 
-// ─── TX ITEM HTML ───
-function txItemHTML(tx, showActs) {
-  const isInc = tx.type !== 'expense';
-  const style = getCatStyle(tx.category, tx.type);
-  const acts = showActs && S.isParent ? `
-    <div class="tx-acts">
-      <button class="txbtn edit" onclick="editTx('${tx.id}')">編集</button>
-      <button class="txbtn del" onclick="confirmDelTx('${tx.id}')">削除</button>
-    </div>` : '';
-  return `<div class="tx-item">
-    <div class="tx-cat-ico ${style.bg}">${style.ico}</div>
-    <div class="tx-body">
-      <div class="tx-name">${tx.category}</div>
-      <div class="tx-date">${fmtD(tx.date)}${tx.memo?' · '+tx.memo:''}</div>
-    </div>
-    <div class="tx-right">
-      <div class="tx-amt ${isInc?'inc':'exp'}">${isInc?'+':'-'}¥${fmt(tx.amount)}</div>
-      ${acts}
-    </div>
-  </div>`;
+// ─── HOME ───
+let homeY=new Date().getFullYear(),homeM=new Date().getMonth();
+function homeMonthShift(d){if(d<0){if(homeM===0){homeM=11;homeY--;}else homeM--;}else{if(homeM===11){homeM=0;homeY++;}else homeM++;}renderHome();}
+
+function renderHome(){
+  document.getElementById('home-month-lbl').textContent=`${homeY}年${homeM+1}月`;
+  const bal=calcBalance(S.entries);
+  document.getElementById('home-held').textContent=fmt(bal);
+  const assetTotal=S.assets.reduce((s,a)=>s+(a.purchasePrice||0),0);
+  document.getElementById('home-asset-total').textContent=fmt(assetTotal);
+
+  const cfg=S.cfg;
+  if(cfg&&cfg.currentRank){
+    const tier=getTier(cfg.currentRank,cfg.tiers);
+    document.getElementById('home-rank').textContent=`${cfg.currentRank}位`;
+    if(tier){
+      document.getElementById('home-rank-sub').textContent=`${tier.label}：月額 ¥${fmt(tier.amount)}`;
+      document.getElementById('home-phone').textContent=fmtTime(tier.phone);
+      document.getElementById('home-ps5').textContent=fmtTime(tier.ps5);
+    }
+  } else {
+    document.getElementById('home-rank').textContent='未設定';
+    document.getElementById('home-rank-sub').textContent='順位を入力するとお小遣い額が決まります';
+    document.getElementById('home-phone').textContent='—';
+    document.getElementById('home-ps5').textContent='—';
+  }
+
+  // Recent 5 entries
+  const recent=S.entries.slice(0,5);
+  const el=document.getElementById('home-ledger');
+  if(recent.length===0){el.innerHTML='<div class="empty"><div class="empty-ico">📒</div><div class="empty-txt">まだ記録がありません</div></div>';return;}
+  // Running balance from bottom
+  const sorted=[...S.entries].sort((a,b)=>a.date.localeCompare(b.date)||(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+  const balMap={};let run=0;
+  sorted.forEach(e=>{run+=e.type==='in'?e.amount:-e.amount;balMap[e.id]=run;});
+  el.innerHTML=`<table class="ledger" style="width:100%;">
+    <thead><tr><th>日付</th><th>摘要</th><th>増加</th><th>減少</th><th>残高</th></tr></thead>
+    <tbody>${recent.map(e=>`<tr>
+      <td>${fmtD(e.date)}</td>
+      <td class="memo">${e.memo}</td>
+      <td class="${e.type==='in'?'inc':'empty-cell'}">${e.type==='in'?`¥${fmt(e.amount)}`:'-'}</td>
+      <td class="${e.type==='out'?'dec':'empty-cell'}">${e.type==='out'?`¥${fmt(e.amount)}`:'-'}</td>
+      <td class="bal">¥${fmt(balMap[e.id]||0)}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
 }
 
-// ─── TX LIST PAGE ───
-function renderTxList() {
-  const months = [...new Set(S.txs.map(t=>t.date.slice(0,7)))].sort().reverse();
-  const filter = document.getElementById('tx-filter');
-  filter.innerHTML = `<button class="mtab ${S.txFilter===null?'on':''}" onclick="setFilter(null)">すべて</button>` +
-    months.map(m=>`<button class="mtab ${S.txFilter===m?'on':''}" onclick="setFilter('${m}')">${m.replace('-','年')}月</button>`).join('');
+// ─── LEDGER PAGE ───
+let ledY=new Date().getFullYear(),ledM=new Date().getMonth();
+function ledgerMonthShift(d){if(d<0){if(ledM===0){ledM=11;ledY--;}else ledM--;}else{if(ledM===11){ledM=0;ledY++;}else ledM++;}renderLedger();}
 
-  const txs = S.txFilter ? S.txs.filter(t=>t.date.startsWith(S.txFilter)) : S.txs;
-  const inc = txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const exp = txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-  document.getElementById('tx-inc').textContent = `¥${fmt(inc)}`;
-  document.getElementById('tx-exp').textContent = `¥${fmt(exp)}`;
-  const balEl = document.getElementById('tx-bal');
-  const bal = inc - exp;
-  balEl.textContent = (bal>=0?'+':'-') + `¥${fmt(bal)}`;
+function renderLedger(){
+  document.getElementById('ledger-month-lbl').textContent=`${ledY}年${ledM+1}月`;
+  const monthEntries=filterMonth(S.entries,ledY,ledM);
+  const inc=monthEntries.filter(e=>e.type==='in').reduce((s,e)=>s+e.amount,0);
+  const dec=monthEntries.filter(e=>e.type==='out').reduce((s,e)=>s+e.amount,0);
 
-  const wrap = document.getElementById('tx-list-wrap');
-  const empty = document.getElementById('tx-empty');
-  if(txs.length === 0) { wrap.innerHTML=''; empty.classList.remove('hide'); return; }
+  // Balance at END of this month = all entries up to end of this month
+  const monthEnd=`${ledY}-${String(ledM+1).padStart(2,'0')}-31`;
+  const allUpTo=S.entries.filter(e=>e.date<=monthEnd);
+  const balAtMonthEnd=calcBalance(allUpTo);
+
+  document.getElementById('led-inc').textContent=`¥${fmt(inc)}`;
+  document.getElementById('led-dec').textContent=`¥${fmt(dec)}`;
+  document.getElementById('led-bal').textContent=`¥${fmt(balAtMonthEnd)}`;
+
+  const area=document.getElementById('ledger-table-area');
+  const empty=document.getElementById('ledger-empty');
+
+  if(monthEntries.length===0){area.innerHTML='';empty.classList.remove('hide');return;}
   empty.classList.add('hide');
 
+  // Sort ascending for running balance
+  const asc=[...monthEntries].sort((a,b)=>a.date.localeCompare(b.date)||(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+
+  // Balance BEFORE this month
+  const monthStart=`${ledY}-${String(ledM+1).padStart(2,'0')}-01`;
+  const before=S.entries.filter(e=>e.date<monthStart);
+  let runBal=calcBalance(before);
+
   // Group by date
-  const byDate = {};
-  txs.forEach(tx => { if(!byDate[tx.date]) byDate[tx.date]=[];  byDate[tx.date].push(tx); });
-  wrap.innerHTML = Object.entries(byDate).map(([date, items]) =>
-    `<div class="tx-date-hdr">${fmtD(date)}</div>
-     <div class="tx-list-wrap">${items.map(tx=>txItemHTML(tx,true)).join('')}</div>`
+  const byDate={};
+  asc.forEach(e=>{if(!byDate[e.date])byDate[e.date]=[];byDate[e.date].push(e);});
+
+  let html='';
+  // Opening balance row
+  html+=`<div class="ledger-table-wrap">
+    <div class="ledger-date-hdr">前月繰越</div>
+    <table class="ledger"><thead><tr><th>日付</th><th>摘要</th><th>増加（+）</th><th>減少（-）</th><th>残高</th></tr></thead><tbody>`;
+  html+=`<tr><td>${ledY}/${String(ledM+1).padStart(2,'0')}/01</td><td class="memo" style="color:var(--sub);">前月繰越</td><td class="empty-cell">-</td><td class="empty-cell">-</td><td class="bal">¥${fmt(runBal)}</td></tr>`;
+
+  Object.entries(byDate).forEach(([date,entries])=>{
+    entries.forEach(e=>{
+      runBal+=e.type==='in'?e.amount:-e.amount;
+      const acts=S.isParent&&!e.auto?`<div class="ledger-acts"><button class="lbtn edit" onclick="editLedgerEntry('${e.id}')">編集</button><button class="lbtn del" onclick="confirmDelEntry('${e.id}')">削除</button></div>`:'';
+      html+=`<tr>
+        <td>${fmtD(date)}</td>
+        <td class="memo">${e.memo}${acts}</td>
+        <td class="${e.type==='in'?'inc':'empty-cell'}">${e.type==='in'?`¥${fmt(e.amount)}`:'-'}</td>
+        <td class="${e.type==='out'?'dec':'empty-cell'}">${e.type==='out'?`¥${fmt(e.amount)}`:'-'}</td>
+        <td class="bal">¥${fmt(runBal)}</td>
+      </tr>`;
+    });
+  });
+  html+=`</tbody></table></div>`;
+  area.innerHTML=html;
+}
+
+// ─── LEDGER ENTRY ACTIONS ───
+function openLedgerModal(type, entry=null){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  S.editEntryId=entry?entry.id:null;
+  document.getElementById('ledger-modal-title').textContent=entry?'出納帳を編集':'出納帳に追加';
+  document.getElementById('led-type').value=entry?entry.type:type;
+  document.getElementById('led-date').value=entry?entry.date:today();
+  document.getElementById('led-amount').value=entry?entry.amount:'';
+  document.getElementById('led-memo').value=entry?entry.memo:'';
+  document.getElementById('led-del-btn').classList.toggle('hide',!entry);
+  openModal('ledger-overlay');resetParentTimer();
+}
+async function saveLedgerEntry(){
+  const type=document.getElementById('led-type').value;
+  const date=document.getElementById('led-date').value;
+  const amount=parseInt(document.getElementById('led-amount').value)||0;
+  const memo=document.getElementById('led-memo').value.trim();
+  if(!date||!amount||!memo){showToast('日付・金額・摘要を入力してください');return;}
+  const data={type,date,amount,memo};
+  if(S.editEntryId){await updEntry(S.editEntryId,data);showToast('✅ 更新しました');}
+  else{await addEntry(data);showToast('✅ 追加しました');}
+  closeModal('ledger-overlay');await loadEntries();renderHome();renderLedger();
+}
+function editLedgerEntry(id){const e=S.entries.find(x=>x.id===id);if(e)openLedgerModal(e.type,e);}
+async function deleteLedgerEntry(){
+  if(!S.editEntryId)return;
+  if(!confirm('この記録を削除しますか？'))return;
+  await delEntry(S.editEntryId);closeModal('ledger-overlay');showToast('削除しました');
+  await loadEntries();renderHome();renderLedger();
+}
+async function confirmDelEntry(id){
+  if(!confirm('この記録を削除しますか？'))return;
+  await delEntry(id);showToast('削除しました');await loadEntries();renderHome();renderLedger();
+}
+
+// ─── BENTO ───
+function doBento(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  const amount=S.cfg.bentoAmount||500;
+  document.getElementById('bento-amount-disp').textContent=`¥${fmt(amount)}`;
+  document.getElementById('bento-date-disp').textContent=`日付：${fmtD(today())}`;
+  openModal('bento-overlay');resetParentTimer();
+}
+async function confirmBento(){
+  const amount=S.cfg.bentoAmount||500;
+  await addEntry({date:today(),type:'in',amount,memo:'弁当代',auto:false});
+  closeModal('bento-overlay');showToast(`🍱 弁当代 ¥${fmt(amount)} を追加しました`);
+  await loadEntries();renderHome();if(S.currentTab==='ledger')renderLedger();
+}
+
+// ─── CASH PAY ───
+function openPayModal(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  document.getElementById('pay-date').value=today();
+  document.getElementById('pay-amount').value='';
+  document.getElementById('pay-memo').value='';
+  openModal('pay-overlay');resetParentTimer();
+}
+async function savePay(){
+  const date=document.getElementById('pay-date').value;
+  const amount=parseInt(document.getElementById('pay-amount').value)||0;
+  const memo=document.getElementById('pay-memo').value.trim()||'現金払い';
+  if(!date||!amount){showToast('日付と金額を入力してください');return;}
+  await addEntry({date,type:'out',amount,memo:`現金払い${memo?'（'+memo+'）':''}`});
+  closeModal('pay-overlay');showToast(`💵 ¥${fmt(amount)} を払い出しました`);
+  await loadEntries();renderHome();if(S.currentTab==='ledger')renderLedger();
+}
+
+// ─── AT TEST ───
+function openATModal(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  const atTiers=S.cfg.atTiers||DEFAULT_AT_TIERS;
+  document.getElementById('at-grid').innerHTML=atTiers.map((t,i)=>
+    `<button class="at-btn" onclick="selectAT(${i})">${t.label}<br><span class="at-sub">${t.amount>0?`臨時 ¥${fmt(t.amount)}`:''} ${t.poke?'🃏ポケカ1P':''}</span></button>`
   ).join('');
+  openModal('at-overlay');resetParentTimer();
 }
-
-function setFilter(m) { S.txFilter = m; renderTxList(); }
-
-// ─── TX ADD/EDIT ───
-function openTxModal(type, tx=null) {
-  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
-  S.editTxId = tx ? tx.id : null;
-  document.getElementById('tx-modal-title').textContent = tx ? '取引を編集' : (type==='income'?'収入を追加':'支出を追加');
-  document.getElementById('tx-type').value = tx ? tx.type : type;
-  document.getElementById('tx-date').value = tx ? tx.date : today();
-  document.getElementById('tx-amount').value = tx ? tx.amount : '';
-  document.getElementById('tx-category').value = tx ? tx.category : '';
-  document.getElementById('tx-memo').value = tx ? tx.memo||'' : '';
-  openModal('tx-overlay'); resetParentTimer();
+async function selectAT(idx){
+  const t=(S.cfg.atTiers||DEFAULT_AT_TIERS)[idx];closeModal('at-overlay');
+  const d=today();
+  if(t.amount>0){await addEntry({date:d,type:'in',amount:t.amount,memo:`ATテスト臨時（${t.label}）`});}
+  if(t.poke){await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:d,purchasePrice:0,memo:`ATテスト ${t.label} 獲得`});await loadAssets();}
+  showToast(t.poke?(t.amount>0?`📝 ¥${fmt(t.amount)} ＋ `:'')+'🃏ポケカ1P を追加しました':`📝 ¥${fmt(t.amount)} 臨時お小遣いを追加しました`);
+  await loadEntries();renderHome();
 }
-async function saveTx() {
-  const type=document.getElementById('tx-type').value, date=document.getElementById('tx-date').value;
-  const amount=parseInt(document.getElementById('tx-amount').value)||0;
-  const category=document.getElementById('tx-category').value.trim();
-  const memo=document.getElementById('tx-memo').value.trim();
-  if(!date||!amount||!category){ showToast('日付・金額・項目を入力してください'); return; }
-  if(S.editTxId){ await updTx(S.editTxId,{type,date,amount,category,memo}); showToast('✅ 取引を更新しました'); }
-  else{ await addTx({type,date,amount,category,memo}); showToast('✅ 取引を追加しました'); }
-  closeModal('tx-overlay'); await loadTxs(); renderHome(); renderTxList(); resetParentTimer();
-}
-function editTx(id) { const tx=S.txs.find(t=>t.id===id); if(tx) openTxModal(tx.type,tx); }
-async function confirmDelTx(id) {
-  if(!confirm('この取引を削除しますか？')) return;
-  await delTx(id); showToast('削除しました');
-  await loadTxs(); renderHome(); renderTxList();
-}
-
-// ─── QUICK ACTIONS ───
-async function doLunch() {
-  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
-  const t = today();
-  if(S.lunchDates.has(t) && !confirm('今日はすでに弁当代を記録しています。もう一度追加しますか？')) return;
-  const amount = S.cfg.lunchAmount||500;
-  await addTx({date:t,amount,type:'income',category:'弁当代',memo:'弁当代支給'});
-  if(!S.lunchDates.has(t)){ await db.collection('lunchDates').doc(t).set({date:t}); S.lunchDates.add(t); }
-  showToast(`🍱 弁当代 ¥${fmt(amount)} を追加しました`);
-  await loadTxs(); renderHome(); resetParentTimer();
-}
-
-function openATModal() {
-  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
-  const atTiers = S.cfg.atTiers||DEFAULT_AT_TIERS;
-  document.getElementById('at-grid').innerHTML = atTiers.map((t,i)=>
-    `<button class="at-btn" onclick="selectAT(${i})">${t.label}<br>
-    <span class="at-sub">${t.amount>0?`臨時 ¥${fmt(t.amount)}`:''} ${t.poke?'🃏ポケカ1P':''}</span></button>`
-  ).join('');
-  openModal('at-overlay'); resetParentTimer();
-}
-async function selectAT(idx) {
-  const t = (S.cfg.atTiers||DEFAULT_AT_TIERS)[idx]; closeModal('at-overlay');
-  const d = today();
-  if(t.amount>0) await addTx({date:d,amount:t.amount,type:'income',category:'ATテスト臨時',memo:`ATテスト ${t.label}`});
-  if(t.poke){ await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:d,purchasePrice:0,memo:`ATテスト ${t.label} 獲得`}); await loadAssets(); }
-  showToast(t.poke ? (t.amount>0?`📝 ¥${fmt(t.amount)} ＋ 🃏ポケカ1P`:'🃏 ポケカ1P') + 'を追加しました' : `📝 ¥${fmt(t.amount)} 臨時お小遣いを追加しました`);
-  await loadTxs(); renderHome();
-}
-async function doKotest() {
-  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
-  if(!confirm('小テスト満点 — ポケカ1Pをモノ資産に追加しますか？')) return;
+async function doKotest(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  if(!confirm('小テスト満点 — ポケカ1Pをモノ資産に追加しますか？'))return;
   await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:today(),purchasePrice:0,memo:'小テスト満点 獲得'});
-  await loadAssets(); showToast('✅ 🃏 ポケカ1Pをモノ資産に追加しました');
+  await loadAssets();showToast('✅ 🃏 ポケカ1Pをモノ資産に追加しました');
 }
-function doKotestFromAT(){ closeModal('at-overlay'); doKotest(); }
+function doKotestFromAT(){closeModal('at-overlay');doKotest();}
 
-function openRankModal() {
-  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
-  document.getElementById('rank-input').value = S.cfg.currentRank||'';
-  document.getElementById('rank-name').value = '';
-  openModal('rank-overlay'); resetParentTimer();
+// ─── RANK ───
+function openRankModal(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  document.getElementById('rank-input').value=S.cfg.currentRank||'';
+  document.getElementById('rank-name').value='';
+  openModal('rank-overlay');resetParentTimer();
 }
-async function saveRank() {
-  const rank = parseInt(document.getElementById('rank-input').value)||0;
-  if(!rank||rank<1){ showToast('正しい順位を入力してください'); return; }
-  const tier = getTier(rank,S.cfg.tiers);
-  if(!tier){ showToast('順位に対応する設定がありません'); return; }
+async function saveRank(){
+  const rank=parseInt(document.getElementById('rank-input').value)||0;
+  if(!rank||rank<1){showToast('正しい順位を入力してください');return;}
+  const tier=getTier(rank,S.cfg.tiers);
+  if(!tier){showToast('順位に対応する設定がありません');return;}
   await saveCfg({currentRank:rank,currentTier:tier.label});
-  closeModal('rank-overlay'); showToast(`🏆 ${rank}位（${tier.label}）を記録しました`); renderHome();
+  closeModal('rank-overlay');showToast(`🏆 ${rank}位（${tier.label}）を記録しました`);renderHome();
 }
-
-// ─── CALENDAR ───
-function renderCalendar() {
-  const y=S.calY,m=S.calM;
-  document.getElementById('cal-month-lbl').textContent = `${y}年${m+1}月`;
-  const first=new Date(y,m,1).getDay(), last=new Date(y,m+1,0).getDate();
-  const todayDate=new Date(); const grid=document.getElementById('cal-grid');
-  grid.innerHTML='';
-  for(let i=0;i<first;i++) grid.innerHTML+=`<div class="cal-day"></div>`;
-  for(let d=1;d<=last;d++){
-    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dow=(first+d-1)%7;
-    const isToday=todayDate.getFullYear()===y&&todayDate.getMonth()===m&&todayDate.getDate()===d;
-    const cls=['cal-day',isToday?'today':'',S.lunchDates.has(ds)&&!isToday?'has-lunch':'',dow===0?'sun':dow===6?'sat':''].filter(Boolean).join(' ');
-    grid.innerHTML+=`<div class="${cls}">${d}</div>`;
-  }
-}
-function calPrev(){if(S.calM===0){S.calM=11;S.calY--;}else S.calM--;renderCalendar();}
-function calNext(){if(S.calM===11){S.calM=0;S.calY++;}else S.calM++;renderCalendar();}
 
 // ─── ASSETS ───
-function renderAssets() {
+function renderAssets(){
   const list=document.getElementById('asset-list'),empty=document.getElementById('asset-empty');
+  const total=S.assets.reduce((s,a)=>s+(a.purchasePrice||0),0);
+  document.getElementById('asset-total-disp').textContent=`合計 ¥${fmt(total)}`;
   if(S.assets.length===0){list.innerHTML='';list.style.display='none';empty.classList.remove('hide');return;}
   empty.classList.add('hide');list.style.display='block';
   list.innerHTML=S.assets.map(a=>{
     const ico=a.name.includes('ポケモン')||a.name.includes('ポケカ')?'🃏':a.name.includes('PS5')?'🎮':a.name.includes('ゲーム')?'🕹️':'📦';
-    const acts=S.isParent?`<div class="asset-acts"><button class="txbtn edit" onclick="editAsset('${a.id}')">編集</button><button class="txbtn del" onclick="deleteAssetById('${a.id}')">削除</button></div>`:'';
+    const acts=S.isParent?`<div class="asset-acts"><button class="lbtn edit" onclick="editAsset('${a.id}')">編集</button><button class="lbtn del" onclick="deleteAsset('${a.id}')">削除</button></div>`:'';
     return `<div class="asset-item">
       <div class="asset-ico">${ico}</div>
       <div class="asset-body"><div class="asset-name">${a.name}</div><div class="asset-meta">${a.purchaseDate?fmtD(a.purchaseDate):''}${a.memo?' · '+a.memo:''}</div></div>
-      ${a.purchasePrice>0?`<span class="asset-price">¥${fmt(a.purchasePrice)}</span>`:''}
+      ${a.purchasePrice>0?`<span class="asset-price">¥${fmt(a.purchasePrice)}</span>`:'<span class="asset-price" style="color:var(--sub);font-size:12px;">¥0</span>'}
       ${acts}
     </div>`;
   }).join('');
@@ -1436,7 +1063,7 @@ function openAssetModal(){
   ['asset-name','asset-memo'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('asset-date').value=today();
   document.getElementById('asset-price').value='0';
-  document.getElementById('asset-del-btn').classList.add('hide');
+  const delBtn=document.getElementById('asset-del-btn');delBtn.classList.add('hide');
   openModal('asset-overlay');resetParentTimer();
 }
 function editAsset(id){
@@ -1447,8 +1074,7 @@ function editAsset(id){
   document.getElementById('asset-date').value=a.purchaseDate||today();
   document.getElementById('asset-price').value=a.purchasePrice||0;
   document.getElementById('asset-memo').value=a.memo||'';
-  document.getElementById('asset-del-btn').classList.remove('hide');
-  document.getElementById('asset-del-btn').onclick=()=>deleteAssetById(id);
+  const delBtn=document.getElementById('asset-del-btn');delBtn.classList.remove('hide');delBtn.onclick=()=>deleteAsset(id);
   openModal('asset-overlay');
 }
 async function saveAsset(){
@@ -1460,49 +1086,35 @@ async function saveAsset(){
   const data={name,purchaseDate:date,purchasePrice:price,memo};
   if(S.editAssetId){await updAssetDoc(S.editAssetId,data);showToast('✅ 資産を更新しました');}
   else{await addAssetDoc(data);showToast('✅ 資産を追加しました');}
-  closeModal('asset-overlay');await loadAssets();renderAssets();
+  closeModal('asset-overlay');await loadAssets();renderAssets();renderHome();
 }
-async function deleteAssetById(id){
-  const targetId=id||S.editAssetId;if(!targetId)return;
+async function deleteAsset(id){
   if(!confirm('この資産を削除しますか？'))return;
-  closeModal('asset-overlay');await delAssetDoc(targetId);showToast('削除しました');await loadAssets();renderAssets();
-}
-
-// ─── GRAPH ───
-function renderGraph(){
-  const canvas=document.getElementById('balance-chart'),empty=document.getElementById('graph-empty');
-  if(S.txs.length===0){canvas.style.display='none';empty.classList.remove('hide');return;}
-  empty.classList.add('hide');canvas.style.display='block';
-  const sorted=[...S.txs].sort((a,b)=>a.date.localeCompare(b.date));
-  let run=0;const byDate={};
-  sorted.forEach(tx=>{run+=tx.type==='expense'?-tx.amount:tx.amount;byDate[tx.date]=run;});
-  if(S.chart)S.chart.destroy();
-  const ctx=canvas.getContext('2d');
-  S.chart=new Chart(ctx,{type:'line',data:{labels:Object.keys(byDate).map(d=>d.replace(/-/g,'/')),datasets:[{label:'残高',data:Object.values(byDate),borderColor:'#FF6B00',backgroundColor:'rgba(255,107,0,0.1)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#FF6B00'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},maxTicksLimit:6}},y:{ticks:{callback:v=>`¥${fmt(v)}`,font:{size:10}}}}}});
+  closeModal('asset-overlay');await delAssetDoc(id);showToast('削除しました');await loadAssets();renderAssets();renderHome();
 }
 
 // ─── SETTINGS ───
 function renderSettings(){
   const cfg=S.cfg;
-  document.getElementById('set-lunch').textContent=`¥${fmt(cfg.lunchAmount||500)}`;
+  document.getElementById('set-bento').textContent=`¥${fmt(cfg.bentoAmount||500)}`;
   document.getElementById('set-day').textContent=`毎月${cfg.allowanceDay||1}日`;
-  document.getElementById('tier-table').innerHTML=(cfg.tiers||DEFAULT_TIERS).map(t=>`
-    <div class="tier-row"><span class="tier-badge">${t.label}</span><div class="tier-info"><div class="tier-amt">¥${fmt(t.amount)}/月</div><div class="tier-time">📱${fmtTime(t.phone)} 🎮${fmtTime(t.ps5)}</div></div></div>`).join('');
-  document.getElementById('at-tier-table').innerHTML=(cfg.atTiers||DEFAULT_AT_TIERS).map(t=>`
-    <div class="tier-row"><span class="tier-badge at">${t.label}</span><div class="tier-info"><div class="tier-amt">${t.amount>0?`¥${fmt(t.amount)}`:'現金なし'}</div><div class="tier-time">${t.poke?'🃏 ポケカ1P自動追加':''}</div></div></div>`).join('');
+  document.getElementById('tier-table').innerHTML=(cfg.tiers||DEFAULT_TIERS).map(t=>
+    `<div class="tier-row"><span class="tier-badge">${t.label}</span><div class="tier-info"><div class="tier-amt">¥${fmt(t.amount)}/月</div><div class="tier-time">📱${fmtTime(t.phone)} 🎮${fmtTime(t.ps5)}</div></div></div>`).join('');
+  document.getElementById('at-tier-table').innerHTML=(cfg.atTiers||DEFAULT_AT_TIERS).map(t=>
+    `<div class="tier-row"><span class="tier-badge at">${t.label}</span><div class="tier-info"><div class="tier-amt">${t.amount>0?`¥${fmt(t.amount)}`:'現金なし'}</div><div class="tier-time">${t.poke?'🃏 ポケカ1P自動追加':''}</div></div></div>`).join('');
 }
-let currentSetType='';
+let curSetType='';
 function openSetModal(type){
   if(!S.isParent){showToast('親モードのみ変更できます');return;}
-  currentSetType=type;
-  if(type==='lunch'){document.getElementById('set-modal-title').textContent='弁当代金額を変更';document.getElementById('set-modal-lbl').textContent='金額（円）';document.getElementById('set-modal-val').value=S.cfg.lunchAmount||500;}
+  curSetType=type;
+  if(type==='bento'){document.getElementById('set-modal-title').textContent='弁当代金額を変更';document.getElementById('set-modal-lbl').textContent='金額（円）';document.getElementById('set-modal-val').value=S.cfg.bentoAmount||500;}
   else{document.getElementById('set-modal-title').textContent='お小遣い追加日を変更';document.getElementById('set-modal-lbl').textContent='日（1〜28）';document.getElementById('set-modal-val').value=S.cfg.allowanceDay||1;}
-  openModal('set-overlay');resetParentTimer();
+  openModal('set-overlay');
 }
 async function saveSetModal(){
   const val=parseInt(document.getElementById('set-modal-val').value);
   if(isNaN(val)||val<1){showToast('正しい値を入力してください');return;}
-  if(currentSetType==='lunch'){await saveCfg({lunchAmount:val});showToast(`✅ 弁当代を ¥${fmt(val)} に変更しました`);}
+  if(curSetType==='bento'){await saveCfg({bentoAmount:val});showToast(`✅ 弁当代を ¥${fmt(val)} に変更しました`);}
   else{const day=Math.min(28,Math.max(1,val));await saveCfg({allowanceDay:day});showToast(`✅ お小遣い追加日を毎月${day}日に変更しました`);}
   closeModal('set-overlay');renderSettings();
 }
@@ -1512,11 +1124,10 @@ function openChangePass(mode){
   changeMode=mode;const isPc=mode==='passcode';
   document.getElementById('chpass-title').textContent=isPc?'パスコードを変更（6桁）':'親PINを変更（4桁）';
   document.getElementById('chpass-lbl1').textContent=isPc?'新しいパスコード（6桁）':'新しいPIN（4桁）';
-  document.getElementById('chpass-new').maxLength=isPc?6:4;
-  document.getElementById('chpass-confirm').maxLength=isPc?6:4;
+  document.getElementById('chpass-new').maxLength=isPc?6:4;document.getElementById('chpass-confirm').maxLength=isPc?6:4;
   ['chpass-new','chpass-confirm'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('chpass-err').textContent='';
-  openModal('chpass-overlay');resetParentTimer();
+  openModal('chpass-overlay');
 }
 async function savePasscode(){
   const n=document.getElementById('chpass-new').value,c=document.getElementById('chpass-confirm').value;
@@ -1529,46 +1140,10 @@ async function savePasscode(){
   closeModal('chpass-overlay');
 }
 
-// ─── FAB ───
-function toggleFab(){
-  const open=document.getElementById('fab-items').classList.toggle('open');
-  document.getElementById('fab-main').classList.toggle('open',open);
-  document.getElementById('fab-overlay').classList.toggle('open',open);
-  resetParentTimer();
-}
-function closeFab(){
-  document.getElementById('fab-items').classList.remove('open');
-  document.getElementById('fab-main').classList.remove('open');
-  document.getElementById('fab-overlay').classList.remove('open');
-}
-function buildFab(){
-  const items=document.getElementById('fab-items');
-  const actions=[
-    {ico:'🍱',lbl:'弁当代 +500円',bg:'#FF6B00',fn:'doLunch()'},
-    {ico:'📝',lbl:'ATテスト結果',bg:'#F59E0B',fn:'openATModal()'},
-    {ico:'🏆',lbl:'テスト順位入力',bg:'#2196F3',fn:'openRankModal()'},
-    {ico:'💰',lbl:'収入を追加',bg:'#4CAF50',fn:"openTxModal('income')"},
-    {ico:'💸',lbl:'支出を追加',bg:'#E53E3E',fn:"openTxModal('expense')"},
-    {ico:'📦',lbl:'資産を追加',bg:'#9C27B0',fn:'openAssetModal()'},
-  ];
-  items.innerHTML=actions.map((a,i)=>
-    `<div class="fab-item" style="animation-delay:${i*.04}s">
-      <span class="fab-lbl">${a.lbl}</span>
-      <button class="fab-btn" style="background:${a.bg};color:#fff;" onclick="closeFab();${a.fn};">${a.ico}</button>
-    </div>`
-  ).join('');
-}
-function updateFab(){
-  const wrap=document.getElementById('fab-wrap');
-  if(S.isParent) wrap.classList.remove('hidden'); else { wrap.classList.add('hidden'); closeFab(); }
-}
-
-// ─── LOGOUT ───
 function doLogout(){
   if(!confirm('ログアウトしますか？'))return;
   S.isParent=false;clearParentTimer();
-  document.getElementById('app').style.display='none';
-  showLock();
+  document.getElementById('app').style.display='none';showLock();
 }
 
 // ─── INIT ───
@@ -1578,7 +1153,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
     db=firebase.firestore();
     db.enablePersistence().catch(()=>{});
     S.cfg=await loadCfg();
-    if(!S.cfg) startSetup(); else showLock();
+    if(!S.cfg)startSetup();else showLock();
   }catch(e){alert('Firebase接続エラー\n'+e.message);}
 });
 </script>
