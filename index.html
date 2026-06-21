@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>こづかい管理</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    :root{
+      --bg:#F1F5F9;
+      --card:#FFFFFF;
+      --accent:#6366F1;
+      --accent2:#8B5CF6;
+      --green:#10B981;
+      --red:#EF4444;
+      --orange:#F59E0B;
+      --purple:#8B5CF6;
+      --text:#0F172A;
+      --sub:#64748B;
+      --border:#E2E8F0;
+      --nav-h:64px;
+      --grad:linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#A855F7 100%);
+    }
+    html,body{height:100%;-webkit-font-smoothing:antialiased;}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;
+      background:var(--bg);color:var(--text);
+      max-width:430px;margin:0 auto;min-height:100vh;
+    }
+
+    /* ── LOCK SCREEN ── */
+    .lock{
+      position:fixed;inset:0;z-index:1000;
+      background:#0F172A;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:40px 32px;
+    }
+    .lock-logo{
+      width:72px;height:72px;border-radius:20px;
+      background:var(--grad);
+      display:flex;align-items:center;justify-content:center;
+      font-size:36px;margin-bottom:24px;
+      box-shadow:0 8px 32px rgba(99,102,241,.4);
+    }
+    .lock-title{font-size:22px;font-weight:700;color:#F8FAFC;margin-bottom:6px;}
+    .lock-sub{font-size:13px;color:#94A3B8;margin-bottom:40px;text-align:center;}
+    .lock-dots{display:flex;gap:16px;margin-bottom:40px;}
+    .lock-dot{
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid #475569;background:transparent;
+      transition:all .15s;
+    }
+    .lock-dot.on{background:#6366F1;border-color:#6366F1;box-shadow:0 0 8px rgba(99,102,241,.6);}
+    .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:264px;}
+    .nk{
+      aspect-ratio:1;border:none;border-radius:50%;
+      background:#1E293B;color:#F8FAFC;
+      font-size:22px;font-weight:500;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:background .1s;
+    }
+    .nk:active{background:#334155;}
+    .lock-err{color:#F87171;font-size:13px;margin-top:16px;min-height:18px;text-align:center;}
+    .lock-hint{color:#475569;font-size:12px;margin-top:12px;}
+
+    /* ── APP SHELL ── */
+    #app{display:none;padding-bottom:var(--nav-h);}
+
+    /* ── HEADER ── */
+    .hdr{
+      background:var(--card);padding:14px 18px 12px;
+      border-bottom:1px solid var(--border);
+      position:sticky;top:0;z-index:20;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .hdr-title{font-size:17px;font-weight:700;}
+    .hdr-right{display:flex;gap:8px;align-items:center;}
+    .mode-chip{
+      font-size:11px;font-weight:700;padding:4px 12px;
+      border-radius:20px;background:#EEF2FF;color:#6366F1;
+      display:flex;align-items:center;gap:4px;
+    }
+    .mode-chip.parent{background:#6366F1;color:#fff;}
+    .mode-btn{
+      border:none;background:var(--bg);border-radius:10px;
+      padding:7px 10px;font-size:16px;cursor:pointer;
+      transition:background .1s;
+    }
+    .mode-btn:active{background:var(--border);}
+    .parent-timer{
+      font-size:10px;font-weight:600;color:#F59E0B;
+      background:#FEF3C7;padding:2px 8px;border-radius:10px;
+      display:none;
+    }
+
+    /* ── BOTTOM NAV ── */
+    #nav{
+      position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+      width:100%;max-width:430px;
+      background:var(--card);border-top:1px solid var(--border);
+      height:var(--nav-h);display:flex;z-index:100;
+      padding-bottom:env(safe-area-inset-bottom,0);
+    }
+    .ni{
+      flex:1;display:flex;flex-direction:column;align-items:center;
+      justify-content:center;gap:3px;cursor:pointer;
+      color:var(--sub);font-size:10px;font-weight:500;
+      transition:color .15s;
+    }
+    .ni.on{color:var(--accent);}
+    .ni-ico{font-size:22px;line-height:1;}
+
+    /* ── PAGES ── */
+    .page{display:none;}.page.on{display:block;}
+    .pg{padding-bottom:24px;}
+
+    /* ── HOME HERO ── */
+    .hero{
+      margin:16px 16px 0;border-radius:24px;
+      background:var(--grad);color:#fff;
+      padding:28px 24px 24px;
+      box-shadow:0 8px 32px rgba(99,102,241,.3);
+      position:relative;overflow:hidden;
+    }
+    .hero::before{
+      content:'';position:absolute;top:-30px;right:-30px;
+      width:160px;height:160px;border-radius:50%;
+      background:rgba(255,255,255,.08);
+    }
+    .hero::after{
+      content:'';position:absolute;bottom:-40px;left:-20px;
+      width:120px;height:120px;border-radius:50%;
+      background:rgba(255,255,255,.05);
+    }
+    .hero-lbl{font-size:12px;opacity:.75;font-weight:500;letter-spacing:.5px;margin-bottom:6px;}
+    .hero-amt{font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;}
+    .hero-yen{font-size:28px;font-weight:700;vertical-align:middle;margin-right:2px;}
+    .hero-sub{font-size:12px;opacity:.65;margin-top:8px;}
+    .hero-row{display:flex;gap:12px;margin-top:20px;}
+    .hero-stat{
+      flex:1;background:rgba(255,255,255,.15);
+      border-radius:12px;padding:10px 12px;
+      backdrop-filter:blur(8px);
+    }
+    .hero-stat-lbl{font-size:10px;opacity:.75;margin-bottom:2px;}
+    .hero-stat-val{font-size:14px;font-weight:700;}
+
+    /* ── INFO CARDS ── */
+    .cards2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 16px 0;}
+    .icard{
+      background:var(--card);border-radius:16px;padding:16px 14px;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .icard-ico{font-size:20px;margin-bottom:6px;}
+    .icard-lbl{font-size:11px;color:var(--sub);margin-bottom:3px;}
+    .icard-val{font-size:15px;font-weight:700;}
+
+    /* ── RANK CARD ── */
+    .rank-card{
+      margin:12px 16px 0;background:var(--card);border-radius:16px;
+      padding:16px;display:flex;align-items:center;gap:14px;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .rank-badge-big{
+      width:52px;height:52px;border-radius:14px;
+      background:linear-gradient(135deg,#F59E0B,#EF4444);
+      display:flex;align-items:center;justify-content:center;
+      font-size:26px;flex-shrink:0;
+    }
+    .rank-info-lbl{font-size:11px;color:var(--sub);margin-bottom:2px;}
+    .rank-info-val{font-size:18px;font-weight:700;}
+    .rank-info-sub{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px;}
+
+    /* ── SECTION TITLE ── */
+    .sec-hd{
+      font-size:12px;font-weight:600;color:var(--sub);
+      letter-spacing:.5px;text-transform:uppercase;
+      padding:18px 16px 8px;
+    }
+
+    /* ── TX LIST ── */
+    .tx-card{
+      background:var(--card);border-radius:16px;
+      margin:0 16px;overflow:hidden;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .tx-item{
+      display:flex;align-items:center;gap:12px;padding:13px 14px;
+      border-bottom:1px solid var(--border);
+    }
+    .tx-item:last-child{border-bottom:none;}
+    .tx-ico-wrap{
+      width:40px;height:40px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;flex-shrink:0;
+    }
+    .tx-ico-wrap.inc{background:#EEF2FF;}
+    .tx-ico-wrap.exp{background:#FEF2F2;}
+    .tx-info{flex:1;min-width:0;}
+    .tx-cat{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .tx-meta{font-size:11px;color:var(--sub);margin-top:1px;}
+    .tx-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+    .tx-amt{font-size:15px;font-weight:700;}
+    .tx-amt.plus{color:var(--accent);}
+    .tx-amt.minus{color:var(--red);}
+    .tx-acts{display:flex;gap:4px;}
+    .txbtn{
+      border:none;background:var(--bg);border-radius:8px;
+      padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;
+    }
+    .txbtn.edit{color:var(--accent);}
+    .txbtn.del{color:var(--red);}
+
+    /* ── FAB SPEED DIAL ── */
+    .fab-wrap{
+      position:fixed;bottom:calc(var(--nav-h) + 16px);
+      right:calc(max(0px,(100vw - 430px)/2) + 16px);
+      z-index:90;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;
+    }
+    .fab-main{
+      width:56px;height:56px;border-radius:50%;
+      background:var(--grad);color:#fff;border:none;
+      font-size:26px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 20px rgba(99,102,241,.45);
+      transition:transform .2s,box-shadow .2s;
+    }
+    .fab-main:active{transform:scale(.93);}
+    .fab-main.open{transform:rotate(45deg);}
+    .fab-items{display:none;flex-direction:column-reverse;gap:8px;align-items:flex-end;}
+    .fab-items.open{display:flex;}
+    .fab-item{
+      display:flex;align-items:center;gap:10px;
+      animation:fabIn .18s ease both;
+    }
+    @keyframes fabIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+    .fab-item-lbl{
+      background:var(--text);color:#fff;font-size:12px;font-weight:600;
+      padding:6px 12px;border-radius:20px;white-space:nowrap;
+      box-shadow:0 2px 8px rgba(0,0,0,.2);
+    }
+    .fab-item-btn{
+      width:44px;height:44px;border-radius:50%;border:none;
+      font-size:20px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.15);
+      flex-shrink:0;
+    }
+    .fab-overlay{
+      position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.3);
+      display:none;
+      backdrop-filter:blur(2px);
+    }
+    .fab-overlay.open{display:block;}
+    .fab-wrap.hidden{display:none;}
+
+    /* ── MONTH FILTER ── */
+    .mfilter{
+      display:flex;gap:8px;padding:12px 16px;overflow-x:auto;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    }
+    .mfilter::-webkit-scrollbar{display:none;}
+    .mtab{
+      flex-shrink:0;padding:6px 16px;border-radius:20px;border:none;
+      font-size:13px;font-weight:600;
+      background:var(--card);color:var(--sub);cursor:pointer;
+      transition:all .15s;
+      box-shadow:0 1px 3px rgba(0,0,0,.06);
+    }
+    .mtab.on{background:var(--accent);color:#fff;}
+
+    /* ── CALENDAR ── */
+    .cal-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
+    .cal-nav-btn{
+      border:none;background:var(--card);border-radius:10px;
+      width:36px;height:36px;font-size:18px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 1px 3px rgba(0,0,0,.08);
+    }
+    .cal-month{font-size:17px;font-weight:700;}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 12px 12px;}
+    .cal-hd{text-align:center;font-size:11px;color:var(--sub);font-weight:600;padding:6px 0;}
+    .cal-hd:first-child,.cal-day.sun{color:var(--red);}
+    .cal-hd:nth-child(7),.cal-day.sat{color:var(--accent);}
+    .cal-day{
+      aspect-ratio:1;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;position:relative;
+    }
+    .cal-day.today{background:var(--accent);color:#fff;font-weight:700;}
+    .cal-day.has-lunch{background:#EEF2FF;}
+    .cal-day.has-lunch::after{
+      content:'🍱';position:absolute;
+      bottom:-2px;right:-2px;font-size:9px;
+    }
+    .cal-legend{font-size:12px;color:var(--sub);padding:0 16px 16px;}
+
+    /* ── ASSETS ── */
+    .asset-card{
+      background:var(--card);border-radius:16px;
+      margin:0 16px;overflow:hidden;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .asset-item{
+      display:flex;align-items:center;gap:12px;padding:13px 14px;
+      border-bottom:1px solid var(--border);
+    }
+    .asset-item:last-child{border-bottom:none;}
+    .asset-ico-wrap{
+      width:40px;height:40px;border-radius:12px;
+      background:#F0FDF4;
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;flex-shrink:0;
+    }
+    .asset-info{flex:1;min-width:0;}
+    .asset-name{font-size:14px;font-weight:600;}
+    .asset-meta{font-size:11px;color:var(--sub);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .asset-price{font-size:14px;font-weight:700;color:var(--green);flex-shrink:0;}
+    .asset-acts{display:flex;gap:4px;flex-shrink:0;}
+
+    /* ── GRAPH ── */
+    .graph-card{background:var(--card);border-radius:16px;margin:0 16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+
+    /* ── SETTINGS ── */
+    .set-card{
+      background:var(--card);border-radius:16px;
+      margin:0 16px 12px;overflow:hidden;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .set-item{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:15px 16px;border-bottom:1px solid var(--border);
+    }
+    .set-item:last-child{border-bottom:none;}
+    .set-lbl{font-size:15px;}
+    .set-val{font-size:14px;color:var(--accent);font-weight:600;}
+    .set-btn{
+      border:none;background:var(--bg);color:var(--accent);
+      font-size:13px;font-weight:600;cursor:pointer;
+      padding:6px 12px;border-radius:8px;
+    }
+    .tier-row{
+      display:flex;align-items:center;gap:12px;padding:12px 16px;
+      border-bottom:1px solid var(--border);
+    }
+    .tier-row:last-child{border-bottom:none;}
+    .tier-chip{
+      font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;
+      background:#EEF2FF;color:#6366F1;white-space:nowrap;flex-shrink:0;
+    }
+    .tier-chip.orange{background:#FEF3C7;color:#D97706;}
+    .tier-info{flex:1;}
+    .tier-amt{font-size:14px;font-weight:700;}
+    .tier-time{font-size:11px;color:var(--sub);margin-top:2px;}
+    .logout-btn{
+      width:calc(100% - 32px);margin:8px 16px;padding:15px;border:none;
+      background:var(--card);color:var(--red);border-radius:16px;
+      font-size:16px;font-weight:600;cursor:pointer;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+
+    /* ── MODALS ── */
+    .overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);
+      z-index:500;display:flex;align-items:flex-end;justify-content:center;
+      backdrop-filter:blur(4px);
+    }
+    .overlay.hide{display:none;}
+    .modal{
+      background:var(--card);border-radius:24px 24px 0 0;
+      width:100%;max-width:430px;padding:24px 20px 40px;
+      max-height:90vh;overflow-y:auto;
+    }
+    .modal-handle{
+      width:36px;height:4px;background:var(--border);
+      border-radius:2px;margin:0 auto 20px;
+    }
+    .modal-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:20px;}
+    .modal-close{
+      position:absolute;top:16px;right:16px;border:none;
+      background:var(--bg);border-radius:50%;width:32px;height:32px;
+      font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    }
+    .modal-wrap{position:relative;}
+    .fg{margin-bottom:16px;}
+    .fl{font-size:13px;color:var(--sub);margin-bottom:6px;font-weight:500;display:block;}
+    .fi{
+      width:100%;padding:13px 14px;border:1.5px solid var(--border);
+      border-radius:12px;font-size:16px;color:var(--text);
+      background:var(--card);-webkit-appearance:none;outline:none;
+    }
+    .fi:focus{border-color:var(--accent);}
+    select.fi{background:var(--card);}
+    .btn-p{
+      width:100%;padding:15px;border:none;background:var(--grad);color:#fff;
+      border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px;
+    }
+    .btn-p:active{opacity:.85;}
+    .btn-s{
+      width:100%;padding:15px;border:1.5px solid var(--border);
+      background:var(--card);color:var(--text);border-radius:14px;
+      font-size:17px;font-weight:600;cursor:pointer;margin-top:8px;
+    }
+    .btn-d{
+      width:100%;padding:15px;border:none;background:#FEF2F2;color:var(--red);
+      border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px;
+    }
+
+    /* AT test grid */
+    .at-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+    .at-btn{
+      padding:18px 10px;border:2px solid var(--border);border-radius:14px;
+      background:var(--card);font-size:13px;font-weight:700;cursor:pointer;
+      text-align:center;line-height:1.6;transition:border-color .15s,background .15s;
+    }
+    .at-btn:active{border-color:var(--orange);background:#FFFBEB;}
+    .at-sub{font-size:11px;font-weight:400;color:var(--sub);}
+
+    /* Switch */
+    .sw-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .sw{position:relative;display:inline-block;width:48px;height:28px;}
+    .sw input{opacity:0;width:0;height:0;}
+    .sw-track{position:absolute;inset:0;background:var(--border);border-radius:28px;transition:.2s;cursor:pointer;}
+    .sw input:checked + .sw-track{background:var(--green);}
+    .sw-track::before{
+      content:'';position:absolute;width:22px;height:22px;
+      left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;
+    }
+    .sw input:checked + .sw-track::before{left:23px;}
+
+    /* Toast */
+    #toast{
+      position:fixed;bottom:calc(var(--nav-h) + 20px);left:50%;transform:translateX(-50%);
+      background:#0F172A;color:#fff;padding:12px 24px;border-radius:24px;
+      font-size:14px;font-weight:500;z-index:999;
+      opacity:0;transition:opacity .3s;
+      white-space:nowrap;pointer-events:none;
+      box-shadow:0 4px 20px rgba(0,0,0,.25);
+    }
+    #toast.show{opacity:1;}
+
+    /* Empty state */
+    .empty{text-align:center;padding:60px 20px;color:var(--sub);}
+    .empty-ico{font-size:48px;margin-bottom:12px;}
+    .empty-txt{font-size:15px;}
+
+    /* Hide */
+    .hide{display:none!important;}
+
+    /* PIN inside modal */
+    .pin-modal-dots{display:flex;gap:14px;justify-content:center;margin-bottom:28px;}
+    .pin-modal-dot{
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid var(--border);background:transparent;transition:all .15s;
+    }
+    .pin-modal-dot.on{background:var(--accent);border-color:var(--accent);}
+    .pin-modal-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:240px;margin:0 auto;}
+    .pin-modal-err{color:var(--red);font-size:13px;text-align:center;margin-top:14px;min-height:18px;}
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     LOCK SCREEN
+══════════════════════════════ -->
+<div id="lock-screen" class="lock">
+  <div class="lock-logo">💰</div>
+  <div class="lock-title" id="lock-title">こづかい管理</div>
+  <div class="lock-sub" id="lock-sub">パスコードを入力してください</div>
+  <div class="lock-dots" id="lock-dots"></div>
+  <div class="numpad" id="lock-pad"></div>
+  <div class="lock-err" id="lock-err"></div>
+</div>
+
+<!-- ══════════════════════════════
+     MAIN APP
+══════════════════════════════ -->
+<div id="app">
+  <!-- Header -->
+  <div class="hdr">
+    <span class="hdr-title" id="hdr-title">こづかい管理</span>
+    <div class="hdr-right">
+      <span class="parent-timer" id="parent-timer"></span>
+      <span class="mode-chip" id="mode-chip">👦 子どもモード</span>
+      <button class="mode-btn" id="mode-btn" title="親モード切替">🔐</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="page on pg" id="page-home">
+    <div class="hero" id="hero-card">
+      <div class="hero-lbl">現在の残高</div>
+      <div class="hero-amt"><span class="hero-yen">¥</span><span id="hero-val">0</span></div>
+      <div class="hero-sub" id="hero-sub"></div>
+      <div class="hero-row">
+        <div class="hero-stat">
+          <div class="hero-stat-lbl">📱 スマホ</div>
+          <div class="hero-stat-val" id="hero-phone">未設定</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-lbl">🎮 PS5</div>
+          <div class="hero-stat-val" id="hero-ps5">未設定</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rank-card" id="rank-card">
+      <div class="rank-badge-big" id="rank-badge-ico">📊</div>
+      <div>
+        <div class="rank-info-lbl">直近のテスト順位</div>
+        <div class="rank-info-val" id="rank-val">未設定</div>
+        <div class="rank-info-sub" id="rank-sub">順位を入力するとお小遣い額が決まります</div>
+      </div>
+    </div>
+
+    <div class="sec-hd">最近の取引</div>
+    <div class="tx-card" id="home-tx"></div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div class="page pg" id="page-tx">
+    <div class="mfilter" id="tx-filter"></div>
+    <div class="tx-card hide" id="tx-list" style="margin:0 16px;"></div>
+    <div class="empty hide" id="tx-empty">
+      <div class="empty-ico">💴</div>
+      <div class="empty-txt">取引記録がありません</div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="page pg" id="page-cal">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+      <span class="cal-month" id="cal-month-lbl"></span>
+      <button class="cal-nav-btn" onclick="calNext()">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend">🍱 弁当代を渡した日</div>
+  </div>
+
+  <!-- ASSETS -->
+  <div class="page pg" id="page-asset">
+    <div class="sec-hd">モノ資産一覧（現金残高に含まない）</div>
+    <div class="asset-card" id="asset-list"></div>
+    <div class="empty hide" id="asset-empty">
+      <div class="empty-ico">📦</div>
+      <div class="empty-txt">資産が登録されていません</div>
+    </div>
+  </div>
+
+  <!-- GRAPH -->
+  <div class="page pg" id="page-graph">
+    <div class="sec-hd">残高推移</div>
+    <div class="graph-card">
+      <canvas id="balance-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- SETTINGS (parent only) -->
+  <div class="page pg" id="page-settings">
+    <div class="sec-hd">基本設定</div>
+    <div class="set-card">
+      <div class="set-item">
+        <span class="set-lbl">弁当代金額</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="set-val" id="set-lunch">¥500</span>
+          <button class="set-btn" onclick="openSetModal('lunch')">変更</button>
+        </div>
+      </div>
+      <div class="set-item">
+        <span class="set-lbl">月次お小遣い追加日</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="set-val" id="set-day">毎月1日</span>
+          <button class="set-btn" onclick="openSetModal('day')">変更</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-hd">本テスト 順位帯とお小遣い額</div>
+    <div class="set-card" id="tier-table"></div>
+
+    <div class="sec-hd">ATテスト 臨時お小遣い</div>
+    <div class="set-card" id="at-tier-table"></div>
+
+    <div class="sec-hd">セキュリティ</div>
+    <div class="set-card">
+      <div class="set-item">
+        <span class="set-lbl">アプリパスコード変更</span>
+        <button class="set-btn" onclick="openChangePass('passcode')">変更</button>
+      </div>
+      <div class="set-item">
+        <span class="set-lbl">親PIN変更</span>
+        <button class="set-btn" onclick="openChangePass('pin')">変更</button>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+  </div>
+
+  <!-- Nav -->
+  <nav id="nav">
+    <div class="ni on" data-tab="home" onclick="go('home')"><span class="ni-ico">🏠</span>ホーム</div>
+    <div class="ni" data-tab="tx" onclick="go('tx')"><span class="ni-ico">💴</span>取引</div>
+    <div class="ni" data-tab="cal" onclick="go('cal')"><span class="ni-ico">📅</span>カレンダー</div>
+    <div class="ni" data-tab="asset" onclick="go('asset')"><span class="ni-ico">📦</span>資産</div>
+    <div class="ni" data-tab="graph" onclick="go('graph')"><span class="ni-ico">📈</span>グラフ</div>
+    <div class="ni hide" id="nav-settings" data-tab="settings" onclick="go('settings')"><span class="ni-ico">⚙️</span>設定</div>
+  </nav>
+</div>
+
+<!-- Speed Dial FAB -->
+<div class="fab-overlay" id="fab-overlay" onclick="closeFab()"></div>
+<div class="fab-wrap hidden" id="fab-wrap">
+  <button class="fab-main" id="fab-main" onclick="toggleFab()">＋</button>
+  <div class="fab-items" id="fab-items"></div>
+</div>
+
+<!-- ══════════════════════════════
+     MODALS
+══════════════════════════════ -->
+
+<!-- Parent PIN -->
+<div class="overlay hide" id="pin-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('pin-overlay')">✕</button>
+    <div class="modal-title">親モードに切り替え</div>
+    <div class="pin-modal-dots" id="pin-dots"></div>
+    <div class="pin-modal-pad" id="pin-pad"></div>
+    <div class="pin-modal-err" id="pin-err"></div>
+  </div>
+</div>
+
+<!-- Transaction -->
+<div class="overlay hide" id="tx-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('tx-overlay')">✕</button>
+    <div class="modal-title" id="tx-modal-title">収入を追加</div>
+    <div class="fg">
+      <label class="fl">種別</label>
+      <select class="fi" id="tx-type">
+        <option value="income">収入</option>
+        <option value="expense">支出</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">日付</label>
+      <input class="fi" type="date" id="tx-date">
+    </div>
+    <div class="fg">
+      <label class="fl">金額（円）</label>
+      <input class="fi" type="number" id="tx-amount" placeholder="例：1000" inputmode="numeric">
+    </div>
+    <div class="fg">
+      <label class="fl">項目名</label>
+      <input class="fi" type="text" id="tx-category" placeholder="例：お小遣い">
+    </div>
+    <div class="fg">
+      <label class="fl">メモ（任意）</label>
+      <input class="fi" type="text" id="tx-memo" placeholder="任意">
+    </div>
+    <button class="btn-p" onclick="saveTx()">保存</button>
+    <button class="btn-s" onclick="closeModal('tx-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- AT Test -->
+<div class="overlay hide" id="at-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('at-overlay')">✕</button>
+    <div class="modal-title">ATテスト結果</div>
+    <div class="at-grid" id="at-grid"></div>
+    <button class="at-btn" style="width:100%;margin-bottom:16px;border-color:var(--purple);background:#F5F3FF;" onclick="doKotestFromAT()">
+      ✅ 小テスト満点<br><span class="at-sub">🃏 ポケカ1Pを追加</span>
+    </button>
+    <button class="btn-s" onclick="closeModal('at-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- Rank input -->
+<div class="overlay hide" id="rank-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('rank-overlay')">✕</button>
+    <div class="modal-title">テスト順位を入力</div>
+    <p style="font-size:13px;color:var(--sub);margin-bottom:16px;text-align:center;">
+      来月からのお小遣い・スマホ・PS5時間が自動更新されます
+    </p>
+    <div class="fg">
+      <label class="fl">学年順位（位）</label>
+      <input class="fi" type="number" id="rank-input" placeholder="例：15" inputmode="numeric">
+    </div>
+    <div class="fg">
+      <label class="fl">テスト名（任意）</label>
+      <input class="fi" type="text" id="rank-test-name" placeholder="例：1学期中間テスト">
+    </div>
+    <button class="btn-p" onclick="saveRank()">保存</button>
+    <button class="btn-s" onclick="closeModal('rank-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- Asset -->
+<div class="overlay hide" id="asset-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('asset-overlay')">✕</button>
+    <div class="modal-title" id="asset-modal-title">資産を追加</div>
+    <div class="fg">
+      <label class="fl">品目名</label>
+      <input class="fi" type="text" id="asset-name" placeholder="例：ポケモンカード、PS5">
+    </div>
+    <div class="fg">
+      <label class="fl">購入日</label>
+      <input class="fi" type="date" id="asset-date">
+    </div>
+    <div class="fg">
+      <label class="fl">購入額（円・0でも可）</label>
+      <input class="fi" type="number" id="asset-price" placeholder="0" inputmode="numeric">
+    </div>
+    <div class="fg">
+      <label class="fl">メモ（任意）</label>
+      <input class="fi" type="text" id="asset-memo" placeholder="任意">
+    </div>
+    <button class="btn-p" onclick="saveAsset()">保存</button>
+    <button class="btn-d hide" id="asset-del-btn" onclick="deleteAssetById(null)">削除</button>
+    <button class="btn-s" onclick="closeModal('asset-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- Settings value change -->
+<div class="overlay hide" id="set-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('set-overlay')">✕</button>
+    <div class="modal-title" id="set-modal-title">設定変更</div>
+    <div class="fg">
+      <label class="fl" id="set-modal-lbl">値</label>
+      <input class="fi" type="number" id="set-modal-val" inputmode="numeric">
+    </div>
+    <button class="btn-p" onclick="saveSetModal()">保存</button>
+    <button class="btn-s" onclick="closeModal('set-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- Change passcode/PIN -->
+<div class="overlay hide" id="chpass-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('chpass-overlay')">✕</button>
+    <div class="modal-title" id="chpass-title">パスコード変更</div>
+    <div class="fg">
+      <label class="fl" id="chpass-lbl1">新しいパスコード（6桁）</label>
+      <input class="fi" type="password" id="chpass-new" maxlength="6" inputmode="numeric">
+    </div>
+    <div class="fg">
+      <label class="fl">確認（もう一度）</label>
+      <input class="fi" type="password" id="chpass-confirm" maxlength="6" inputmode="numeric">
+    </div>
+    <div class="lock-err" id="chpass-err"></div>
+    <button class="btn-p" onclick="savePasscode()">保存</button>
+    <button class="btn-s" onclick="closeModal('chpass-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- Setup: allowance day -->
+<div class="overlay hide" id="setup-day-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <div class="modal-title">月次お小遣いの追加日</div>
+    <p style="font-size:14px;color:var(--sub);text-align:center;margin-bottom:20px;">毎月何日にお小遣いを自動追加しますか？</p>
+    <div class="fg">
+      <label class="fl">日にち（1〜28）</label>
+      <input class="fi" type="number" id="setup-day-val" value="1" min="1" max="28" inputmode="numeric">
+    </div>
+    <button class="btn-p" onclick="finishSetup()">設定完了</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════
+     SCRIPT
+══════════════════════════════ -->
+<script>
+// ─── FIREBASE CONFIG ───
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyBf3elvPKH0nG-RJgHuxiWLALXony-Cgi8",
+  authDomain:        "kozukai-kanri.firebaseapp.com",
+  projectId:         "kozukai-kanri",
+  storageBucket:     "kozukai-kanri.firebasestorage.app",
+  messagingSenderId: "197851819869",
+  appId:             "1:197851819869:web:7f07224cc17c326d6b02b4"
+};
+
+// ─── DEFAULT TIER DATA ───
+const DEFAULT_TIERS = [
+  {label:'1〜8位',   min:1,   max:8,    amount:10000, phone:120, ps5:60},
+  {label:'9〜21位',  min:9,   max:21,   amount:7000,  phone:120, ps5:45},
+  {label:'22〜45位', min:22,  max:45,   amount:5000,  phone:120, ps5:45},
+  {label:'46〜110位',min:46,  max:110,  amount:3000,  phone:120, ps5:30},
+  {label:'111位〜',  min:111, max:9999, amount:1500,  phone:105, ps5:0 },
+];
+const DEFAULT_AT_TIERS = [
+  {label:'1〜8位',   min:1,  max:8,   amount:3000, poke:false},
+  {label:'9〜21位',  min:9,  max:21,  amount:2000, poke:false},
+  {label:'22〜45位', min:22, max:45,  amount:1000, poke:false},
+  {label:'46〜94位', min:46, max:94,  amount:0,    poke:true },
+];
+
+// ─── STATE ───
+let db;
+const S = {
+  isParent: false,
+  cfg: null,
+  txs: [],
+  assets: [],
+  lunchDates: new Set(),
+  calY: new Date().getFullYear(),
+  calM: new Date().getMonth(),
+  txFilter: null,
+  chart: null,
+  editTxId: null,
+  editAssetId: null,
+  currentTab: 'home',
+  parentTimer: null,
+  parentTimerSecs: 0,
+  // setup flow
+  setupStep: 'passcode',
+  setupHash: '',
+};
+
+// ─── UTILS ───
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+const fmt = n => n.toLocaleString('ja-JP');
+const fmtD = d => d.replace(/-/g,'/');
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function thisMonth() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function fmtTime(m) {
+  if(m === 0) return '0分';
+  if(m % 60 === 0) return `${m/60}時間`;
+  return `${Math.floor(m/60)}時間${m%60}分`;
+}
+function getTier(rank, tiers) {
+  return (tiers || S.cfg.tiers).find(t => rank >= t.min && rank <= t.max) || null;
+}
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+function openModal(id) { document.getElementById(id).classList.remove('hide'); }
+function closeModal(id) { document.getElementById(id).classList.add('hide'); }
+
+// ─── FIREBASE HELPERS ───
+async function loadCfg() {
+  const s = await db.collection('app').doc('config').get();
+  return s.exists ? s.data() : null;
+}
+async function saveCfg(c) {
+  await db.collection('app').doc('config').set(c, {merge:true});
+  S.cfg = {...S.cfg, ...c};
+}
+async function loadTxs() {
+  const s = await db.collection('transactions').orderBy('date','desc').get();
+  S.txs = s.docs.map(d => ({id:d.id,...d.data()}));
+}
+async function loadAssets() {
+  const s = await db.collection('assets').orderBy('createdAt','desc').get();
+  S.assets = s.docs.map(d => ({id:d.id,...d.data()}));
+}
+async function loadLunch() {
+  const s = await db.collection('lunchDates').get();
+  S.lunchDates = new Set(s.docs.map(d => d.id));
+}
+const TS = () => firebase.firestore.FieldValue.serverTimestamp();
+async function addTx(tx) { await db.collection('transactions').add({...tx, createdAt:TS()}); }
+async function updTx(id, tx) { await db.collection('transactions').doc(id).update(tx); }
+async function delTx(id) { await db.collection('transactions').doc(id).delete(); }
+async function addAssetDoc(a) { await db.collection('assets').add({...a, createdAt:TS()}); }
+async function updAssetDoc(id, a) { await db.collection('assets').doc(id).update(a); }
+async function delAssetDoc(id) { await db.collection('assets').doc(id).delete(); }
+
+// ─── BALANCE ───
+function balance() {
+  return S.txs.reduce((sum,tx) => tx.type==='expense' ? sum-Math.abs(tx.amount) : sum+Math.abs(tx.amount), 0);
+}
+
+// ─── MONTHLY ALLOWANCE (idempotent via Firestore transaction) ───
+async function checkMonthly() {
+  const cfg = S.cfg;
+  if(!cfg || !cfg.currentRank) return;
+  const d = new Date();
+  if(d.getDate() < cfg.allowanceDay) return;
+  const month = thisMonth();
+  if(cfg.lastAllowanceMonth === month) return;
+
+  const tier = getTier(cfg.currentRank, cfg.tiers);
+  if(!tier) return;
+
+  // Use transaction to prevent double-add
+  const cfgRef = db.collection('app').doc('config');
+  let added = false;
+  await db.runTransaction(async t => {
+    const snap = await t.get(cfgRef);
+    const data = snap.data() || {};
+    if(data.lastAllowanceMonth === month) return; // already done
+    const txRef = db.collection('transactions').doc();
+    t.set(txRef, {
+      date: today(), amount: tier.amount, type: 'income',
+      category: '月次お小遣い', memo: `${month} 自動追加（${tier.label}）`,
+      createdAt: TS()
+    });
+    t.update(cfgRef, {lastAllowanceMonth: month});
+    added = true;
+  });
+  if(added) {
+    S.cfg.lastAllowanceMonth = month;
+    showToast(`💴 ¥${fmt(tier.amount)} 月次お小遣いを追加しました`);
+  }
+}
+
+// ─── NUMPAD BUILDER ───
+function buildNumpad(padId, handler, digits, dotsId) {
+  const pad = document.getElementById(padId);
+  if(!pad) return;
+  pad.innerHTML = '';
+  [1,2,3,4,5,6,7,8,9,null,0,'⌫'].forEach(k => {
+    const btn = document.createElement('button');
+    btn.className = 'nk';
+    if(k === null) { btn.style.visibility='hidden'; pad.appendChild(btn); return; }
+    btn.textContent = String(k);
+    btn.onclick = () => handler(k);
+    pad.appendChild(btn);
+  });
+  renderDots(dotsId, '', digits);
+}
+function renderDots(id, buf, total) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = '';
+  const cls = id.startsWith('lock') ? 'lock-dot' : 'pin-modal-dot';
+  for(let i=0;i<total;i++){
+    const d = document.createElement('div');
+    d.className = cls + (i < buf.length ? ' on' : '');
+    el.appendChild(d);
+  }
+}
+
+// ─── LOCK / SETUP ───
+let lockBuf = '';
+let setupBuf = '';
+let setupHash = '';
+
+function showLock() {
+  const ls = document.getElementById('lock-screen');
+  ls.style.display = 'flex';
+  lockBuf = '';
+  buildNumpad('lock-pad', onLockKey, 6, 'lock-dots');
+  document.getElementById('lock-err').textContent = '';
+}
+
+function startSetup() {
+  S.setupStep = 'passcode';
+  setupBuf = ''; setupHash = '';
+  document.getElementById('lock-title').textContent = '初期設定';
+  document.getElementById('lock-sub').textContent = 'パスコードを設定してください（6桁）';
+  document.getElementById('lock-err').textContent = '';
+  buildNumpad('lock-pad', onSetupKey, 6, 'lock-dots');
+}
+
+async function onLockKey(k) {
+  const err = document.getElementById('lock-err');
+  if(k === '⌫') lockBuf = lockBuf.slice(0,-1);
+  else lockBuf += String(k);
+  renderDots('lock-dots', lockBuf, 6);
+  err.textContent = '';
+  if(lockBuf.length === 6) {
+    const h = await sha256(lockBuf);
+    lockBuf = '';
+    renderDots('lock-dots','',6);
+    if(h === S.cfg.passcodeHash) {
+      document.getElementById('lock-screen').style.display = 'none';
+      await startApp();
+    } else {
+      err.textContent = 'パスコードが違います';
+    }
+  }
+}
+
+async function onSetupKey(k) {
+  const err = document.getElementById('lock-err');
+  const digits = S.setupStep === 'pin' ? 4 : 6;
+  if(k === '⌫') setupBuf = setupBuf.slice(0,-1);
+  else setupBuf += String(k);
+  renderDots('lock-dots', setupBuf, digits);
+  err.textContent = '';
+
+  if(S.setupStep === 'passcode' && setupBuf.length === 6) {
+    setupHash = await sha256(setupBuf);
+    setupBuf = '';
+    S.setupStep = 'passcode2';
+    document.getElementById('lock-sub').textContent = '確認のため、もう一度入力してください';
+    renderDots('lock-dots','',6);
+  } else if(S.setupStep === 'passcode2' && setupBuf.length === 6) {
+    const h = await sha256(setupBuf);
+    if(h !== setupHash) {
+      err.textContent = 'パスコードが一致しません。最初からやり直してください';
+      setupBuf = ''; setupHash = '';
+      S.setupStep = 'passcode';
+      document.getElementById('lock-sub').textContent = 'パスコードを設定してください（6桁）';
+      renderDots('lock-dots','',6);
+      return;
+    }
+    setupBuf = '';
+    S.setupStep = 'pin';
+    document.getElementById('lock-sub').textContent = '親用PIN（4桁）を設定してください';
+    buildNumpad('lock-pad', onSetupKey, 4, 'lock-dots');
+  } else if(S.setupStep === 'pin' && setupBuf.length === 4) {
+    const pinHash = await sha256(setupBuf);
+    setupBuf = '';
+    S.setupHash_pin = pinHash;
+    // Show day selection modal instead of prompt()
+    document.getElementById('setup-day-val').value = '1';
+    openModal('setup-day-overlay');
+  }
+}
+
+async function finishSetup() {
+  const day = Math.min(28, Math.max(1, parseInt(document.getElementById('setup-day-val').value) || 1));
+  closeModal('setup-day-overlay');
+  const cfg = {
+    passcodeHash: setupHash,
+    pinHash: S.setupHash_pin,
+    lunchAmount: 500,
+    allowanceDay: day,
+    tiers: DEFAULT_TIERS,
+    atTiers: DEFAULT_AT_TIERS,
+    currentRank: null,
+    currentTier: null,
+    lastAllowanceMonth: null,
+  };
+  await db.collection('app').doc('config').set(cfg);
+  S.cfg = cfg;
+  document.getElementById('lock-screen').style.display = 'none';
+  await startApp();
+}
+
+// ─── PARENT PIN MODAL ───
+let pinBuf = '';
+
+function openPinModal() {
+  pinBuf = '';
+  buildNumpad('pin-pad', onPinKey, 4, 'pin-dots');
+  document.getElementById('pin-err').textContent = '';
+  openModal('pin-overlay');
+}
+
+async function onPinKey(k) {
+  if(k === '⌫') pinBuf = pinBuf.slice(0,-1);
+  else pinBuf += String(k);
+  renderDots('pin-dots', pinBuf, 4);
+  document.getElementById('pin-err').textContent = '';
+  if(pinBuf.length === 4) {
+    const h = await sha256(pinBuf);
+    pinBuf = '';
+    renderDots('pin-dots','',4);
+    if(h === S.cfg.pinHash) {
+      S.isParent = true;
+      closeModal('pin-overlay');
+      startParentTimer();
+      updateModeUI();
+      showToast('🔐 親モードに切り替えました');
+    } else {
+      document.getElementById('pin-err').textContent = 'PINが違います';
+    }
+  }
+}
+
+function toggleMode() {
+  if(S.isParent) {
+    exitParentMode();
+  } else {
+    openPinModal();
+  }
+}
+
+function exitParentMode() {
+  S.isParent = false;
+  clearParentTimer();
+  updateModeUI();
+  showToast('👦 子どもモードに切り替えました');
+}
+
+// ─── PARENT AUTO-TIMEOUT ───
+function startParentTimer() {
+  clearParentTimer();
+  S.parentTimerSecs = 300; // 5 minutes
+  const el = document.getElementById('parent-timer');
+  el.style.display = 'block';
+  S.parentTimer = setInterval(() => {
+    S.parentTimerSecs--;
+    const m = Math.floor(S.parentTimerSecs / 60);
+    const s = S.parentTimerSecs % 60;
+    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    if(S.parentTimerSecs <= 0) exitParentMode();
+  }, 1000);
+}
+
+function clearParentTimer() {
+  if(S.parentTimer) { clearInterval(S.parentTimer); S.parentTimer = null; }
+  const el = document.getElementById('parent-timer');
+  if(el) el.style.display = 'none';
+}
+
+function resetParentTimer() {
+  if(S.isParent) startParentTimer();
+}
+
+// ─── MODE UI ───
+function updateModeUI() {
+  const chip = document.getElementById('mode-chip');
+  const navSettings = document.getElementById('nav-settings');
+  const fabWrap = document.getElementById('fab-wrap');
+
+  if(S.isParent) {
+    chip.textContent = '🔐 親モード';
+    chip.className = 'mode-chip parent';
+    navSettings.classList.remove('hide');
+  } else {
+    chip.textContent = '👦 子どもモード';
+    chip.className = 'mode-chip';
+    navSettings.classList.add('hide');
+    if(S.currentTab === 'settings') go('home');
+  }
+  updateFab();
+  renderHome();
+  renderTxList();
+  renderAssets();
+}
+
+// ─── START APP ───
+async function startApp() {
+  await Promise.all([loadTxs(), loadAssets(), loadLunch()]);
+  await checkMonthly();
+  await loadTxs(); // reload after possible auto-add
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('mode-btn').onclick = toggleMode;
+  // Reset to child mode on each login
+  S.isParent = false;
+  updateModeUI();
+  go('home');
+}
+
+// ─── TAB NAVIGATION ───
+function go(tab) {
+  S.currentTab = tab;
+  ['home','tx','cal','asset','graph','settings'].forEach(t => {
+    document.getElementById(`page-${t}`).classList.toggle('on', t===tab);
+  });
+  document.querySelectorAll('#nav .ni').forEach(el => {
+    el.classList.toggle('on', el.dataset.tab === tab);
+  });
+  const titles = {home:'こづかい管理',tx:'取引履歴',cal:'カレンダー',asset:'モノ資産',graph:'残高グラフ',settings:'設定'};
+  document.getElementById('hdr-title').textContent = titles[tab] || 'こづかい管理';
+  closeFab();
+  updateFab();
+  if(tab==='tx') renderTxList();
+  if(tab==='cal') renderCalendar();
+  if(tab==='asset') renderAssets();
+  if(tab==='graph') renderGraph();
+  if(tab==='settings') renderSettings();
+  resetParentTimer();
+}
+
+// ─── SPEED DIAL FAB ───
+const FAB_ACTIONS = [
+  {ico:'🍱',lbl:'弁当代 +500円',color:'#10B981',fn:'doLunch'},
+  {ico:'📝',lbl:'ATテスト結果',color:'#F59E0B',fn:'openATModal'},
+  {ico:'🏆',lbl:'テスト順位入力',color:'#6366F1',fn:'openRankModal'},
+  {ico:'💰',lbl:'収入を追加',color:'#10B981',fn:"openTxModal('income')"},
+  {ico:'💸',lbl:'支出を追加',color:'#EF4444',fn:"openTxModal('expense')"},
+  {ico:'📦',lbl:'資産を追加',color:'#8B5CF6',fn:'openAssetModal'},
+];
+
+function buildFab() {
+  const items = document.getElementById('fab-items');
+  items.innerHTML = FAB_ACTIONS.map((a,i) =>
+    `<div class="fab-item" style="animation-delay:${i*0.04}s">
+      <span class="fab-item-lbl">${a.lbl}</span>
+      <button class="fab-item-btn" style="background:${a.color};" onclick="closeFab();${a.fn}();">
+        ${a.ico}
+      </button>
+    </div>`
+  ).join('');
+}
+
+function updateFab() {
+  const wrap = document.getElementById('fab-wrap');
+  const show = S.isParent;
+  wrap.classList.toggle('hidden', !show);
+  if(!show) closeFab();
+}
+
+function toggleFab() {
+  const open = document.getElementById('fab-items').classList.toggle('open');
+  document.getElementById('fab-main').classList.toggle('open', open);
+  document.getElementById('fab-overlay').classList.toggle('open', open);
+  resetParentTimer();
+}
+
+function closeFab() {
+  document.getElementById('fab-items').classList.remove('open');
+  document.getElementById('fab-main').classList.remove('open');
+  document.getElementById('fab-overlay').classList.remove('open');
+}
+
+// ─── HOME ───
+function renderHome() {
+  const bal = balance();
+  document.getElementById('hero-val').textContent = fmt(Math.abs(bal));
+  const card = document.getElementById('hero-card');
+  card.style.background = bal >= 0
+    ? 'linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#A855F7 100%)'
+    : 'linear-gradient(135deg,#EF4444 0%,#DC2626 100%)';
+
+  const cfg = S.cfg;
+  if(cfg && cfg.currentRank) {
+    const tier = getTier(cfg.currentRank, cfg.tiers);
+    document.getElementById('rank-val').textContent = `${cfg.currentRank}位`;
+    if(tier) {
+      document.getElementById('rank-sub').textContent = `${tier.label}：月額 ¥${fmt(tier.amount)}`;
+      document.getElementById('hero-phone').textContent = fmtTime(tier.phone);
+      document.getElementById('hero-ps5').textContent = fmtTime(tier.ps5);
+    }
+  } else {
+    document.getElementById('rank-val').textContent = '未設定';
+    document.getElementById('rank-sub').textContent = '順位を入力するとお小遣い額が決まります';
+    document.getElementById('hero-phone').textContent = '未設定';
+    document.getElementById('hero-ps5').textContent = '未設定';
+  }
+
+  const list = document.getElementById('home-tx');
+  const recent = S.txs.slice(0,5);
+  list.innerHTML = recent.length === 0
+    ? '<div class="empty"><div class="empty-ico">💴</div><div class="empty-txt">取引記録がありません</div></div>'
+    : recent.map(tx => txItemHTML(tx, false)).join('');
+}
+
+// ─── TX ITEM HTML ───
+function txItemHTML(tx, showActs) {
+  const isInc = tx.type !== 'expense';
+  const ico = tx.category.includes('弁当') ? '🍱'
+    : tx.category.includes('ATテスト') ? '📝'
+    : tx.category.includes('小テスト') ? '✅'
+    : tx.category.includes('月次') ? '💴'
+    : tx.category.includes('臨時') ? '🎁'
+    : isInc ? '💰' : '💸';
+  const acts = showActs && S.isParent ? `
+    <div class="tx-acts">
+      <button class="txbtn edit" onclick="editTx('${tx.id}')">編集</button>
+      <button class="txbtn del" onclick="confirmDelTx('${tx.id}')">削除</button>
+    </div>` : '';
+  return `<div class="tx-item">
+    <div class="tx-ico-wrap ${isInc?'inc':'exp'}">${ico}</div>
+    <div class="tx-info">
+      <div class="tx-cat">${tx.category}</div>
+      <div class="tx-meta">${fmtD(tx.date)}${tx.memo?' · '+tx.memo:''}</div>
+    </div>
+    <div class="tx-right">
+      <span class="tx-amt ${isInc?'plus':'minus'}">${isInc?'+':'-'}¥${fmt(tx.amount)}</span>
+      ${acts}
+    </div>
+  </div>`;
+}
+
+// ─── TX LIST ───
+function renderTxList() {
+  const months = [...new Set(S.txs.map(t=>t.date.slice(0,7)))].sort().reverse();
+  const filter = document.getElementById('tx-filter');
+  filter.innerHTML = `<button class="mtab ${S.txFilter===null?'on':''}" onclick="setFilter(null)">すべて</button>` +
+    months.map(m => `<button class="mtab ${S.txFilter===m?'on':''}" onclick="setFilter('${m}')">${m.replace('-','年')}月</button>`).join('');
+
+  const txs = S.txFilter ? S.txs.filter(t=>t.date.startsWith(S.txFilter)) : S.txs;
+  const list = document.getElementById('tx-list');
+  const empty = document.getElementById('tx-empty');
+  if(txs.length === 0) {
+    list.classList.add('hide'); empty.classList.remove('hide');
+  } else {
+    empty.classList.add('hide'); list.classList.remove('hide');
+    list.innerHTML = txs.map(tx => txItemHTML(tx,true)).join('');
+  }
+}
+
+function setFilter(m) { S.txFilter = m; renderTxList(); }
+
+// ─── TX ADD/EDIT ───
+function openTxModal(type, tx=null) {
+  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
+  S.editTxId = tx ? tx.id : null;
+  document.getElementById('tx-modal-title').textContent = tx ? '取引を編集' : (type==='income'?'収入を追加':'支出を追加');
+  document.getElementById('tx-type').value = tx ? tx.type : type;
+  document.getElementById('tx-date').value = tx ? tx.date : today();
+  document.getElementById('tx-amount').value = tx ? tx.amount : '';
+  document.getElementById('tx-category').value = tx ? tx.category : '';
+  document.getElementById('tx-memo').value = tx ? tx.memo : '';
+  openModal('tx-overlay');
+  resetParentTimer();
+}
+
+async function saveTx() {
+  const type = document.getElementById('tx-type').value;
+  const date = document.getElementById('tx-date').value;
+  const amount = parseInt(document.getElementById('tx-amount').value) || 0;
+  const category = document.getElementById('tx-category').value.trim();
+  const memo = document.getElementById('tx-memo').value.trim();
+  if(!date||!amount||!category) { showToast('日付・金額・項目を入力してください'); return; }
+  const tx = {type,date,amount,category,memo};
+  if(S.editTxId) {
+    await updTx(S.editTxId, tx);
+    showToast('✅ 取引を更新しました');
+  } else {
+    await addTx(tx);
+    showToast('✅ 取引を追加しました');
+  }
+  closeModal('tx-overlay');
+  await loadTxs(); renderHome(); renderTxList();
+  resetParentTimer();
+}
+
+function editTx(id) {
+  const tx = S.txs.find(t=>t.id===id);
+  if(tx) openTxModal(tx.type, tx);
+}
+
+async function confirmDelTx(id) {
+  if(!confirm('この取引を削除しますか？')) return;
+  await delTx(id);
+  showToast('削除しました');
+  await loadTxs(); renderHome(); renderTxList();
+}
+
+// ─── LUNCH ───
+async function doLunch() {
+  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
+  const t = today();
+  if(S.lunchDates.has(t) && !confirm('今日はすでに弁当代を記録しています。もう一度追加しますか？')) return;
+  const amount = S.cfg.lunchAmount || 500;
+  await addTx({date:t,amount,type:'income',category:'弁当代',memo:'弁当代支給'});
+  if(!S.lunchDates.has(t)) {
+    await db.collection('lunchDates').doc(t).set({date:t});
+    S.lunchDates.add(t);
+  }
+  showToast(`🍱 弁当代 ¥${fmt(amount)} を追加しました`);
+  await loadTxs(); renderHome();
+  resetParentTimer();
+}
+
+// ─── AT TEST ───
+function openATModal() {
+  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
+  const atTiers = S.cfg.atTiers || DEFAULT_AT_TIERS;
+  document.getElementById('at-grid').innerHTML = atTiers.map((t,i) =>
+    `<button class="at-btn" onclick="selectAT(${i})">
+      ${t.label}<br>
+      <span class="at-sub">${t.amount>0?`臨時 ¥${fmt(t.amount)}`:''} ${t.poke?'🃏ポケカ1P':''}</span>
+    </button>`
+  ).join('');
+  openModal('at-overlay');
+  resetParentTimer();
+}
+
+async function selectAT(idx) {
+  const t = (S.cfg.atTiers || DEFAULT_AT_TIERS)[idx];
+  closeModal('at-overlay');
+  const d = today();
+  if(t.amount > 0) {
+    await addTx({date:d,amount:t.amount,type:'income',category:'ATテスト臨時',memo:`ATテスト ${t.label}`});
+  }
+  if(t.poke) {
+    await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:d,purchasePrice:0,memo:`ATテスト ${t.label} 獲得`});
+    await loadAssets();
+    showToast(t.amount>0 ? `📝 ¥${fmt(t.amount)} ＋ 🃏ポケカ1P を追加しました` : '🃏 ポケカ1Pをモノ資産に追加しました');
+  } else {
+    showToast(`📝 臨時お小遣い ¥${fmt(t.amount)} を追加しました`);
+  }
+  await loadTxs(); renderHome();
+}
+
+async function doKotest() {
+  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
+  if(!confirm('小テスト満点 — ポケカ1Pをモノ資産に追加しますか？')) return;
+  await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:today(),purchasePrice:0,memo:'小テスト満点 獲得'});
+  await loadAssets();
+  showToast('✅ 🃏 ポケカ1Pをモノ資産に追加しました');
+}
+
+function doKotestFromAT() { closeModal('at-overlay'); doKotest(); }
+
+// ─── RANK ───
+function openRankModal() {
+  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
+  document.getElementById('rank-input').value = S.cfg.currentRank || '';
+  document.getElementById('rank-test-name').value = '';
+  openModal('rank-overlay');
+  resetParentTimer();
+}
+
+async function saveRank() {
+  const rank = parseInt(document.getElementById('rank-input').value) || 0;
+  if(!rank || rank < 1) { showToast('正しい順位を入力してください'); return; }
+  const tier = getTier(rank, S.cfg.tiers);
+  if(!tier) { showToast('順位に対応する設定がありません'); return; }
+  await saveCfg({currentRank:rank, currentTier:tier.label});
+  closeModal('rank-overlay');
+  showToast(`🏆 ${rank}位（${tier.label}）を記録しました`);
+  renderHome();
+}
+
+// ─── CALENDAR ───
+function renderCalendar() {
+  const y = S.calY, m = S.calM;
+  document.getElementById('cal-month-lbl').textContent = `${y}年${m+1}月`;
+  const first = new Date(y,m,1).getDay();
+  const last = new Date(y,m+1,0).getDate();
+  const todayDate = new Date();
+  const grid = document.getElementById('cal-grid');
+  const days = ['日','月','火','水','木','金','土'];
+  grid.innerHTML = days.map(d=>`<div class="cal-hd">${d}</div>`).join('');
+  for(let i=0;i<first;i++) grid.innerHTML += `<div class="cal-day"></div>`;
+  for(let d=1;d<=last;d++){
+    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow = (first+d-1)%7;
+    const isToday = todayDate.getFullYear()===y && todayDate.getMonth()===m && todayDate.getDate()===d;
+    const cls = ['cal-day', isToday?'today':'', S.lunchDates.has(ds)&&!isToday?'has-lunch':'', dow===0?'sun':dow===6?'sat':''].filter(Boolean).join(' ');
+    grid.innerHTML += `<div class="${cls}">${d}</div>`;
+  }
+}
+function calPrev(){ if(S.calM===0){S.calM=11;S.calY--;}else S.calM--; renderCalendar(); }
+function calNext(){ if(S.calM===11){S.calM=0;S.calY++;}else S.calM++; renderCalendar(); }
+
+// ─── ASSETS ───
+function renderAssets() {
+  const list = document.getElementById('asset-list');
+  const empty = document.getElementById('asset-empty');
+  if(S.assets.length === 0) {
+    list.innerHTML=''; list.classList.add('hide'); empty.classList.remove('hide');
+  } else {
+    empty.classList.add('hide'); list.classList.remove('hide');
+    list.innerHTML = S.assets.map(a => {
+      const ico = a.name.includes('ポケモン')||a.name.includes('ポケカ') ? '🃏'
+        : a.name.includes('PS5')||a.name.includes('プレステ') ? '🎮'
+        : a.name.includes('ゲーム') ? '🕹️' : '📦';
+      const acts = S.isParent ? `<div class="asset-acts">
+        <button class="txbtn edit" onclick="editAsset('${a.id}')">編集</button>
+        <button class="txbtn del" onclick="deleteAssetById('${a.id}')">削除</button>
+      </div>` : '';
+      return `<div class="asset-item">
+        <div class="asset-ico-wrap">${ico}</div>
+        <div class="asset-info">
+          <div class="asset-name">${a.name}</div>
+          <div class="asset-meta">${a.purchaseDate?fmtD(a.purchaseDate):''}${a.memo?' · '+a.memo:''}</div>
+        </div>
+        ${a.purchasePrice>0?`<span class="asset-price">¥${fmt(a.purchasePrice)}</span>`:''}
+        ${acts}
+      </div>`;
+    }).join('');
+  }
+}
+
+function openAssetModal() {
+  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
+  S.editAssetId = null;
+  document.getElementById('asset-modal-title').textContent = '資産を追加';
+  document.getElementById('asset-name').value = '';
+  document.getElementById('asset-date').value = today();
+  document.getElementById('asset-price').value = '0';
+  document.getElementById('asset-memo').value = '';
+  document.getElementById('asset-del-btn').classList.add('hide');
+  openModal('asset-overlay');
+  resetParentTimer();
+}
+
+function editAsset(id) {
+  const a = S.assets.find(x=>x.id===id);
+  if(!a) return;
+  S.editAssetId = id;
+  document.getElementById('asset-modal-title').textContent = '資産を編集';
+  document.getElementById('asset-name').value = a.name;
+  document.getElementById('asset-date').value = a.purchaseDate || today();
+  document.getElementById('asset-price').value = a.purchasePrice || 0;
+  document.getElementById('asset-memo').value = a.memo || '';
+  document.getElementById('asset-del-btn').classList.remove('hide');
+  document.getElementById('asset-del-btn').onclick = () => deleteAssetById(id);
+  openModal('asset-overlay');
+}
+
+async function saveAsset() {
+  const name = document.getElementById('asset-name').value.trim();
+  const date = document.getElementById('asset-date').value;
+  const price = parseInt(document.getElementById('asset-price').value) || 0;
+  const memo = document.getElementById('asset-memo').value.trim();
+  if(!name){ showToast('品目名を入力してください'); return; }
+  const data = {name, purchaseDate:date, purchasePrice:price, memo};
+  if(S.editAssetId) {
+    await updAssetDoc(S.editAssetId, data);
+    showToast('✅ 資産を更新しました');
+  } else {
+    await addAssetDoc(data);
+    showToast('✅ 資産を追加しました');
+  }
+  closeModal('asset-overlay');
+  await loadAssets(); renderAssets();
+}
+
+async function deleteAssetById(id) {
+  const targetId = id || S.editAssetId;
+  if(!targetId) return;
+  if(!confirm('この資産を削除しますか？')) return;
+  closeModal('asset-overlay');
+  await delAssetDoc(targetId);
+  showToast('削除しました');
+  await loadAssets(); renderAssets();
+}
+
+// ─── GRAPH ───
+function renderGraph() {
+  const wrap = document.querySelector('.graph-card') || document.getElementById('page-graph');
+  if(S.txs.length === 0) {
+    document.getElementById('balance-chart').style.display = 'none';
+    return;
+  }
+  const sorted = [...S.txs].sort((a,b)=>a.date.localeCompare(b.date));
+  let run = 0;
+  const byDate = {};
+  sorted.forEach(tx => {
+    run += tx.type==='expense' ? -tx.amount : tx.amount;
+    byDate[tx.date] = run;
+  });
+  const labels = Object.keys(byDate).map(d=>d.replace(/-/g,'/'));
+  const data = Object.values(byDate);
+
+  if(S.chart) S.chart.destroy();
+  const ctx = document.getElementById('balance-chart').getContext('2d');
+  document.getElementById('balance-chart').style.display = 'block';
+  S.chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets:[{
+        label:'残高',data,
+        borderColor:'#6366F1',
+        backgroundColor:'rgba(99,102,241,0.1)',
+        fill:true,tension:.35,
+        pointRadius:3,pointBackgroundColor:'#6366F1',
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10},maxTicksLimit:6}},
+        y:{ticks:{callback:v=>`¥${fmt(v)}`,font:{size:10}}},
+      }
+    }
+  });
+}
+
+// ─── SETTINGS ───
+function renderSettings() {
+  const cfg = S.cfg;
+  document.getElementById('set-lunch').textContent = `¥${fmt(cfg.lunchAmount||500)}`;
+  document.getElementById('set-day').textContent = `毎月${cfg.allowanceDay||1}日`;
+
+  document.getElementById('tier-table').innerHTML =
+    (cfg.tiers||DEFAULT_TIERS).map(t => `
+      <div class="tier-row">
+        <span class="tier-chip">${t.label}</span>
+        <div class="tier-info">
+          <div class="tier-amt">¥${fmt(t.amount)}/月</div>
+          <div class="tier-time">📱${fmtTime(t.phone)} 🎮${fmtTime(t.ps5)}</div>
+        </div>
+      </div>`).join('');
+
+  document.getElementById('at-tier-table').innerHTML =
+    (cfg.atTiers||DEFAULT_AT_TIERS).map(t => `
+      <div class="tier-row">
+        <span class="tier-chip orange">${t.label}</span>
+        <div class="tier-info">
+          <div class="tier-amt">${t.amount>0?`¥${fmt(t.amount)}`:'現金なし'}</div>
+          <div class="tier-time">${t.poke?'🃏 ポケカ1P自動追加':''}</div>
+        </div>
+      </div>`).join('');
+}
+
+let currentSetType = '';
+function openSetModal(type) {
+  if(!S.isParent){ showToast('親モードのみ変更できます'); return; }
+  currentSetType = type;
+  if(type==='lunch'){
+    document.getElementById('set-modal-title').textContent = '弁当代金額を変更';
+    document.getElementById('set-modal-lbl').textContent = '金額（円）';
+    document.getElementById('set-modal-val').value = S.cfg.lunchAmount||500;
+  } else {
+    document.getElementById('set-modal-title').textContent = 'お小遣い追加日を変更';
+    document.getElementById('set-modal-lbl').textContent = '日（1〜28）';
+    document.getElementById('set-modal-val').value = S.cfg.allowanceDay||1;
+  }
+  openModal('set-overlay');
+  resetParentTimer();
+}
+
+async function saveSetModal() {
+  const val = parseInt(document.getElementById('set-modal-val').value);
+  if(isNaN(val)||val<1){ showToast('正しい値を入力してください'); return; }
+  if(currentSetType==='lunch'){
+    await saveCfg({lunchAmount:val});
+    showToast(`✅ 弁当代を ¥${fmt(val)} に変更しました`);
+  } else {
+    const day = Math.min(28,Math.max(1,val));
+    await saveCfg({allowanceDay:day});
+    showToast(`✅ お小遣い追加日を毎月${day}日に変更しました`);
+  }
+  closeModal('set-overlay');
+  renderSettings();
+}
+
+let changeMode = '';
+function openChangePass(mode) {
+  if(!S.isParent){ showToast('親モードのみ変更できます'); return; }
+  changeMode = mode;
+  const isPc = mode==='passcode';
+  document.getElementById('chpass-title').textContent = isPc ? 'パスコードを変更（6桁）' : '親PINを変更（4桁）';
+  document.getElementById('chpass-lbl1').textContent = isPc ? '新しいパスコード（6桁）' : '新しいPIN（4桁）';
+  document.getElementById('chpass-new').maxLength = isPc ? 6 : 4;
+  document.getElementById('chpass-confirm').maxLength = isPc ? 6 : 4;
+  document.getElementById('chpass-new').value = '';
+  document.getElementById('chpass-confirm').value = '';
+  document.getElementById('chpass-err').textContent = '';
+  openModal('chpass-overlay');
+  resetParentTimer();
+}
+
+async function savePasscode() {
+  const n = document.getElementById('chpass-new').value;
+  const c = document.getElementById('chpass-confirm').value;
+  const err = document.getElementById('chpass-err');
+  const len = changeMode==='passcode' ? 6 : 4;
+  if(n.length!==len||!/^\d+$/.test(n)){ err.textContent=`${len}桁の数字を入力してください`; return; }
+  if(n!==c){ err.textContent='確認と一致しません'; return; }
+  const h = await sha256(n);
+  if(changeMode==='passcode'){
+    await saveCfg({passcodeHash:h});
+    showToast('✅ パスコードを変更しました');
+  } else {
+    await saveCfg({pinHash:h});
+    showToast('✅ PINを変更しました');
+  }
+  closeModal('chpass-overlay');
+}
+
+// ─── LOGOUT ───
+function doLogout() {
+  if(!confirm('ログアウトしますか？')) return;
+  S.isParent = false;
+  clearParentTimer();
+  document.getElementById('app').style.display = 'none';
+  showLock();
+}
+
+// ─── INIT ───
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    db.enablePersistence().catch(()=>{});
+    buildFab();
+    S.cfg = await loadCfg();
+    if(!S.cfg){
+      startSetup();
+    } else {
+      showLock();
+    }
+  } catch(e){
+    alert('Firebase接続エラー\n' + e.message);
+  }
+});
+</script>
+</body>
+</html>
