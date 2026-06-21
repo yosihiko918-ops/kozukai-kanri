@@ -11,19 +11,18 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{
-      --bg:#F1F5F9;
+      --or:#FF6B00;
+      --or-lt:#FFF3E8;
+      --or-dk:#E05A00;
+      --bg:#F4F5F7;
       --card:#FFFFFF;
-      --accent:#6366F1;
-      --accent2:#8B5CF6;
-      --green:#10B981;
-      --red:#EF4444;
-      --orange:#F59E0B;
-      --purple:#8B5CF6;
-      --text:#0F172A;
-      --sub:#64748B;
-      --border:#E2E8F0;
-      --nav-h:64px;
-      --grad:linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#A855F7 100%);
+      --text:#1A1A1A;
+      --sub:#999999;
+      --border:#EBEBEB;
+      --blue:#2B6CB0;
+      --red:#E53E3E;
+      --green:#2F855A;
+      --nav-h:58px;
     }
     html,body{height:100%;-webkit-font-smoothing:antialiased;}
     body{
@@ -32,576 +31,671 @@
       max-width:430px;margin:0 auto;min-height:100vh;
     }
 
-    /* ── LOCK SCREEN ── */
+    /* ─── LOCK SCREEN ─── */
     .lock{
-      position:fixed;inset:0;z-index:1000;
-      background:#0F172A;
+      position:fixed;inset:0;z-index:2000;
+      background:#FFFFFF;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      padding:40px 32px;
+      padding:40px 40px;
     }
-    .lock-logo{
+    .lock-logo{margin-bottom:32px;text-align:center;}
+    .lock-logo-icon{
       width:72px;height:72px;border-radius:20px;
-      background:var(--grad);
+      background:var(--or);
       display:flex;align-items:center;justify-content:center;
-      font-size:36px;margin-bottom:24px;
-      box-shadow:0 8px 32px rgba(99,102,241,.4);
+      font-size:38px;margin:0 auto 14px;
+      box-shadow:0 4px 16px rgba(255,107,0,.3);
     }
-    .lock-title{font-size:22px;font-weight:700;color:#F8FAFC;margin-bottom:6px;}
-    .lock-sub{font-size:13px;color:#94A3B8;margin-bottom:40px;text-align:center;}
-    .lock-dots{display:flex;gap:16px;margin-bottom:40px;}
+    .lock-logo-name{font-size:20px;font-weight:700;color:var(--text);}
+    .lock-logo-sub{font-size:12px;color:var(--sub);margin-top:3px;}
+    .lock-label{font-size:14px;color:var(--sub);margin-bottom:24px;}
+    .lock-dots{display:flex;gap:18px;margin-bottom:32px;}
     .lock-dot{
-      width:14px;height:14px;border-radius:50%;
-      border:2px solid #475569;background:transparent;
+      width:13px;height:13px;border-radius:50%;
+      border:2px solid #D0D0D0;background:transparent;
       transition:all .15s;
     }
-    .lock-dot.on{background:#6366F1;border-color:#6366F1;box-shadow:0 0 8px rgba(99,102,241,.6);}
-    .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:264px;}
+    .lock-dot.on{background:var(--or);border-color:var(--or);}
+    .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;}
     .nk{
       aspect-ratio:1;border:none;border-radius:50%;
-      background:#1E293B;color:#F8FAFC;
+      background:#F5F5F5;color:var(--text);
       font-size:22px;font-weight:500;cursor:pointer;
       display:flex;align-items:center;justify-content:center;
       transition:background .1s;
     }
-    .nk:active{background:#334155;}
-    .lock-err{color:#F87171;font-size:13px;margin-top:16px;min-height:18px;text-align:center;}
-    .lock-hint{color:#475569;font-size:12px;margin-top:12px;}
+    .nk:active{background:#E5E5E5;}
+    .lock-err{color:var(--red);font-size:13px;margin-top:16px;text-align:center;min-height:18px;}
 
-    /* ── APP SHELL ── */
-    #app{display:none;padding-bottom:var(--nav-h);}
-
-    /* ── HEADER ── */
+    /* ─── HEADER ─── */
     .hdr{
-      background:var(--card);padding:14px 18px 12px;
-      border-bottom:1px solid var(--border);
-      position:sticky;top:0;z-index:20;
+      background:var(--or);
+      padding:14px 16px 12px;
       display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:50;
     }
-    .hdr-title{font-size:17px;font-weight:700;}
+    .hdr-left{display:flex;align-items:center;gap:10px;}
+    .hdr-logo-sm{
+      width:28px;height:28px;border-radius:8px;
+      background:rgba(255,255,255,.25);
+      display:flex;align-items:center;justify-content:center;font-size:16px;
+    }
+    .hdr-title{font-size:16px;font-weight:700;color:#fff;}
     .hdr-right{display:flex;gap:8px;align-items:center;}
-    .mode-chip{
-      font-size:11px;font-weight:700;padding:4px 12px;
-      border-radius:20px;background:#EEF2FF;color:#6366F1;
-      display:flex;align-items:center;gap:4px;
+    .hdr-mode{
+      font-size:11px;font-weight:700;
+      padding:4px 10px;border-radius:20px;
+      background:rgba(255,255,255,.25);color:#fff;
     }
-    .mode-chip.parent{background:#6366F1;color:#fff;}
-    .mode-btn{
-      border:none;background:var(--bg);border-radius:10px;
-      padding:7px 10px;font-size:16px;cursor:pointer;
-      transition:background .1s;
+    .hdr-mode.parent{background:#fff;color:var(--or);}
+    .hdr-btn{
+      border:none;background:rgba(255,255,255,.2);color:#fff;
+      border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;
     }
-    .mode-btn:active{background:var(--border);}
     .parent-timer{
-      font-size:10px;font-weight:600;color:#F59E0B;
-      background:#FEF3C7;padding:2px 8px;border-radius:10px;
-      display:none;
+      font-size:10px;font-weight:700;color:var(--or);
+      background:#fff;padding:3px 8px;border-radius:10px;display:none;
     }
 
-    /* ── BOTTOM NAV ── */
+    /* ─── NAV ─── */
     #nav{
       position:fixed;bottom:0;left:50%;transform:translateX(-50%);
       width:100%;max-width:430px;
-      background:var(--card);border-top:1px solid var(--border);
+      background:#fff;border-top:1px solid var(--border);
       height:var(--nav-h);display:flex;z-index:100;
-      padding-bottom:env(safe-area-inset-bottom,0);
     }
     .ni{
       flex:1;display:flex;flex-direction:column;align-items:center;
-      justify-content:center;gap:3px;cursor:pointer;
-      color:var(--sub);font-size:10px;font-weight:500;
-      transition:color .15s;
+      justify-content:center;gap:2px;cursor:pointer;
+      color:#BBBBBB;font-size:10px;font-weight:500;
     }
-    .ni.on{color:var(--accent);}
+    .ni.on{color:var(--or);}
     .ni-ico{font-size:22px;line-height:1;}
 
-    /* ── PAGES ── */
+    /* ─── PAGES ─── */
     .page{display:none;}.page.on{display:block;}
-    .pg{padding-bottom:24px;}
+    .pg{padding-bottom:calc(var(--nav-h) + 16px);}
 
-    /* ── HOME HERO ── */
-    .hero{
-      margin:16px 16px 0;border-radius:24px;
-      background:var(--grad);color:#fff;
-      padding:28px 24px 24px;
-      box-shadow:0 8px 32px rgba(99,102,241,.3);
-      position:relative;overflow:hidden;
+    /* ─── HOME ─── */
+    /* Month selector */
+    .month-bar{
+      background:var(--or);
+      display:flex;align-items:center;justify-content:center;gap:20px;
+      padding:10px 0 14px;
     }
-    .hero::before{
-      content:'';position:absolute;top:-30px;right:-30px;
-      width:160px;height:160px;border-radius:50%;
-      background:rgba(255,255,255,.08);
+    .month-arrow{
+      border:none;background:none;color:rgba(255,255,255,.7);
+      font-size:22px;cursor:pointer;padding:4px 10px;
     }
-    .hero::after{
-      content:'';position:absolute;bottom:-40px;left:-20px;
-      width:120px;height:120px;border-radius:50%;
-      background:rgba(255,255,255,.05);
-    }
-    .hero-lbl{font-size:12px;opacity:.75;font-weight:500;letter-spacing:.5px;margin-bottom:6px;}
-    .hero-amt{font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;}
-    .hero-yen{font-size:28px;font-weight:700;vertical-align:middle;margin-right:2px;}
-    .hero-sub{font-size:12px;opacity:.65;margin-top:8px;}
-    .hero-row{display:flex;gap:12px;margin-top:20px;}
-    .hero-stat{
-      flex:1;background:rgba(255,255,255,.15);
-      border-radius:12px;padding:10px 12px;
-      backdrop-filter:blur(8px);
-    }
-    .hero-stat-lbl{font-size:10px;opacity:.75;margin-bottom:2px;}
-    .hero-stat-val{font-size:14px;font-weight:700;}
+    .month-label{font-size:16px;font-weight:700;color:#fff;}
 
-    /* ── INFO CARDS ── */
-    .cards2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 16px 0;}
-    .icard{
-      background:var(--card);border-radius:16px;padding:16px 14px;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    /* Summary card */
+    .summary-card{
+      background:#fff;margin:0;
+      padding:20px 20px 16px;
+      border-bottom:1px solid var(--border);
     }
-    .icard-ico{font-size:20px;margin-bottom:6px;}
-    .icard-lbl{font-size:11px;color:var(--sub);margin-bottom:3px;}
-    .icard-val{font-size:15px;font-weight:700;}
+    .summary-period{font-size:11px;color:var(--sub);margin-bottom:14px;}
+    .summary-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .summary-row:last-child{margin-bottom:0;}
+    .summary-lbl{font-size:13px;color:var(--sub);width:36px;flex-shrink:0;}
+    .summary-bar-wrap{flex:1;height:6px;background:#F0F0F0;border-radius:3px;overflow:hidden;}
+    .summary-bar{height:100%;border-radius:3px;}
+    .summary-bar.inc{background:var(--blue);}
+    .summary-bar.exp{background:var(--red);}
+    .summary-amt{font-size:15px;font-weight:700;width:96px;text-align:right;flex-shrink:0;}
+    .summary-amt.inc{color:var(--blue);}
+    .summary-amt.exp{color:var(--red);}
+    .summary-divider{border:none;border-top:1px dashed var(--border);margin:12px 0;}
+    .summary-balance-row{display:flex;align-items:center;justify-content:space-between;}
+    .summary-balance-lbl{font-size:13px;color:var(--sub);}
+    .summary-balance-val{font-size:22px;font-weight:800;color:var(--text);}
+    .summary-balance-val.minus{color:var(--red);}
 
-    /* ── RANK CARD ── */
-    .rank-card{
-      margin:12px 16px 0;background:var(--card);border-radius:16px;
-      padding:16px;display:flex;align-items:center;gap:14px;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    /* Chart section */
+    .chart-section{background:#fff;margin-top:8px;padding:18px 16px;}
+    .chart-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .chart-title{font-size:14px;font-weight:700;}
+    .chart-tabs{display:flex;gap:0;border:1px solid var(--or);border-radius:6px;overflow:hidden;}
+    .chart-tab{
+      border:none;background:#fff;color:var(--or);
+      padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;
     }
-    .rank-badge-big{
-      width:52px;height:52px;border-radius:14px;
-      background:linear-gradient(135deg,#F59E0B,#EF4444);
-      display:flex;align-items:center;justify-content:center;
-      font-size:26px;flex-shrink:0;
+    .chart-tab.on{background:var(--or);color:#fff;}
+    .donut-wrap{display:flex;align-items:center;gap:16px;}
+    .donut-canvas-wrap{position:relative;width:130px;height:130px;flex-shrink:0;}
+    .donut-center{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      text-align:center;pointer-events:none;
     }
-    .rank-info-lbl{font-size:11px;color:var(--sub);margin-bottom:2px;}
-    .rank-info-val{font-size:18px;font-weight:700;}
-    .rank-info-sub{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px;}
+    .donut-center-amt{font-size:15px;font-weight:800;color:var(--text);}
+    .donut-center-lbl{font-size:10px;color:var(--sub);margin-top:1px;}
+    .donut-legend{flex:1;}
+    .legend-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);}
+    .legend-item:last-child{border-bottom:none;}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .legend-name{font-size:12px;flex:1;color:var(--text);}
+    .legend-pct{font-size:11px;color:var(--sub);margin-right:4px;}
+    .legend-amt{font-size:12px;font-weight:700;color:var(--text);}
 
-    /* ── SECTION TITLE ── */
-    .sec-hd{
-      font-size:12px;font-weight:600;color:var(--sub);
-      letter-spacing:.5px;text-transform:uppercase;
-      padding:18px 16px 8px;
+    /* Rank + allowance info */
+    .info-banner{
+      background:#fff;margin-top:8px;padding:14px 16px;
+      display:flex;align-items:center;gap:12px;
     }
+    .info-badge{
+      width:46px;height:46px;border-radius:12px;
+      background:var(--or-lt);
+      display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+    }
+    .info-main{flex:1;}
+    .info-title{font-size:12px;color:var(--sub);margin-bottom:2px;}
+    .info-val{font-size:16px;font-weight:700;}
+    .info-sub{font-size:11px;color:var(--or);margin-top:2px;font-weight:600;}
+    .info-right{text-align:right;}
+    .info-right-lbl{font-size:10px;color:var(--sub);}
+    .info-right-val{font-size:13px;font-weight:700;color:var(--text);}
 
-    /* ── TX LIST ── */
-    .tx-card{
-      background:var(--card);border-radius:16px;
-      margin:0 16px;overflow:hidden;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    /* Quick actions (parent only) */
+    .quick-sec{background:#fff;margin-top:8px;padding:14px 16px;}
+    .quick-title{font-size:13px;font-weight:700;color:var(--sub);margin-bottom:12px;letter-spacing:.3px;}
+    .quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+    .qbtn{
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      cursor:pointer;border:none;background:none;padding:0;
     }
+    .qbtn-ico{
+      width:48px;height:48px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;font-size:22px;
+    }
+    .qbtn-lbl{font-size:10px;font-weight:600;color:var(--text);text-align:center;line-height:1.3;}
+    .qbtn-ico.lunch{background:#FFF3E8;}
+    .qbtn-ico.at{background:#FFF8E1;}
+    .qbtn-ico.rank{background:#E8F4FD;}
+    .qbtn-ico.income{background:#E8F5E9;}
+    .qbtn-ico.expense{background:#FFEBEE;}
+    .qbtn-ico.asset{background:#F3E8FF;}
+    .qbtn-ico.kotest{background:#E8F5E9;}
+    .qbtn-ico.logout{background:#F5F5F5;}
+
+    /* Recent TX */
+    .tx-sec{background:#fff;margin-top:8px;}
+    .tx-sec-hdr{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 16px 10px;
+      border-bottom:1px solid var(--border);
+    }
+    .tx-sec-title{font-size:14px;font-weight:700;}
+    .tx-more{font-size:12px;color:var(--or);font-weight:600;border:none;background:none;cursor:pointer;}
     .tx-item{
-      display:flex;align-items:center;gap:12px;padding:13px 14px;
+      display:flex;align-items:center;gap:12px;padding:12px 16px;
       border-bottom:1px solid var(--border);
     }
     .tx-item:last-child{border-bottom:none;}
-    .tx-ico-wrap{
-      width:40px;height:40px;border-radius:12px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:20px;flex-shrink:0;
+    .tx-cat-ico{
+      width:38px;height:38px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
     }
-    .tx-ico-wrap.inc{background:#EEF2FF;}
-    .tx-ico-wrap.exp{background:#FEF2F2;}
-    .tx-info{flex:1;min-width:0;}
-    .tx-cat{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .tx-meta{font-size:11px;color:var(--sub);margin-top:1px;}
-    .tx-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+    .tx-body{flex:1;min-width:0;}
+    .tx-name{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .tx-date{font-size:11px;color:var(--sub);margin-top:1px;}
+    .tx-right{text-align:right;flex-shrink:0;}
     .tx-amt{font-size:15px;font-weight:700;}
-    .tx-amt.plus{color:var(--accent);}
-    .tx-amt.minus{color:var(--red);}
-    .tx-acts{display:flex;gap:4px;}
-    .txbtn{
-      border:none;background:var(--bg);border-radius:8px;
-      padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600;
-    }
-    .txbtn.edit{color:var(--accent);}
+    .tx-amt.inc{color:var(--blue);}
+    .tx-amt.exp{color:var(--red);}
+    .tx-acts{display:flex;gap:4px;margin-top:3px;}
+    .txbtn{border:none;background:var(--bg);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-weight:600;}
+    .txbtn.edit{color:var(--or);}
     .txbtn.del{color:var(--red);}
 
-    /* ── FAB SPEED DIAL ── */
-    .fab-wrap{
-      position:fixed;bottom:calc(var(--nav-h) + 16px);
-      right:calc(max(0px,(100vw - 430px)/2) + 16px);
-      z-index:90;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;
+    /* ─── TX PAGE ─── */
+    .month-summary-bar{
+      background:var(--or);padding:10px 16px;
+      display:flex;justify-content:space-between;align-items:center;
     }
-    .fab-main{
-      width:56px;height:56px;border-radius:50%;
-      background:var(--grad);color:#fff;border:none;
-      font-size:26px;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 4px 20px rgba(99,102,241,.45);
-      transition:transform .2s,box-shadow .2s;
-    }
-    .fab-main:active{transform:scale(.93);}
-    .fab-main.open{transform:rotate(45deg);}
-    .fab-items{display:none;flex-direction:column-reverse;gap:8px;align-items:flex-end;}
-    .fab-items.open{display:flex;}
-    .fab-item{
-      display:flex;align-items:center;gap:10px;
-      animation:fabIn .18s ease both;
-    }
-    @keyframes fabIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-    .fab-item-lbl{
-      background:var(--text);color:#fff;font-size:12px;font-weight:600;
-      padding:6px 12px;border-radius:20px;white-space:nowrap;
-      box-shadow:0 2px 8px rgba(0,0,0,.2);
-    }
-    .fab-item-btn{
-      width:44px;height:44px;border-radius:50%;border:none;
-      font-size:20px;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 2px 10px rgba(0,0,0,.15);
-      flex-shrink:0;
-    }
-    .fab-overlay{
-      position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.3);
-      display:none;
-      backdrop-filter:blur(2px);
-    }
-    .fab-overlay.open{display:block;}
-    .fab-wrap.hidden{display:none;}
-
-    /* ── MONTH FILTER ── */
+    .ms-item{text-align:center;}
+    .ms-lbl{font-size:10px;color:rgba(255,255,255,.75);}
+    .ms-val{font-size:15px;font-weight:700;color:#fff;}
+    .ms-div{width:1px;background:rgba(255,255,255,.3);height:30px;}
     .mfilter{
-      display:flex;gap:8px;padding:12px 16px;overflow-x:auto;
+      background:#fff;display:flex;gap:0;overflow-x:auto;
+      border-bottom:1px solid var(--border);
       -webkit-overflow-scrolling:touch;scrollbar-width:none;
     }
     .mfilter::-webkit-scrollbar{display:none;}
     .mtab{
-      flex-shrink:0;padding:6px 16px;border-radius:20px;border:none;
-      font-size:13px;font-weight:600;
-      background:var(--card);color:var(--sub);cursor:pointer;
-      transition:all .15s;
-      box-shadow:0 1px 3px rgba(0,0,0,.06);
+      flex-shrink:0;padding:10px 16px;border:none;background:#fff;
+      font-size:13px;font-weight:600;color:var(--sub);cursor:pointer;
+      border-bottom:2px solid transparent;white-space:nowrap;
     }
-    .mtab.on{background:var(--accent);color:#fff;}
+    .mtab.on{color:var(--or);border-bottom-color:var(--or);}
+    .tx-list-wrap{background:#fff;margin-top:8px;}
+    .tx-date-hdr{
+      background:#F9F9F9;padding:8px 16px;
+      font-size:12px;font-weight:600;color:var(--sub);
+      border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+    }
 
-    /* ── CALENDAR ── */
-    .cal-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
-    .cal-nav-btn{
-      border:none;background:var(--card);border-radius:10px;
-      width:36px;height:36px;font-size:18px;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 1px 3px rgba(0,0,0,.08);
+    /* ─── CALENDAR ─── */
+    .cal-nav{
+      background:var(--or);
+      display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px;
     }
-    .cal-month{font-size:17px;font-weight:700;}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 12px 12px;}
-    .cal-hd{text-align:center;font-size:11px;color:var(--sub);font-weight:600;padding:6px 0;}
-    .cal-hd:first-child,.cal-day.sun{color:var(--red);}
-    .cal-hd:nth-child(7),.cal-day.sat{color:var(--accent);}
+    .cal-nav-btn{border:none;background:none;color:rgba(255,255,255,.8);font-size:24px;cursor:pointer;padding:4px 10px;}
+    .cal-month-lbl{font-size:16px;font-weight:700;color:#fff;}
+    .cal-wrap{background:#fff;padding:8px 12px 16px;}
+    .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px;}
+    .cal-dow span{font-size:11px;font-weight:600;color:var(--sub);padding:4px 0;}
+    .cal-dow span:first-child{color:var(--red);}
+    .cal-dow span:last-child{color:var(--blue);}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
     .cal-day{
-      aspect-ratio:1;border-radius:50%;
-      display:flex;align-items:center;justify-content:center;
-      font-size:13px;position:relative;
+      aspect-ratio:1;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      font-size:13px;border-radius:50%;position:relative;cursor:default;
     }
-    .cal-day.today{background:var(--accent);color:#fff;font-weight:700;}
-    .cal-day.has-lunch{background:#EEF2FF;}
-    .cal-day.has-lunch::after{
-      content:'🍱';position:absolute;
-      bottom:-2px;right:-2px;font-size:9px;
-    }
-    .cal-legend{font-size:12px;color:var(--sub);padding:0 16px 16px;}
+    .cal-day.today{background:var(--or);color:#fff;font-weight:700;}
+    .cal-day.has-lunch{background:var(--or-lt);}
+    .cal-day.has-lunch::after{content:'🍱';position:absolute;bottom:-1px;right:-1px;font-size:8px;}
+    .cal-day.sun{color:var(--red);}
+    .cal-day.sat{color:var(--blue);}
+    .cal-legend{padding:10px 16px;font-size:12px;color:var(--sub);background:#fff;border-top:1px solid var(--border);}
 
-    /* ── ASSETS ── */
-    .asset-card{
-      background:var(--card);border-radius:16px;
-      margin:0 16px;overflow:hidden;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
-    }
-    .asset-item{
-      display:flex;align-items:center;gap:12px;padding:13px 14px;
+    /* ─── ASSETS ─── */
+    .asset-hdr{
+      background:#fff;padding:14px 16px;
+      display:flex;align-items:center;justify-content:space-between;
       border-bottom:1px solid var(--border);
     }
-    .asset-item:last-child{border-bottom:none;}
-    .asset-ico-wrap{
-      width:40px;height:40px;border-radius:12px;
-      background:#F0FDF4;
-      display:flex;align-items:center;justify-content:center;
-      font-size:20px;flex-shrink:0;
+    .asset-title{font-size:14px;font-weight:700;}
+    .asset-note{font-size:11px;color:var(--sub);}
+    .asset-item{
+      display:flex;align-items:center;gap:12px;padding:12px 16px;
+      background:#fff;border-bottom:1px solid var(--border);
     }
-    .asset-info{flex:1;min-width:0;}
+    .asset-ico{
+      width:38px;height:38px;border-radius:10px;
+      background:#F3E8FF;
+      display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+    }
+    .asset-body{flex:1;min-width:0;}
     .asset-name{font-size:14px;font-weight:600;}
     .asset-meta{font-size:11px;color:var(--sub);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .asset-price{font-size:14px;font-weight:700;color:var(--green);flex-shrink:0;}
     .asset-acts{display:flex;gap:4px;flex-shrink:0;}
 
-    /* ── GRAPH ── */
-    .graph-card{background:var(--card);border-radius:16px;margin:0 16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    /* ─── GRAPH ─── */
+    .graph-card{background:#fff;margin:8px;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .graph-title{font-size:14px;font-weight:700;margin-bottom:14px;}
 
-    /* ── SETTINGS ── */
-    .set-card{
-      background:var(--card);border-radius:16px;
-      margin:0 16px 12px;overflow:hidden;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    /* ─── SETTINGS ─── */
+    .set-hdr-card{
+      background:var(--or);padding:20px 16px;color:#fff;
+      display:flex;align-items:center;gap:14px;
     }
+    .set-avatar{
+      width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.3);
+      display:flex;align-items:center;justify-content:center;font-size:26px;
+    }
+    .set-hdr-name{font-size:17px;font-weight:700;}
+    .set-hdr-sub{font-size:12px;opacity:.8;margin-top:2px;}
+    .set-sec{background:#fff;margin-top:8px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .set-sec-title{font-size:12px;color:var(--sub);padding:12px 16px 6px;font-weight:600;letter-spacing:.3px;}
     .set-item{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:15px 16px;border-bottom:1px solid var(--border);
-    }
-    .set-item:last-child{border-bottom:none;}
-    .set-lbl{font-size:15px;}
-    .set-val{font-size:14px;color:var(--accent);font-weight:600;}
-    .set-btn{
-      border:none;background:var(--bg);color:var(--accent);
-      font-size:13px;font-weight:600;cursor:pointer;
-      padding:6px 12px;border-radius:8px;
-    }
-    .tier-row{
-      display:flex;align-items:center;gap:12px;padding:12px 16px;
+      display:flex;align-items:center;padding:14px 16px;
       border-bottom:1px solid var(--border);
     }
-    .tier-row:last-child{border-bottom:none;}
-    .tier-chip{
-      font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;
-      background:#EEF2FF;color:#6366F1;white-space:nowrap;flex-shrink:0;
+    .set-item:last-child{border-bottom:none;}
+    .set-item-ico{
+      width:32px;height:32px;border-radius:8px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:16px;margin-right:12px;flex-shrink:0;
     }
-    .tier-chip.orange{background:#FEF3C7;color:#D97706;}
+    .set-item-body{flex:1;}
+    .set-item-lbl{font-size:14px;}
+    .set-item-val{font-size:12px;color:var(--sub);margin-top:1px;}
+    .set-item-right{display:flex;align-items:center;gap:6px;}
+    .set-val{font-size:14px;color:var(--or);font-weight:600;}
+    .set-btn{border:none;background:var(--or-lt);color:var(--or);font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;}
+    .set-arr{color:#CCCCCC;font-size:18px;}
+    .tier-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
+    .tier-row:last-child{border-bottom:none;}
+    .tier-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--or-lt);color:var(--or);white-space:nowrap;flex-shrink:0;}
+    .tier-badge.at{background:#FFF8E1;color:#E65100;}
     .tier-info{flex:1;}
     .tier-amt{font-size:14px;font-weight:700;}
     .tier-time{font-size:11px;color:var(--sub);margin-top:2px;}
     .logout-btn{
-      width:calc(100% - 32px);margin:8px 16px;padding:15px;border:none;
-      background:var(--card);color:var(--red);border-radius:16px;
-      font-size:16px;font-weight:600;cursor:pointer;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
+      width:calc(100% - 32px);margin:16px;padding:14px;border:none;
+      background:#fff;color:var(--red);border-radius:10px;
+      font-size:15px;font-weight:600;cursor:pointer;
+      border:1px solid var(--border);
     }
 
-    /* ── MODALS ── */
-    .overlay{
-      position:fixed;inset:0;background:rgba(0,0,0,.5);
-      z-index:500;display:flex;align-items:flex-end;justify-content:center;
-      backdrop-filter:blur(4px);
-    }
+    /* ─── MODALS ─── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:flex-end;justify-content:center;}
     .overlay.hide{display:none;}
     .modal{
-      background:var(--card);border-radius:24px 24px 0 0;
-      width:100%;max-width:430px;padding:24px 20px 40px;
+      background:#fff;border-radius:18px 18px 0 0;
+      width:100%;max-width:430px;padding:20px 20px 36px;
       max-height:90vh;overflow-y:auto;
     }
-    .modal-handle{
-      width:36px;height:4px;background:var(--border);
-      border-radius:2px;margin:0 auto 20px;
-    }
-    .modal-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:20px;}
-    .modal-close{
-      position:absolute;top:16px;right:16px;border:none;
-      background:var(--bg);border-radius:50%;width:32px;height:32px;
-      font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-    }
+    .modal-handle{width:36px;height:4px;background:#E0E0E0;border-radius:2px;margin:0 auto 18px;}
+    .modal-title{font-size:17px;font-weight:700;margin-bottom:18px;text-align:center;}
+    .modal-close{position:absolute;top:14px;right:14px;border:none;background:#F0F0F0;border-radius:50%;width:30px;height:30px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
     .modal-wrap{position:relative;}
-    .fg{margin-bottom:16px;}
-    .fl{font-size:13px;color:var(--sub);margin-bottom:6px;font-weight:500;display:block;}
-    .fi{
-      width:100%;padding:13px 14px;border:1.5px solid var(--border);
-      border-radius:12px;font-size:16px;color:var(--text);
-      background:var(--card);-webkit-appearance:none;outline:none;
-    }
-    .fi:focus{border-color:var(--accent);}
-    select.fi{background:var(--card);}
-    .btn-p{
-      width:100%;padding:15px;border:none;background:var(--grad);color:#fff;
-      border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px;
-    }
-    .btn-p:active{opacity:.85;}
-    .btn-s{
-      width:100%;padding:15px;border:1.5px solid var(--border);
-      background:var(--card);color:var(--text);border-radius:14px;
-      font-size:17px;font-weight:600;cursor:pointer;margin-top:8px;
-    }
-    .btn-d{
-      width:100%;padding:15px;border:none;background:#FEF2F2;color:var(--red);
-      border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;margin-top:8px;
-    }
+    .fg{margin-bottom:14px;}
+    .fl{font-size:12px;color:var(--sub);margin-bottom:5px;font-weight:600;display:block;letter-spacing:.3px;}
+    .fi{width:100%;padding:13px 14px;border:1.5px solid #E5E5E5;border-radius:10px;font-size:16px;color:var(--text);background:#fff;-webkit-appearance:none;outline:none;}
+    .fi:focus{border-color:var(--or);}
+    select.fi{background:#fff;}
+    .btn-p{width:100%;padding:14px;border:none;background:var(--or);color:#fff;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;}
+    .btn-p:active{background:var(--or-dk);}
+    .btn-s{width:100%;padding:14px;border:1.5px solid #E5E5E5;background:#fff;color:var(--text);border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px;}
+    .btn-d{width:100%;padding:14px;border:none;background:#FFEBEE;color:var(--red);border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;}
 
-    /* AT test grid */
-    .at-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-    .at-btn{
-      padding:18px 10px;border:2px solid var(--border);border-radius:14px;
-      background:var(--card);font-size:13px;font-weight:700;cursor:pointer;
-      text-align:center;line-height:1.6;transition:border-color .15s,background .15s;
-    }
-    .at-btn:active{border-color:var(--orange);background:#FFFBEB;}
-    .at-sub{font-size:11px;font-weight:400;color:var(--sub);}
+    /* AT grid */
+    .at-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .at-btn{padding:16px 8px;border:2px solid #E5E5E5;border-radius:12px;background:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:center;line-height:1.6;}
+    .at-btn:active{border-color:var(--or);background:var(--or-lt);}
+    .at-sub{font-size:11px;color:var(--sub);font-weight:400;}
 
-    /* Switch */
-    .sw-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-    .sw{position:relative;display:inline-block;width:48px;height:28px;}
-    .sw input{opacity:0;width:0;height:0;}
-    .sw-track{position:absolute;inset:0;background:var(--border);border-radius:28px;transition:.2s;cursor:pointer;}
-    .sw input:checked + .sw-track{background:var(--green);}
-    .sw-track::before{
-      content:'';position:absolute;width:22px;height:22px;
-      left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;
+    /* PIN in modal */
+    .pin-dots{display:flex;gap:16px;justify-content:center;margin-bottom:26px;}
+    .pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid #D0D0D0;background:transparent;transition:all .15s;}
+    .pin-dot.on{background:var(--or);border-color:var(--or);}
+    .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;}
+    .pin-err{color:var(--red);font-size:13px;text-align:center;margin-top:12px;min-height:18px;}
+
+    /* FAB */
+    .fab-overlay{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.25);display:none;}
+    .fab-overlay.open{display:block;}
+    .fab-wrap{
+      position:fixed;bottom:calc(var(--nav-h)+14px);
+      right:calc(max(0px,(100vw - 430px)/2) + 14px);
+      z-index:90;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:10px;
     }
-    .sw input:checked + .sw-track::before{left:23px;}
+    .fab-wrap.hidden{display:none;}
+    .fab-main{
+      width:54px;height:54px;border-radius:50%;background:var(--or);color:#fff;
+      border:none;font-size:26px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 16px rgba(255,107,0,.4);transition:transform .2s;
+    }
+    .fab-main:active{transform:scale(.92);}
+    .fab-main.open{transform:rotate(45deg);}
+    .fab-items{display:none;flex-direction:column-reverse;gap:8px;align-items:flex-end;}
+    .fab-items.open{display:flex;}
+    .fab-item{display:flex;align-items:center;gap:10px;animation:fabIn .16s ease both;}
+    @keyframes fabIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+    .fab-lbl{background:#333;color:#fff;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+    .fab-btn{width:42px;height:42px;border-radius:50%;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.15);flex-shrink:0;}
 
     /* Toast */
-    #toast{
-      position:fixed;bottom:calc(var(--nav-h) + 20px);left:50%;transform:translateX(-50%);
-      background:#0F172A;color:#fff;padding:12px 24px;border-radius:24px;
-      font-size:14px;font-weight:500;z-index:999;
-      opacity:0;transition:opacity .3s;
-      white-space:nowrap;pointer-events:none;
-      box-shadow:0 4px 20px rgba(0,0,0,.25);
-    }
+    #toast{position:fixed;bottom:calc(var(--nav-h)+16px);left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2);}
     #toast.show{opacity:1;}
 
-    /* Empty state */
-    .empty{text-align:center;padding:60px 20px;color:var(--sub);}
-    .empty-ico{font-size:48px;margin-bottom:12px;}
-    .empty-txt{font-size:15px;}
-
-    /* Hide */
+    /* Empty */
+    .empty{text-align:center;padding:48px 20px;color:var(--sub);}
+    .empty-ico{font-size:44px;margin-bottom:10px;}
+    .empty-txt{font-size:14px;}
     .hide{display:none!important;}
 
-    /* PIN inside modal */
-    .pin-modal-dots{display:flex;gap:14px;justify-content:center;margin-bottom:28px;}
-    .pin-modal-dot{
-      width:14px;height:14px;border-radius:50%;
-      border:2px solid var(--border);background:transparent;transition:all .15s;
-    }
-    .pin-modal-dot.on{background:var(--accent);border-color:var(--accent);}
-    .pin-modal-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:240px;margin:0 auto;}
-    .pin-modal-err{color:var(--red);font-size:13px;text-align:center;margin-top:14px;min-height:18px;}
+    /* Setup day overlay */
+    #setup-day-overlay .modal{padding-top:28px;}
+
+    /* Category colors */
+    .cat-orange{background:#FFF3E8;}
+    .cat-yellow{background:#FFF8E1;}
+    .cat-blue{background:#E3F2FD;}
+    .cat-green{background:#E8F5E9;}
+    .cat-red{background:#FFEBEE;}
+    .cat-purple{background:#F3E8FF;}
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════
-     LOCK SCREEN
-══════════════════════════════ -->
+<!-- ── LOCK ── -->
 <div id="lock-screen" class="lock">
-  <div class="lock-logo">💰</div>
-  <div class="lock-title" id="lock-title">こづかい管理</div>
-  <div class="lock-sub" id="lock-sub">パスコードを入力してください</div>
+  <div class="lock-logo">
+    <div class="lock-logo-icon">💰</div>
+    <div class="lock-logo-name">こづかい管理</div>
+    <div class="lock-logo-sub">家族の家計・資産管理アプリ</div>
+  </div>
+  <div class="lock-label" id="lock-label">パスコードを入力してください</div>
   <div class="lock-dots" id="lock-dots"></div>
   <div class="numpad" id="lock-pad"></div>
   <div class="lock-err" id="lock-err"></div>
 </div>
 
-<!-- ══════════════════════════════
-     MAIN APP
-══════════════════════════════ -->
-<div id="app">
-  <!-- Header -->
+<!-- ── APP ── -->
+<div id="app" style="display:none;">
+
   <div class="hdr">
-    <span class="hdr-title" id="hdr-title">こづかい管理</span>
+    <div class="hdr-left">
+      <div class="hdr-logo-sm">💰</div>
+      <span class="hdr-title" id="hdr-title">こづかい管理</span>
+    </div>
     <div class="hdr-right">
       <span class="parent-timer" id="parent-timer"></span>
-      <span class="mode-chip" id="mode-chip">👦 子どもモード</span>
-      <button class="mode-btn" id="mode-btn" title="親モード切替">🔐</button>
+      <span class="mode-chip" id="mode-chip">子どもモード</span>
+      <button class="hdr-btn" id="mode-btn">🔐</button>
     </div>
   </div>
 
   <!-- HOME -->
   <div class="page on pg" id="page-home">
-    <div class="hero" id="hero-card">
-      <div class="hero-lbl">現在の残高</div>
-      <div class="hero-amt"><span class="hero-yen">¥</span><span id="hero-val">0</span></div>
-      <div class="hero-sub" id="hero-sub"></div>
-      <div class="hero-row">
-        <div class="hero-stat">
-          <div class="hero-stat-lbl">📱 スマホ</div>
-          <div class="hero-stat-val" id="hero-phone">未設定</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-lbl">🎮 PS5</div>
-          <div class="hero-stat-val" id="hero-ps5">未設定</div>
-        </div>
+    <div class="month-bar">
+      <button class="month-arrow" onclick="homeMonthPrev()">‹</button>
+      <span class="month-label" id="home-month-lbl"></span>
+      <button class="month-arrow" onclick="homeMonthNext()">›</button>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-period" id="home-period"></div>
+      <div class="summary-row">
+        <span class="summary-lbl" style="color:var(--blue);">収入</span>
+        <div class="summary-bar-wrap"><div class="summary-bar inc" id="inc-bar" style="width:0%"></div></div>
+        <span class="summary-amt inc" id="home-inc">¥0</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-lbl" style="color:var(--red);">支出</span>
+        <div class="summary-bar-wrap"><div class="summary-bar exp" id="exp-bar" style="width:0%"></div></div>
+        <span class="summary-amt exp" id="home-exp">¥0</span>
+      </div>
+      <hr class="summary-divider">
+      <div class="summary-balance-row">
+        <span class="summary-balance-lbl">収支</span>
+        <span class="summary-balance-val" id="home-balance">¥0</span>
       </div>
     </div>
 
-    <div class="rank-card" id="rank-card">
-      <div class="rank-badge-big" id="rank-badge-ico">📊</div>
-      <div>
-        <div class="rank-info-lbl">直近のテスト順位</div>
-        <div class="rank-info-val" id="rank-val">未設定</div>
-        <div class="rank-info-sub" id="rank-sub">順位を入力するとお小遣い額が決まります</div>
+    <div class="chart-section">
+      <div class="chart-title-row">
+        <span class="chart-title">支出内訳</span>
+        <div class="chart-tabs">
+          <button class="chart-tab on" onclick="setChartMode('exp',this)">支出</button>
+          <button class="chart-tab" onclick="setChartMode('inc',this)">収入</button>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut-canvas-wrap">
+          <canvas id="donut-chart" width="130" height="130"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-amt" id="donut-center-amt">¥0</div>
+            <div class="donut-center-lbl" id="donut-center-lbl">合計</div>
+          </div>
+        </div>
+        <div class="donut-legend" id="donut-legend"></div>
       </div>
     </div>
 
-    <div class="sec-hd">最近の取引</div>
-    <div class="tx-card" id="home-tx"></div>
+    <div class="info-banner">
+      <div class="info-badge">🏆</div>
+      <div class="info-main">
+        <div class="info-title">直近テスト順位</div>
+        <div class="info-val" id="home-rank">未設定</div>
+        <div class="info-sub" id="home-rank-sub">順位を入力するとお小遣い額が決まります</div>
+      </div>
+      <div class="info-right">
+        <div class="info-right-lbl">📱 スマホ</div>
+        <div class="info-right-val" id="home-phone">—</div>
+        <div class="info-right-lbl" style="margin-top:4px;">🎮 PS5</div>
+        <div class="info-right-val" id="home-ps5">—</div>
+      </div>
+    </div>
+
+    <div class="quick-sec" id="quick-sec" style="display:none;">
+      <div class="quick-title">クイックアクション</div>
+      <div class="quick-grid">
+        <button class="qbtn" onclick="doLunch()">
+          <div class="qbtn-ico lunch">🍱</div>
+          <span class="qbtn-lbl">弁当代<br>+500円</span>
+        </button>
+        <button class="qbtn" onclick="openATModal()">
+          <div class="qbtn-ico at">📝</div>
+          <span class="qbtn-lbl">ATテスト</span>
+        </button>
+        <button class="qbtn" onclick="openRankModal()">
+          <div class="qbtn-ico rank">🏆</div>
+          <span class="qbtn-lbl">順位入力</span>
+        </button>
+        <button class="qbtn" onclick="openTxModal('income')">
+          <div class="qbtn-ico income">💰</div>
+          <span class="qbtn-lbl">収入追加</span>
+        </button>
+        <button class="qbtn" onclick="openTxModal('expense')">
+          <div class="qbtn-ico expense">💸</div>
+          <span class="qbtn-lbl">支出追加</span>
+        </button>
+        <button class="qbtn" onclick="openAssetModal()">
+          <div class="qbtn-ico asset">📦</div>
+          <span class="qbtn-lbl">資産追加</span>
+        </button>
+        <button class="qbtn" onclick="doKotest()">
+          <div class="qbtn-ico kotest">✅</div>
+          <span class="qbtn-lbl">小テスト<br>満点</span>
+        </button>
+        <button class="qbtn" onclick="doLogout()">
+          <div class="qbtn-ico logout">🚪</div>
+          <span class="qbtn-lbl">ログアウト</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tx-sec">
+      <div class="tx-sec-hdr">
+        <span class="tx-sec-title">最近の取引</span>
+        <button class="tx-more" onclick="go('tx')">すべて見る ›</button>
+      </div>
+      <div id="home-tx-list"></div>
+    </div>
   </div>
 
-  <!-- TRANSACTIONS -->
+  <!-- TX -->
   <div class="page pg" id="page-tx">
-    <div class="mfilter" id="tx-filter"></div>
-    <div class="tx-card hide" id="tx-list" style="margin:0 16px;"></div>
-    <div class="empty hide" id="tx-empty">
-      <div class="empty-ico">💴</div>
-      <div class="empty-txt">取引記録がありません</div>
+    <div class="month-summary-bar">
+      <div class="ms-item"><div class="ms-lbl">収入</div><div class="ms-val" id="tx-inc">¥0</div></div>
+      <div class="ms-div"></div>
+      <div class="ms-item"><div class="ms-lbl">支出</div><div class="ms-val" id="tx-exp">¥0</div></div>
+      <div class="ms-div"></div>
+      <div class="ms-item"><div class="ms-lbl">収支</div><div class="ms-val" id="tx-bal">¥0</div></div>
     </div>
+    <div class="mfilter" id="tx-filter"></div>
+    <div id="tx-list-wrap"></div>
+    <div class="empty hide" id="tx-empty"><div class="empty-ico">💴</div><div class="empty-txt">取引記録がありません</div></div>
   </div>
 
   <!-- CALENDAR -->
   <div class="page pg" id="page-cal">
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="calPrev()">‹</button>
-      <span class="cal-month" id="cal-month-lbl"></span>
+      <span class="cal-month-lbl" id="cal-month-lbl"></span>
       <button class="cal-nav-btn" onclick="calNext()">›</button>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-wrap">
+      <div class="cal-dow"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
     <div class="cal-legend">🍱 弁当代を渡した日</div>
   </div>
 
   <!-- ASSETS -->
   <div class="page pg" id="page-asset">
-    <div class="sec-hd">モノ資産一覧（現金残高に含まない）</div>
-    <div class="asset-card" id="asset-list"></div>
-    <div class="empty hide" id="asset-empty">
-      <div class="empty-ico">📦</div>
-      <div class="empty-txt">資産が登録されていません</div>
+    <div class="asset-hdr">
+      <span class="asset-title">モノ資産一覧</span>
+      <span class="asset-note">現金残高には含まない</span>
     </div>
+    <div id="asset-list"></div>
+    <div class="empty hide" id="asset-empty"><div class="empty-ico">📦</div><div class="empty-txt">資産が登録されていません</div></div>
   </div>
 
   <!-- GRAPH -->
   <div class="page pg" id="page-graph">
-    <div class="sec-hd">残高推移</div>
-    <div class="graph-card">
+    <div class="graph-card" style="margin-top:8px;">
+      <div class="graph-title">残高推移</div>
       <canvas id="balance-chart"></canvas>
+      <div class="empty hide" id="graph-empty"><div class="empty-ico">📈</div><div class="empty-txt">まだ取引記録がありません</div></div>
     </div>
   </div>
 
-  <!-- SETTINGS (parent only) -->
+  <!-- SETTINGS -->
   <div class="page pg" id="page-settings">
-    <div class="sec-hd">基本設定</div>
-    <div class="set-card">
+    <div class="set-hdr-card">
+      <div class="set-avatar">👨‍👩‍👦</div>
+      <div>
+        <div class="set-hdr-name">こづかい管理</div>
+        <div class="set-hdr-sub">親モードでログイン中</div>
+      </div>
+    </div>
+
+    <div class="set-sec">
+      <div class="set-sec-title">基本設定</div>
       <div class="set-item">
-        <span class="set-lbl">弁当代金額</span>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div class="set-item-ico" style="background:#FFF3E8;">🍱</div>
+        <div class="set-item-body"><div class="set-item-lbl">弁当代金額</div></div>
+        <div class="set-item-right">
           <span class="set-val" id="set-lunch">¥500</span>
           <button class="set-btn" onclick="openSetModal('lunch')">変更</button>
         </div>
       </div>
       <div class="set-item">
-        <span class="set-lbl">月次お小遣い追加日</span>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div class="set-item-ico" style="background:#E3F2FD;">📅</div>
+        <div class="set-item-body"><div class="set-item-lbl">月次お小遣い追加日</div></div>
+        <div class="set-item-right">
           <span class="set-val" id="set-day">毎月1日</span>
           <button class="set-btn" onclick="openSetModal('day')">変更</button>
         </div>
       </div>
     </div>
 
-    <div class="sec-hd">本テスト 順位帯とお小遣い額</div>
-    <div class="set-card" id="tier-table"></div>
+    <div class="set-sec">
+      <div class="set-sec-title">本テスト 順位帯とお小遣い</div>
+      <div id="tier-table"></div>
+    </div>
 
-    <div class="sec-hd">ATテスト 臨時お小遣い</div>
-    <div class="set-card" id="at-tier-table"></div>
+    <div class="set-sec">
+      <div class="set-sec-title">ATテスト 臨時お小遣い</div>
+      <div id="at-tier-table"></div>
+    </div>
 
-    <div class="sec-hd">セキュリティ</div>
-    <div class="set-card">
+    <div class="set-sec">
+      <div class="set-sec-title">セキュリティ</div>
       <div class="set-item">
-        <span class="set-lbl">アプリパスコード変更</span>
-        <button class="set-btn" onclick="openChangePass('passcode')">変更</button>
+        <div class="set-item-ico" style="background:#F3E8FF;">🔑</div>
+        <div class="set-item-body"><div class="set-item-lbl">アプリパスコード変更</div></div>
+        <div class="set-item-right"><button class="set-btn" onclick="openChangePass('passcode')">変更</button><span class="set-arr">›</span></div>
       </div>
       <div class="set-item">
-        <span class="set-lbl">親PIN変更</span>
-        <button class="set-btn" onclick="openChangePass('pin')">変更</button>
+        <div class="set-item-ico" style="background:#FFF3E8;">🔐</div>
+        <div class="set-item-body"><div class="set-item-lbl">親PIN変更</div></div>
+        <div class="set-item-right"><button class="set-btn" onclick="openChangePass('pin')">変更</button><span class="set-arr">›</span></div>
       </div>
     </div>
 
     <button class="logout-btn" onclick="doLogout()">ログアウト</button>
   </div>
 
-  <!-- Nav -->
   <nav id="nav">
     <div class="ni on" data-tab="home" onclick="go('home')"><span class="ni-ico">🏠</span>ホーム</div>
     <div class="ni" data-tab="tx" onclick="go('tx')"><span class="ni-ico">💴</span>取引</div>
@@ -612,184 +706,119 @@
   </nav>
 </div>
 
-<!-- Speed Dial FAB -->
+<!-- ── MODALS ── -->
+<div class="overlay hide" id="pin-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('pin-overlay')">✕</button>
+    <div class="modal-title">親モードに切り替え</div>
+    <div class="pin-dots" id="pin-dots"></div>
+    <div class="pin-pad" id="pin-pad"></div>
+    <div class="pin-err" id="pin-err"></div>
+  </div>
+</div>
+
+<div class="overlay hide" id="tx-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('tx-overlay')">✕</button>
+    <div class="modal-title" id="tx-modal-title">収入を追加</div>
+    <div class="fg"><label class="fl">種別</label><select class="fi" id="tx-type"><option value="income">収入</option><option value="expense">支出</option></select></div>
+    <div class="fg"><label class="fl">日付</label><input class="fi" type="date" id="tx-date"></div>
+    <div class="fg"><label class="fl">金額（円）</label><input class="fi" type="number" id="tx-amount" inputmode="numeric" placeholder="例：1000"></div>
+    <div class="fg"><label class="fl">項目名</label><input class="fi" type="text" id="tx-category" placeholder="例：お小遣い"></div>
+    <div class="fg"><label class="fl">メモ（任意）</label><input class="fi" type="text" id="tx-memo" placeholder="任意"></div>
+    <button class="btn-p" onclick="saveTx()">保存する</button>
+    <button class="btn-s" onclick="closeModal('tx-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="at-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('at-overlay')">✕</button>
+    <div class="modal-title">ATテスト結果を選択</div>
+    <div class="at-grid" id="at-grid"></div>
+    <button class="at-btn" style="width:100%;margin-bottom:14px;border-color:#9C27B0;background:#F3E8FF;" onclick="doKotestFromAT()">
+      ✅ 小テスト満点<br><span class="at-sub">🃏 ポケカ1Pをモノ資産に追加</span>
+    </button>
+    <button class="btn-s" onclick="closeModal('at-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="rank-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('rank-overlay')">✕</button>
+    <div class="modal-title">テスト順位を入力</div>
+    <p style="font-size:13px;color:var(--sub);text-align:center;margin-bottom:18px;">入力すると来月からのお小遣い・スマホ・PS5時間が自動更新されます</p>
+    <div class="fg"><label class="fl">学年順位（位）</label><input class="fi" type="number" id="rank-input" inputmode="numeric" placeholder="例：15"></div>
+    <div class="fg"><label class="fl">テスト名（任意）</label><input class="fi" type="text" id="rank-name" placeholder="例：1学期中間テスト"></div>
+    <button class="btn-p" onclick="saveRank()">保存する</button>
+    <button class="btn-s" onclick="closeModal('rank-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="asset-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('asset-overlay')">✕</button>
+    <div class="modal-title" id="asset-modal-title">資産を追加</div>
+    <div class="fg"><label class="fl">品目名</label><input class="fi" type="text" id="asset-name" placeholder="例：ポケモンカード、PS5"></div>
+    <div class="fg"><label class="fl">購入日</label><input class="fi" type="date" id="asset-date"></div>
+    <div class="fg"><label class="fl">購入額（円・0でも可）</label><input class="fi" type="number" id="asset-price" inputmode="numeric" placeholder="0"></div>
+    <div class="fg"><label class="fl">メモ（任意）</label><input class="fi" type="text" id="asset-memo" placeholder="任意"></div>
+    <button class="btn-p" onclick="saveAsset()">保存する</button>
+    <button class="btn-d hide" id="asset-del-btn" onclick="deleteAssetById(null)">削除する</button>
+    <button class="btn-s" onclick="closeModal('asset-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="set-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('set-overlay')">✕</button>
+    <div class="modal-title" id="set-modal-title">設定変更</div>
+    <div class="fg"><label class="fl" id="set-modal-lbl">値</label><input class="fi" type="number" id="set-modal-val" inputmode="numeric"></div>
+    <button class="btn-p" onclick="saveSetModal()">保存する</button>
+    <button class="btn-s" onclick="closeModal('set-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="chpass-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('chpass-overlay')">✕</button>
+    <div class="modal-title" id="chpass-title">パスコード変更</div>
+    <div class="fg"><label class="fl" id="chpass-lbl1">新しいパスコード（6桁）</label><input class="fi" type="password" id="chpass-new" maxlength="6" inputmode="numeric"></div>
+    <div class="fg"><label class="fl">確認（もう一度）</label><input class="fi" type="password" id="chpass-confirm" maxlength="6" inputmode="numeric"></div>
+    <div class="lock-err" id="chpass-err"></div>
+    <button class="btn-p" onclick="savePasscode()">保存する</button>
+    <button class="btn-s" onclick="closeModal('chpass-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<div class="overlay hide" id="setup-day-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <div class="modal-title">月次お小遣いの追加日</div>
+    <p style="font-size:14px;color:var(--sub);text-align:center;margin-bottom:20px;">毎月何日にお小遣いを自動追加しますか？</p>
+    <div class="fg"><label class="fl">日にち（1〜28）</label><input class="fi" type="number" id="setup-day-val" value="1" min="1" max="28" inputmode="numeric"></div>
+    <button class="btn-p" onclick="finishSetup()">設定完了</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ── FAB ── -->
 <div class="fab-overlay" id="fab-overlay" onclick="closeFab()"></div>
 <div class="fab-wrap hidden" id="fab-wrap">
   <button class="fab-main" id="fab-main" onclick="toggleFab()">＋</button>
   <div class="fab-items" id="fab-items"></div>
 </div>
 
-<!-- ══════════════════════════════
-     MODALS
-══════════════════════════════ -->
-
-<!-- Parent PIN -->
-<div class="overlay hide" id="pin-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('pin-overlay')">✕</button>
-    <div class="modal-title">親モードに切り替え</div>
-    <div class="pin-modal-dots" id="pin-dots"></div>
-    <div class="pin-modal-pad" id="pin-pad"></div>
-    <div class="pin-modal-err" id="pin-err"></div>
-  </div>
-</div>
-
-<!-- Transaction -->
-<div class="overlay hide" id="tx-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('tx-overlay')">✕</button>
-    <div class="modal-title" id="tx-modal-title">収入を追加</div>
-    <div class="fg">
-      <label class="fl">種別</label>
-      <select class="fi" id="tx-type">
-        <option value="income">収入</option>
-        <option value="expense">支出</option>
-      </select>
-    </div>
-    <div class="fg">
-      <label class="fl">日付</label>
-      <input class="fi" type="date" id="tx-date">
-    </div>
-    <div class="fg">
-      <label class="fl">金額（円）</label>
-      <input class="fi" type="number" id="tx-amount" placeholder="例：1000" inputmode="numeric">
-    </div>
-    <div class="fg">
-      <label class="fl">項目名</label>
-      <input class="fi" type="text" id="tx-category" placeholder="例：お小遣い">
-    </div>
-    <div class="fg">
-      <label class="fl">メモ（任意）</label>
-      <input class="fi" type="text" id="tx-memo" placeholder="任意">
-    </div>
-    <button class="btn-p" onclick="saveTx()">保存</button>
-    <button class="btn-s" onclick="closeModal('tx-overlay')">キャンセル</button>
-  </div>
-</div>
-
-<!-- AT Test -->
-<div class="overlay hide" id="at-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('at-overlay')">✕</button>
-    <div class="modal-title">ATテスト結果</div>
-    <div class="at-grid" id="at-grid"></div>
-    <button class="at-btn" style="width:100%;margin-bottom:16px;border-color:var(--purple);background:#F5F3FF;" onclick="doKotestFromAT()">
-      ✅ 小テスト満点<br><span class="at-sub">🃏 ポケカ1Pを追加</span>
-    </button>
-    <button class="btn-s" onclick="closeModal('at-overlay')">キャンセル</button>
-  </div>
-</div>
-
-<!-- Rank input -->
-<div class="overlay hide" id="rank-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('rank-overlay')">✕</button>
-    <div class="modal-title">テスト順位を入力</div>
-    <p style="font-size:13px;color:var(--sub);margin-bottom:16px;text-align:center;">
-      来月からのお小遣い・スマホ・PS5時間が自動更新されます
-    </p>
-    <div class="fg">
-      <label class="fl">学年順位（位）</label>
-      <input class="fi" type="number" id="rank-input" placeholder="例：15" inputmode="numeric">
-    </div>
-    <div class="fg">
-      <label class="fl">テスト名（任意）</label>
-      <input class="fi" type="text" id="rank-test-name" placeholder="例：1学期中間テスト">
-    </div>
-    <button class="btn-p" onclick="saveRank()">保存</button>
-    <button class="btn-s" onclick="closeModal('rank-overlay')">キャンセル</button>
-  </div>
-</div>
-
-<!-- Asset -->
-<div class="overlay hide" id="asset-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('asset-overlay')">✕</button>
-    <div class="modal-title" id="asset-modal-title">資産を追加</div>
-    <div class="fg">
-      <label class="fl">品目名</label>
-      <input class="fi" type="text" id="asset-name" placeholder="例：ポケモンカード、PS5">
-    </div>
-    <div class="fg">
-      <label class="fl">購入日</label>
-      <input class="fi" type="date" id="asset-date">
-    </div>
-    <div class="fg">
-      <label class="fl">購入額（円・0でも可）</label>
-      <input class="fi" type="number" id="asset-price" placeholder="0" inputmode="numeric">
-    </div>
-    <div class="fg">
-      <label class="fl">メモ（任意）</label>
-      <input class="fi" type="text" id="asset-memo" placeholder="任意">
-    </div>
-    <button class="btn-p" onclick="saveAsset()">保存</button>
-    <button class="btn-d hide" id="asset-del-btn" onclick="deleteAssetById(null)">削除</button>
-    <button class="btn-s" onclick="closeModal('asset-overlay')">キャンセル</button>
-  </div>
-</div>
-
-<!-- Settings value change -->
-<div class="overlay hide" id="set-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('set-overlay')">✕</button>
-    <div class="modal-title" id="set-modal-title">設定変更</div>
-    <div class="fg">
-      <label class="fl" id="set-modal-lbl">値</label>
-      <input class="fi" type="number" id="set-modal-val" inputmode="numeric">
-    </div>
-    <button class="btn-p" onclick="saveSetModal()">保存</button>
-    <button class="btn-s" onclick="closeModal('set-overlay')">キャンセル</button>
-  </div>
-</div>
-
-<!-- Change passcode/PIN -->
-<div class="overlay hide" id="chpass-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <button class="modal-close" onclick="closeModal('chpass-overlay')">✕</button>
-    <div class="modal-title" id="chpass-title">パスコード変更</div>
-    <div class="fg">
-      <label class="fl" id="chpass-lbl1">新しいパスコード（6桁）</label>
-      <input class="fi" type="password" id="chpass-new" maxlength="6" inputmode="numeric">
-    </div>
-    <div class="fg">
-      <label class="fl">確認（もう一度）</label>
-      <input class="fi" type="password" id="chpass-confirm" maxlength="6" inputmode="numeric">
-    </div>
-    <div class="lock-err" id="chpass-err"></div>
-    <button class="btn-p" onclick="savePasscode()">保存</button>
-    <button class="btn-s" onclick="closeModal('chpass-overlay')">キャンセル</button>
-  </div>
-</div>
-
-<!-- Setup: allowance day -->
-<div class="overlay hide" id="setup-day-overlay">
-  <div class="modal modal-wrap">
-    <div class="modal-handle"></div>
-    <div class="modal-title">月次お小遣いの追加日</div>
-    <p style="font-size:14px;color:var(--sub);text-align:center;margin-bottom:20px;">毎月何日にお小遣いを自動追加しますか？</p>
-    <div class="fg">
-      <label class="fl">日にち（1〜28）</label>
-      <input class="fi" type="number" id="setup-day-val" value="1" min="1" max="28" inputmode="numeric">
-    </div>
-    <button class="btn-p" onclick="finishSetup()">設定完了</button>
-  </div>
-</div>
-
-<!-- Toast -->
-<div id="toast"></div>
-
-<!-- ══════════════════════════════
-     SCRIPT
-══════════════════════════════ -->
 <script>
-// ─── FIREBASE CONFIG ───
+// ─── FIREBASE ───
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyBf3elvPKH0nG-RJgHuxiWLALXony-Cgi8",
   authDomain:        "kozukai-kanri.firebaseapp.com",
@@ -799,7 +828,6 @@ const FIREBASE_CONFIG = {
   appId:             "1:197851819869:web:7f07224cc17c326d6b02b4"
 };
 
-// ─── DEFAULT TIER DATA ───
 const DEFAULT_TIERS = [
   {label:'1〜8位',   min:1,   max:8,    amount:10000, phone:120, ps5:60},
   {label:'9〜21位',  min:9,   max:21,   amount:7000,  phone:120, ps5:45},
@@ -814,26 +842,36 @@ const DEFAULT_AT_TIERS = [
   {label:'46〜94位', min:46, max:94,  amount:0,    poke:true },
 ];
 
-// ─── STATE ───
+// Category color/icon mapping
+const CAT_STYLE = {
+  '弁当代':    {ico:'🍱', bg:'cat-orange'},
+  'ATテスト':  {ico:'📝', bg:'cat-yellow'},
+  '小テスト':  {ico:'✅', bg:'cat-green'},
+  '月次お小遣い':{ico:'💴', bg:'cat-blue'},
+  '臨時':      {ico:'🎁', bg:'cat-yellow'},
+  'ポケモン':  {ico:'🃏', bg:'cat-purple'},
+  'ゲーム':    {ico:'🎮', bg:'cat-purple'},
+  '収入':      {ico:'💰', bg:'cat-green'},
+  '支出':      {ico:'💸', bg:'cat-red'},
+};
+function getCatStyle(cat, type) {
+  for(const [key, val] of Object.entries(CAT_STYLE)) {
+    if(cat.includes(key)) return val;
+  }
+  return type === 'income'
+    ? {ico:'💰', bg:'cat-green'}
+    : {ico:'💸', bg:'cat-red'};
+}
+
 let db;
 const S = {
-  isParent: false,
-  cfg: null,
-  txs: [],
-  assets: [],
-  lunchDates: new Set(),
-  calY: new Date().getFullYear(),
-  calM: new Date().getMonth(),
-  txFilter: null,
-  chart: null,
-  editTxId: null,
-  editAssetId: null,
-  currentTab: 'home',
-  parentTimer: null,
-  parentTimerSecs: 0,
-  // setup flow
-  setupStep: 'passcode',
-  setupHash: '',
+  isParent:false, cfg:null, txs:[], assets:[], lunchDates:new Set(),
+  calY:new Date().getFullYear(), calM:new Date().getMonth(),
+  homeY:new Date().getFullYear(), homeM:new Date().getMonth(),
+  txFilter:null, chart:null, donutChart:null, donutMode:'exp',
+  editTxId:null, editAssetId:null, currentTab:'home',
+  parentTimer:null, parentTimerSecs:0,
+  setupStep:'passcode', setupHash:'', setupPinHash:'',
 };
 
 // ─── UTILS ───
@@ -841,8 +879,8 @@ async function sha256(s) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-const fmt = n => n.toLocaleString('ja-JP');
-const fmtD = d => d.replace(/-/g,'/');
+const fmt = n => Math.abs(n).toLocaleString('ja-JP');
+const fmtD = d => d.replace(/-/g, '/');
 function today() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -861,14 +899,13 @@ function getTier(rank, tiers) {
 }
 function showToast(msg) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2400);
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
 }
-function openModal(id) { document.getElementById(id).classList.remove('hide'); }
-function closeModal(id) { document.getElementById(id).classList.add('hide'); }
+const openModal = id => document.getElementById(id).classList.remove('hide');
+const closeModal = id => document.getElementById(id).classList.add('hide');
 
-// ─── FIREBASE HELPERS ───
+// ─── FIREBASE OPS ───
 async function loadCfg() {
   const s = await db.collection('app').doc('config').get();
   return s.exists ? s.data() : null;
@@ -897,37 +934,23 @@ async function addAssetDoc(a) { await db.collection('assets').add({...a, created
 async function updAssetDoc(id, a) { await db.collection('assets').doc(id).update(a); }
 async function delAssetDoc(id) { await db.collection('assets').doc(id).delete(); }
 
-// ─── BALANCE ───
-function balance() {
-  return S.txs.reduce((sum,tx) => tx.type==='expense' ? sum-Math.abs(tx.amount) : sum+Math.abs(tx.amount), 0);
-}
-
-// ─── MONTHLY ALLOWANCE (idempotent via Firestore transaction) ───
+// ─── MONTHLY ALLOWANCE ───
 async function checkMonthly() {
   const cfg = S.cfg;
   if(!cfg || !cfg.currentRank) return;
-  const d = new Date();
-  if(d.getDate() < cfg.allowanceDay) return;
+  if(new Date().getDate() < cfg.allowanceDay) return;
   const month = thisMonth();
   if(cfg.lastAllowanceMonth === month) return;
-
   const tier = getTier(cfg.currentRank, cfg.tiers);
   if(!tier) return;
-
-  // Use transaction to prevent double-add
   const cfgRef = db.collection('app').doc('config');
   let added = false;
   await db.runTransaction(async t => {
     const snap = await t.get(cfgRef);
-    const data = snap.data() || {};
-    if(data.lastAllowanceMonth === month) return; // already done
+    if((snap.data()||{}).lastAllowanceMonth === month) return;
     const txRef = db.collection('transactions').doc();
-    t.set(txRef, {
-      date: today(), amount: tier.amount, type: 'income',
-      category: '月次お小遣い', memo: `${month} 自動追加（${tier.label}）`,
-      createdAt: TS()
-    });
-    t.update(cfgRef, {lastAllowanceMonth: month});
+    t.set(txRef, {date:today(),amount:tier.amount,type:'income',category:'月次お小遣い',memo:`${month} 自動追加（${tier.label}）`,createdAt:TS()});
+    t.update(cfgRef, {lastAllowanceMonth:month});
     added = true;
   });
   if(added) {
@@ -936,8 +959,8 @@ async function checkMonthly() {
   }
 }
 
-// ─── NUMPAD BUILDER ───
-function buildNumpad(padId, handler, digits, dotsId) {
+// ─── NUMPAD ───
+function buildNumpad(padId, handler, digits, dotsId, dotClass='lock-dot') {
   const pad = document.getElementById(padId);
   if(!pad) return;
   pad.innerHTML = '';
@@ -949,13 +972,12 @@ function buildNumpad(padId, handler, digits, dotsId) {
     btn.onclick = () => handler(k);
     pad.appendChild(btn);
   });
-  renderDots(dotsId, '', digits);
+  renderDots(dotsId, '', digits, dotClass);
 }
-function renderDots(id, buf, total) {
+function renderDots(id, buf, total, cls='lock-dot') {
   const el = document.getElementById(id);
   if(!el) return;
   el.innerHTML = '';
-  const cls = id.startsWith('lock') ? 'lock-dot' : 'pin-modal-dot';
   for(let i=0;i<total;i++){
     const d = document.createElement('div');
     d.className = cls + (i < buf.length ? ' on' : '');
@@ -964,97 +986,73 @@ function renderDots(id, buf, total) {
 }
 
 // ─── LOCK / SETUP ───
-let lockBuf = '';
-let setupBuf = '';
-let setupHash = '';
+let lockBuf = '', setupBuf = '', setupHash = '';
 
 function showLock() {
-  const ls = document.getElementById('lock-screen');
-  ls.style.display = 'flex';
+  document.getElementById('lock-screen').style.display = 'flex';
   lockBuf = '';
   buildNumpad('lock-pad', onLockKey, 6, 'lock-dots');
   document.getElementById('lock-err').textContent = '';
+  document.getElementById('lock-label').textContent = 'パスコードを入力してください';
 }
 
 function startSetup() {
-  S.setupStep = 'passcode';
-  setupBuf = ''; setupHash = '';
-  document.getElementById('lock-title').textContent = '初期設定';
-  document.getElementById('lock-sub').textContent = 'パスコードを設定してください（6桁）';
+  S.setupStep = 'passcode'; setupBuf = ''; setupHash = '';
+  document.getElementById('lock-label').textContent = 'パスコードを設定してください（6桁）';
   document.getElementById('lock-err').textContent = '';
   buildNumpad('lock-pad', onSetupKey, 6, 'lock-dots');
 }
 
 async function onLockKey(k) {
-  const err = document.getElementById('lock-err');
-  if(k === '⌫') lockBuf = lockBuf.slice(0,-1);
-  else lockBuf += String(k);
+  if(k === '⌫') lockBuf = lockBuf.slice(0,-1); else lockBuf += String(k);
   renderDots('lock-dots', lockBuf, 6);
-  err.textContent = '';
+  document.getElementById('lock-err').textContent = '';
   if(lockBuf.length === 6) {
-    const h = await sha256(lockBuf);
-    lockBuf = '';
-    renderDots('lock-dots','',6);
+    const h = await sha256(lockBuf); lockBuf = ''; renderDots('lock-dots','',6);
     if(h === S.cfg.passcodeHash) {
       document.getElementById('lock-screen').style.display = 'none';
       await startApp();
-    } else {
-      err.textContent = 'パスコードが違います';
-    }
+    } else { document.getElementById('lock-err').textContent = 'パスコードが違います'; }
   }
 }
 
 async function onSetupKey(k) {
-  const err = document.getElementById('lock-err');
   const digits = S.setupStep === 'pin' ? 4 : 6;
-  if(k === '⌫') setupBuf = setupBuf.slice(0,-1);
-  else setupBuf += String(k);
+  if(k === '⌫') setupBuf = setupBuf.slice(0,-1); else setupBuf += String(k);
   renderDots('lock-dots', setupBuf, digits);
-  err.textContent = '';
+  document.getElementById('lock-err').textContent = '';
 
   if(S.setupStep === 'passcode' && setupBuf.length === 6) {
-    setupHash = await sha256(setupBuf);
-    setupBuf = '';
+    setupHash = await sha256(setupBuf); setupBuf = '';
     S.setupStep = 'passcode2';
-    document.getElementById('lock-sub').textContent = '確認のため、もう一度入力してください';
+    document.getElementById('lock-label').textContent = '確認のため、もう一度入力してください';
     renderDots('lock-dots','',6);
   } else if(S.setupStep === 'passcode2' && setupBuf.length === 6) {
     const h = await sha256(setupBuf);
     if(h !== setupHash) {
-      err.textContent = 'パスコードが一致しません。最初からやり直してください';
-      setupBuf = ''; setupHash = '';
-      S.setupStep = 'passcode';
-      document.getElementById('lock-sub').textContent = 'パスコードを設定してください（6桁）';
-      renderDots('lock-dots','',6);
-      return;
+      document.getElementById('lock-err').textContent = 'パスコードが一致しません。最初からやり直してください';
+      setupBuf = ''; setupHash = ''; S.setupStep = 'passcode';
+      document.getElementById('lock-label').textContent = 'パスコードを設定してください（6桁）';
+      renderDots('lock-dots','',6); return;
     }
-    setupBuf = '';
-    S.setupStep = 'pin';
-    document.getElementById('lock-sub').textContent = '親用PIN（4桁）を設定してください';
+    setupBuf = ''; S.setupStep = 'pin';
+    document.getElementById('lock-label').textContent = '親用PIN（4桁）を設定してください';
     buildNumpad('lock-pad', onSetupKey, 4, 'lock-dots');
   } else if(S.setupStep === 'pin' && setupBuf.length === 4) {
-    const pinHash = await sha256(setupBuf);
-    setupBuf = '';
-    S.setupHash_pin = pinHash;
-    // Show day selection modal instead of prompt()
+    S.setupPinHash = await sha256(setupBuf); setupBuf = '';
     document.getElementById('setup-day-val').value = '1';
     openModal('setup-day-overlay');
   }
 }
 
 async function finishSetup() {
-  const day = Math.min(28, Math.max(1, parseInt(document.getElementById('setup-day-val').value) || 1));
+  const day = Math.min(28, Math.max(1, parseInt(document.getElementById('setup-day-val').value)||1));
   closeModal('setup-day-overlay');
   const cfg = {
-    passcodeHash: setupHash,
-    pinHash: S.setupHash_pin,
-    lunchAmount: 500,
-    allowanceDay: day,
-    tiers: DEFAULT_TIERS,
-    atTiers: DEFAULT_AT_TIERS,
-    currentRank: null,
-    currentTier: null,
-    lastAllowanceMonth: null,
+    passcodeHash:setupHash, pinHash:S.setupPinHash,
+    lunchAmount:500, allowanceDay:day,
+    tiers:DEFAULT_TIERS, atTiers:DEFAULT_AT_TIERS,
+    currentRank:null, currentTier:null, lastAllowanceMonth:null,
   };
   await db.collection('app').doc('config').set(cfg);
   S.cfg = cfg;
@@ -1062,125 +1060,87 @@ async function finishSetup() {
   await startApp();
 }
 
-// ─── PARENT PIN MODAL ───
+// ─── PARENT PIN ───
 let pinBuf = '';
-
 function openPinModal() {
   pinBuf = '';
-  buildNumpad('pin-pad', onPinKey, 4, 'pin-dots');
+  buildNumpad('pin-pad', onPinKey, 4, 'pin-dots', 'pin-dot');
   document.getElementById('pin-err').textContent = '';
   openModal('pin-overlay');
 }
-
 async function onPinKey(k) {
-  if(k === '⌫') pinBuf = pinBuf.slice(0,-1);
-  else pinBuf += String(k);
-  renderDots('pin-dots', pinBuf, 4);
+  if(k === '⌫') pinBuf = pinBuf.slice(0,-1); else pinBuf += String(k);
+  renderDots('pin-dots', pinBuf, 4, 'pin-dot');
   document.getElementById('pin-err').textContent = '';
   if(pinBuf.length === 4) {
-    const h = await sha256(pinBuf);
-    pinBuf = '';
-    renderDots('pin-dots','',4);
+    const h = await sha256(pinBuf); pinBuf = ''; renderDots('pin-dots','',4,'pin-dot');
     if(h === S.cfg.pinHash) {
-      S.isParent = true;
-      closeModal('pin-overlay');
-      startParentTimer();
-      updateModeUI();
+      S.isParent = true; closeModal('pin-overlay');
+      startParentTimer(); updateModeUI();
       showToast('🔐 親モードに切り替えました');
-    } else {
-      document.getElementById('pin-err').textContent = 'PINが違います';
-    }
+    } else { document.getElementById('pin-err').textContent = 'PINが違います'; }
   }
 }
-
-function toggleMode() {
-  if(S.isParent) {
-    exitParentMode();
-  } else {
-    openPinModal();
-  }
-}
-
-function exitParentMode() {
-  S.isParent = false;
-  clearParentTimer();
-  updateModeUI();
+function toggleMode() { S.isParent ? exitParent() : openPinModal(); }
+function exitParent() {
+  S.isParent = false; clearParentTimer(); updateModeUI();
   showToast('👦 子どもモードに切り替えました');
 }
 
-// ─── PARENT AUTO-TIMEOUT ───
+// ─── PARENT TIMER ───
 function startParentTimer() {
-  clearParentTimer();
-  S.parentTimerSecs = 300; // 5 minutes
-  const el = document.getElementById('parent-timer');
-  el.style.display = 'block';
+  clearParentTimer(); S.parentTimerSecs = 300;
+  const el = document.getElementById('parent-timer'); el.style.display = 'block';
   S.parentTimer = setInterval(() => {
     S.parentTimerSecs--;
-    const m = Math.floor(S.parentTimerSecs / 60);
-    const s = S.parentTimerSecs % 60;
+    const m = Math.floor(S.parentTimerSecs/60), s = S.parentTimerSecs%60;
     el.textContent = `${m}:${String(s).padStart(2,'0')}`;
-    if(S.parentTimerSecs <= 0) exitParentMode();
+    if(S.parentTimerSecs <= 0) exitParent();
   }, 1000);
 }
-
 function clearParentTimer() {
   if(S.parentTimer) { clearInterval(S.parentTimer); S.parentTimer = null; }
   const el = document.getElementById('parent-timer');
   if(el) el.style.display = 'none';
 }
-
-function resetParentTimer() {
-  if(S.isParent) startParentTimer();
-}
+function resetParentTimer() { if(S.isParent) startParentTimer(); }
 
 // ─── MODE UI ───
 function updateModeUI() {
   const chip = document.getElementById('mode-chip');
-  const navSettings = document.getElementById('nav-settings');
-  const fabWrap = document.getElementById('fab-wrap');
-
+  const qs = document.getElementById('quick-sec');
+  const ns = document.getElementById('nav-settings');
   if(S.isParent) {
-    chip.textContent = '🔐 親モード';
-    chip.className = 'mode-chip parent';
-    navSettings.classList.remove('hide');
+    chip.textContent = '親モード'; chip.className = 'mode-chip parent';
+    qs.style.display = 'block'; ns.classList.remove('hide');
   } else {
-    chip.textContent = '👦 子どもモード';
-    chip.className = 'mode-chip';
-    navSettings.classList.add('hide');
+    chip.textContent = '子どもモード'; chip.className = 'mode-chip';
+    qs.style.display = 'none'; ns.classList.add('hide');
     if(S.currentTab === 'settings') go('home');
   }
   updateFab();
-  renderHome();
-  renderTxList();
-  renderAssets();
+  renderHome(); renderTxList(); renderAssets();
 }
 
-// ─── START APP ───
+// ─── START ───
 async function startApp() {
   await Promise.all([loadTxs(), loadAssets(), loadLunch()]);
-  await checkMonthly();
-  await loadTxs(); // reload after possible auto-add
+  await checkMonthly(); await loadTxs();
   document.getElementById('app').style.display = 'block';
   document.getElementById('mode-btn').onclick = toggleMode;
-  // Reset to child mode on each login
-  S.isParent = false;
-  updateModeUI();
-  go('home');
+  buildFab();
+  S.isParent = false; updateModeUI(); go('home');
 }
 
-// ─── TAB NAVIGATION ───
+// ─── NAVIGATION ───
 function go(tab) {
-  S.currentTab = tab;
+  S.currentTab = tab; closeFab();
   ['home','tx','cal','asset','graph','settings'].forEach(t => {
     document.getElementById(`page-${t}`).classList.toggle('on', t===tab);
   });
-  document.querySelectorAll('#nav .ni').forEach(el => {
-    el.classList.toggle('on', el.dataset.tab === tab);
-  });
+  document.querySelectorAll('#nav .ni').forEach(el => el.classList.toggle('on', el.dataset.tab===tab));
   const titles = {home:'こづかい管理',tx:'取引履歴',cal:'カレンダー',asset:'モノ資産',graph:'残高グラフ',settings:'設定'};
-  document.getElementById('hdr-title').textContent = titles[tab] || 'こづかい管理';
-  closeFab();
-  updateFab();
+  document.getElementById('hdr-title').textContent = titles[tab]||'こづかい管理';
   if(tab==='tx') renderTxList();
   if(tab==='cal') renderCalendar();
   if(tab==='asset') renderAssets();
@@ -1189,123 +1149,166 @@ function go(tab) {
   resetParentTimer();
 }
 
-// ─── SPEED DIAL FAB ───
-const FAB_ACTIONS = [
-  {ico:'🍱',lbl:'弁当代 +500円',color:'#10B981',fn:'doLunch'},
-  {ico:'📝',lbl:'ATテスト結果',color:'#F59E0B',fn:'openATModal'},
-  {ico:'🏆',lbl:'テスト順位入力',color:'#6366F1',fn:'openRankModal'},
-  {ico:'💰',lbl:'収入を追加',color:'#10B981',fn:"openTxModal('income')"},
-  {ico:'💸',lbl:'支出を追加',color:'#EF4444',fn:"openTxModal('expense')"},
-  {ico:'📦',lbl:'資産を追加',color:'#8B5CF6',fn:'openAssetModal'},
-];
-
-function buildFab() {
-  const items = document.getElementById('fab-items');
-  items.innerHTML = FAB_ACTIONS.map((a,i) =>
-    `<div class="fab-item" style="animation-delay:${i*0.04}s">
-      <span class="fab-item-lbl">${a.lbl}</span>
-      <button class="fab-item-btn" style="background:${a.color};" onclick="closeFab();${a.fn}();">
-        ${a.ico}
-      </button>
-    </div>`
-  ).join('');
-}
-
-function updateFab() {
-  const wrap = document.getElementById('fab-wrap');
-  const show = S.isParent;
-  wrap.classList.toggle('hidden', !show);
-  if(!show) closeFab();
-}
-
-function toggleFab() {
-  const open = document.getElementById('fab-items').classList.toggle('open');
-  document.getElementById('fab-main').classList.toggle('open', open);
-  document.getElementById('fab-overlay').classList.toggle('open', open);
-  resetParentTimer();
-}
-
-function closeFab() {
-  document.getElementById('fab-items').classList.remove('open');
-  document.getElementById('fab-main').classList.remove('open');
-  document.getElementById('fab-overlay').classList.remove('open');
-}
-
 // ─── HOME ───
+let homeChartMode = 'exp';
+function setChartMode(mode, el) {
+  homeChartMode = mode;
+  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderDonut();
+}
+
+let homeY = new Date().getFullYear(), homeM = new Date().getMonth();
+function homeMonthPrev() { if(homeM===0){homeM=11;homeY--;}else homeM--; renderHome(); }
+function homeMonthNext() { if(homeM===11){homeM=0;homeY++;}else homeM++; renderHome(); }
+
+function filterByHomeMonth(txs) {
+  const key = `${homeY}-${String(homeM+1).padStart(2,'0')}`;
+  return txs.filter(t => t.date.startsWith(key));
+}
+
 function renderHome() {
-  const bal = balance();
-  document.getElementById('hero-val').textContent = fmt(Math.abs(bal));
-  const card = document.getElementById('hero-card');
-  card.style.background = bal >= 0
-    ? 'linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#A855F7 100%)'
-    : 'linear-gradient(135deg,#EF4444 0%,#DC2626 100%)';
+  const mLabel = `${homeY}年${homeM+1}月`;
+  document.getElementById('home-month-lbl').textContent = mLabel;
+  const d1 = `${homeY}/${String(homeM+1).padStart(2,'0')}/01`;
+  const lastD = new Date(homeY,homeM+1,0).getDate();
+  const d2 = `${homeY}/${String(homeM+1).padStart(2,'0')}/${lastD}`;
+  document.getElementById('home-period').textContent = `${d1}〜${d2}`;
+
+  const monthTxs = filterByHomeMonth(S.txs);
+  const inc = monthTxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp = monthTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const bal = inc - exp;
+  const maxAmt = Math.max(inc,exp,1);
+
+  document.getElementById('home-inc').textContent = `¥${fmt(inc)}`;
+  document.getElementById('home-exp').textContent = `¥${fmt(exp)}`;
+  document.getElementById('inc-bar').style.width = `${(inc/maxAmt)*100}%`;
+  document.getElementById('exp-bar').style.width = `${(exp/maxAmt)*100}%`;
+  const balEl = document.getElementById('home-balance');
+  balEl.textContent = (bal >= 0 ? '+' : '-') + `¥${fmt(bal)}`;
+  balEl.className = 'summary-balance-val' + (bal < 0 ? ' minus' : '');
+
+  renderDonut(monthTxs);
 
   const cfg = S.cfg;
   if(cfg && cfg.currentRank) {
     const tier = getTier(cfg.currentRank, cfg.tiers);
-    document.getElementById('rank-val').textContent = `${cfg.currentRank}位`;
+    document.getElementById('home-rank').textContent = `${cfg.currentRank}位`;
     if(tier) {
-      document.getElementById('rank-sub').textContent = `${tier.label}：月額 ¥${fmt(tier.amount)}`;
-      document.getElementById('hero-phone').textContent = fmtTime(tier.phone);
-      document.getElementById('hero-ps5').textContent = fmtTime(tier.ps5);
+      document.getElementById('home-rank-sub').textContent = `${tier.label}：月額 ¥${fmt(tier.amount)}`;
+      document.getElementById('home-phone').textContent = fmtTime(tier.phone);
+      document.getElementById('home-ps5').textContent = fmtTime(tier.ps5);
     }
   } else {
-    document.getElementById('rank-val').textContent = '未設定';
-    document.getElementById('rank-sub').textContent = '順位を入力するとお小遣い額が決まります';
-    document.getElementById('hero-phone').textContent = '未設定';
-    document.getElementById('hero-ps5').textContent = '未設定';
+    document.getElementById('home-rank').textContent = '未設定';
+    document.getElementById('home-rank-sub').textContent = '順位を入力するとお小遣い額が決まります';
+    document.getElementById('home-phone').textContent = '—';
+    document.getElementById('home-ps5').textContent = '—';
   }
 
-  const list = document.getElementById('home-tx');
-  const recent = S.txs.slice(0,5);
-  list.innerHTML = recent.length === 0
-    ? '<div class="empty"><div class="empty-ico">💴</div><div class="empty-txt">取引記録がありません</div></div>'
+  const recent = S.txs.slice(0,6);
+  const listEl = document.getElementById('home-tx-list');
+  listEl.innerHTML = recent.length === 0
+    ? '<div class="empty"><div class="empty-ico">💴</div><div class="empty-txt">まだ取引記録がありません</div></div>'
     : recent.map(tx => txItemHTML(tx, false)).join('');
+}
+
+const DONUT_COLORS = ['#FF6B00','#FF9D45','#FFC107','#4CAF50','#2196F3','#9C27B0','#F44336','#00BCD4'];
+
+function renderDonut(monthTxs) {
+  if(!monthTxs) monthTxs = filterByHomeMonth(S.txs);
+  const filtered = monthTxs.filter(t => homeChartMode === 'exp' ? t.type==='expense' : t.type==='income');
+  // Group by category
+  const map = {};
+  filtered.forEach(t => { map[t.category] = (map[t.category]||0) + t.amount; });
+  const entries = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const total = entries.reduce((s,[,v])=>s+v,0);
+
+  document.getElementById('donut-center-amt').textContent = `¥${fmt(total)}`;
+  document.getElementById('donut-center-lbl').textContent = homeChartMode==='exp'?'支出合計':'収入合計';
+
+  if(S.donutChart) S.donutChart.destroy();
+  const ctx = document.getElementById('donut-chart').getContext('2d');
+
+  if(entries.length === 0) {
+    document.getElementById('donut-legend').innerHTML = '<div style="font-size:12px;color:#999;padding:16px 0;">記録がありません</div>';
+    S.donutChart = new Chart(ctx, {type:'doughnut',data:{labels:['なし'],datasets:[{data:[1],backgroundColor:['#EBEBEB'],borderWidth:0}]},options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+    return;
+  }
+
+  S.donutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(([k])=>k),
+      datasets: [{data:entries.map(([,v])=>v), backgroundColor:DONUT_COLORS, borderWidth:2, borderColor:'#fff'}]
+    },
+    options: {
+      cutout: '72%',
+      plugins: {legend:{display:false}, tooltip:{callbacks:{label:c=>`¥${fmt(c.raw)}`}}},
+    }
+  });
+
+  document.getElementById('donut-legend').innerHTML = entries.map(([name,amt],i) =>
+    `<div class="legend-item">
+      <div class="legend-dot" style="background:${DONUT_COLORS[i]};"></div>
+      <span class="legend-name">${name}</span>
+      <span class="legend-pct">${Math.round(amt/total*100)}%</span>
+      <span class="legend-amt">¥${fmt(amt)}</span>
+    </div>`
+  ).join('');
 }
 
 // ─── TX ITEM HTML ───
 function txItemHTML(tx, showActs) {
   const isInc = tx.type !== 'expense';
-  const ico = tx.category.includes('弁当') ? '🍱'
-    : tx.category.includes('ATテスト') ? '📝'
-    : tx.category.includes('小テスト') ? '✅'
-    : tx.category.includes('月次') ? '💴'
-    : tx.category.includes('臨時') ? '🎁'
-    : isInc ? '💰' : '💸';
+  const style = getCatStyle(tx.category, tx.type);
   const acts = showActs && S.isParent ? `
     <div class="tx-acts">
       <button class="txbtn edit" onclick="editTx('${tx.id}')">編集</button>
       <button class="txbtn del" onclick="confirmDelTx('${tx.id}')">削除</button>
     </div>` : '';
   return `<div class="tx-item">
-    <div class="tx-ico-wrap ${isInc?'inc':'exp'}">${ico}</div>
-    <div class="tx-info">
-      <div class="tx-cat">${tx.category}</div>
-      <div class="tx-meta">${fmtD(tx.date)}${tx.memo?' · '+tx.memo:''}</div>
+    <div class="tx-cat-ico ${style.bg}">${style.ico}</div>
+    <div class="tx-body">
+      <div class="tx-name">${tx.category}</div>
+      <div class="tx-date">${fmtD(tx.date)}${tx.memo?' · '+tx.memo:''}</div>
     </div>
     <div class="tx-right">
-      <span class="tx-amt ${isInc?'plus':'minus'}">${isInc?'+':'-'}¥${fmt(tx.amount)}</span>
+      <div class="tx-amt ${isInc?'inc':'exp'}">${isInc?'+':'-'}¥${fmt(tx.amount)}</div>
       ${acts}
     </div>
   </div>`;
 }
 
-// ─── TX LIST ───
+// ─── TX LIST PAGE ───
 function renderTxList() {
   const months = [...new Set(S.txs.map(t=>t.date.slice(0,7)))].sort().reverse();
   const filter = document.getElementById('tx-filter');
   filter.innerHTML = `<button class="mtab ${S.txFilter===null?'on':''}" onclick="setFilter(null)">すべて</button>` +
-    months.map(m => `<button class="mtab ${S.txFilter===m?'on':''}" onclick="setFilter('${m}')">${m.replace('-','年')}月</button>`).join('');
+    months.map(m=>`<button class="mtab ${S.txFilter===m?'on':''}" onclick="setFilter('${m}')">${m.replace('-','年')}月</button>`).join('');
 
   const txs = S.txFilter ? S.txs.filter(t=>t.date.startsWith(S.txFilter)) : S.txs;
-  const list = document.getElementById('tx-list');
+  const inc = txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const exp = txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('tx-inc').textContent = `¥${fmt(inc)}`;
+  document.getElementById('tx-exp').textContent = `¥${fmt(exp)}`;
+  const balEl = document.getElementById('tx-bal');
+  const bal = inc - exp;
+  balEl.textContent = (bal>=0?'+':'-') + `¥${fmt(bal)}`;
+
+  const wrap = document.getElementById('tx-list-wrap');
   const empty = document.getElementById('tx-empty');
-  if(txs.length === 0) {
-    list.classList.add('hide'); empty.classList.remove('hide');
-  } else {
-    empty.classList.add('hide'); list.classList.remove('hide');
-    list.innerHTML = txs.map(tx => txItemHTML(tx,true)).join('');
-  }
+  if(txs.length === 0) { wrap.innerHTML=''; empty.classList.remove('hide'); return; }
+  empty.classList.add('hide');
+
+  // Group by date
+  const byDate = {};
+  txs.forEach(tx => { if(!byDate[tx.date]) byDate[tx.date]=[];  byDate[tx.date].push(tx); });
+  wrap.innerHTML = Object.entries(byDate).map(([date, items]) =>
+    `<div class="tx-date-hdr">${fmtD(date)}</div>
+     <div class="tx-list-wrap">${items.map(tx=>txItemHTML(tx,true)).join('')}</div>`
+  ).join('');
 }
 
 function setFilter(m) { S.txFilter = m; renderTxList(); }
@@ -1319,387 +1322,264 @@ function openTxModal(type, tx=null) {
   document.getElementById('tx-date').value = tx ? tx.date : today();
   document.getElementById('tx-amount').value = tx ? tx.amount : '';
   document.getElementById('tx-category').value = tx ? tx.category : '';
-  document.getElementById('tx-memo').value = tx ? tx.memo : '';
-  openModal('tx-overlay');
-  resetParentTimer();
+  document.getElementById('tx-memo').value = tx ? tx.memo||'' : '';
+  openModal('tx-overlay'); resetParentTimer();
 }
-
 async function saveTx() {
-  const type = document.getElementById('tx-type').value;
-  const date = document.getElementById('tx-date').value;
-  const amount = parseInt(document.getElementById('tx-amount').value) || 0;
-  const category = document.getElementById('tx-category').value.trim();
-  const memo = document.getElementById('tx-memo').value.trim();
-  if(!date||!amount||!category) { showToast('日付・金額・項目を入力してください'); return; }
-  const tx = {type,date,amount,category,memo};
-  if(S.editTxId) {
-    await updTx(S.editTxId, tx);
-    showToast('✅ 取引を更新しました');
-  } else {
-    await addTx(tx);
-    showToast('✅ 取引を追加しました');
-  }
-  closeModal('tx-overlay');
-  await loadTxs(); renderHome(); renderTxList();
-  resetParentTimer();
+  const type=document.getElementById('tx-type').value, date=document.getElementById('tx-date').value;
+  const amount=parseInt(document.getElementById('tx-amount').value)||0;
+  const category=document.getElementById('tx-category').value.trim();
+  const memo=document.getElementById('tx-memo').value.trim();
+  if(!date||!amount||!category){ showToast('日付・金額・項目を入力してください'); return; }
+  if(S.editTxId){ await updTx(S.editTxId,{type,date,amount,category,memo}); showToast('✅ 取引を更新しました'); }
+  else{ await addTx({type,date,amount,category,memo}); showToast('✅ 取引を追加しました'); }
+  closeModal('tx-overlay'); await loadTxs(); renderHome(); renderTxList(); resetParentTimer();
 }
-
-function editTx(id) {
-  const tx = S.txs.find(t=>t.id===id);
-  if(tx) openTxModal(tx.type, tx);
-}
-
+function editTx(id) { const tx=S.txs.find(t=>t.id===id); if(tx) openTxModal(tx.type,tx); }
 async function confirmDelTx(id) {
   if(!confirm('この取引を削除しますか？')) return;
-  await delTx(id);
-  showToast('削除しました');
+  await delTx(id); showToast('削除しました');
   await loadTxs(); renderHome(); renderTxList();
 }
 
-// ─── LUNCH ───
+// ─── QUICK ACTIONS ───
 async function doLunch() {
-  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
+  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
   const t = today();
   if(S.lunchDates.has(t) && !confirm('今日はすでに弁当代を記録しています。もう一度追加しますか？')) return;
-  const amount = S.cfg.lunchAmount || 500;
+  const amount = S.cfg.lunchAmount||500;
   await addTx({date:t,amount,type:'income',category:'弁当代',memo:'弁当代支給'});
-  if(!S.lunchDates.has(t)) {
-    await db.collection('lunchDates').doc(t).set({date:t});
-    S.lunchDates.add(t);
-  }
+  if(!S.lunchDates.has(t)){ await db.collection('lunchDates').doc(t).set({date:t}); S.lunchDates.add(t); }
   showToast(`🍱 弁当代 ¥${fmt(amount)} を追加しました`);
-  await loadTxs(); renderHome();
-  resetParentTimer();
+  await loadTxs(); renderHome(); resetParentTimer();
 }
 
-// ─── AT TEST ───
 function openATModal() {
-  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
-  const atTiers = S.cfg.atTiers || DEFAULT_AT_TIERS;
-  document.getElementById('at-grid').innerHTML = atTiers.map((t,i) =>
-    `<button class="at-btn" onclick="selectAT(${i})">
-      ${t.label}<br>
-      <span class="at-sub">${t.amount>0?`臨時 ¥${fmt(t.amount)}`:''} ${t.poke?'🃏ポケカ1P':''}</span>
-    </button>`
+  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
+  const atTiers = S.cfg.atTiers||DEFAULT_AT_TIERS;
+  document.getElementById('at-grid').innerHTML = atTiers.map((t,i)=>
+    `<button class="at-btn" onclick="selectAT(${i})">${t.label}<br>
+    <span class="at-sub">${t.amount>0?`臨時 ¥${fmt(t.amount)}`:''} ${t.poke?'🃏ポケカ1P':''}</span></button>`
   ).join('');
-  openModal('at-overlay');
-  resetParentTimer();
+  openModal('at-overlay'); resetParentTimer();
 }
-
 async function selectAT(idx) {
-  const t = (S.cfg.atTiers || DEFAULT_AT_TIERS)[idx];
-  closeModal('at-overlay');
+  const t = (S.cfg.atTiers||DEFAULT_AT_TIERS)[idx]; closeModal('at-overlay');
   const d = today();
-  if(t.amount > 0) {
-    await addTx({date:d,amount:t.amount,type:'income',category:'ATテスト臨時',memo:`ATテスト ${t.label}`});
-  }
-  if(t.poke) {
-    await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:d,purchasePrice:0,memo:`ATテスト ${t.label} 獲得`});
-    await loadAssets();
-    showToast(t.amount>0 ? `📝 ¥${fmt(t.amount)} ＋ 🃏ポケカ1P を追加しました` : '🃏 ポケカ1Pをモノ資産に追加しました');
-  } else {
-    showToast(`📝 臨時お小遣い ¥${fmt(t.amount)} を追加しました`);
-  }
+  if(t.amount>0) await addTx({date:d,amount:t.amount,type:'income',category:'ATテスト臨時',memo:`ATテスト ${t.label}`});
+  if(t.poke){ await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:d,purchasePrice:0,memo:`ATテスト ${t.label} 獲得`}); await loadAssets(); }
+  showToast(t.poke ? (t.amount>0?`📝 ¥${fmt(t.amount)} ＋ 🃏ポケカ1P`:'🃏 ポケカ1P') + 'を追加しました' : `📝 ¥${fmt(t.amount)} 臨時お小遣いを追加しました`);
   await loadTxs(); renderHome();
 }
-
 async function doKotest() {
-  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
+  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
   if(!confirm('小テスト満点 — ポケカ1Pをモノ資産に追加しますか？')) return;
   await addAssetDoc({name:'ポケモンカード 1P',purchaseDate:today(),purchasePrice:0,memo:'小テスト満点 獲得'});
-  await loadAssets();
-  showToast('✅ 🃏 ポケカ1Pをモノ資産に追加しました');
+  await loadAssets(); showToast('✅ 🃏 ポケカ1Pをモノ資産に追加しました');
 }
+function doKotestFromAT(){ closeModal('at-overlay'); doKotest(); }
 
-function doKotestFromAT() { closeModal('at-overlay'); doKotest(); }
-
-// ─── RANK ───
 function openRankModal() {
-  if(!S.isParent) { showToast('親モードのみ操作できます'); return; }
-  document.getElementById('rank-input').value = S.cfg.currentRank || '';
-  document.getElementById('rank-test-name').value = '';
-  openModal('rank-overlay');
-  resetParentTimer();
+  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
+  document.getElementById('rank-input').value = S.cfg.currentRank||'';
+  document.getElementById('rank-name').value = '';
+  openModal('rank-overlay'); resetParentTimer();
 }
-
 async function saveRank() {
-  const rank = parseInt(document.getElementById('rank-input').value) || 0;
-  if(!rank || rank < 1) { showToast('正しい順位を入力してください'); return; }
-  const tier = getTier(rank, S.cfg.tiers);
-  if(!tier) { showToast('順位に対応する設定がありません'); return; }
-  await saveCfg({currentRank:rank, currentTier:tier.label});
-  closeModal('rank-overlay');
-  showToast(`🏆 ${rank}位（${tier.label}）を記録しました`);
-  renderHome();
+  const rank = parseInt(document.getElementById('rank-input').value)||0;
+  if(!rank||rank<1){ showToast('正しい順位を入力してください'); return; }
+  const tier = getTier(rank,S.cfg.tiers);
+  if(!tier){ showToast('順位に対応する設定がありません'); return; }
+  await saveCfg({currentRank:rank,currentTier:tier.label});
+  closeModal('rank-overlay'); showToast(`🏆 ${rank}位（${tier.label}）を記録しました`); renderHome();
 }
 
 // ─── CALENDAR ───
 function renderCalendar() {
-  const y = S.calY, m = S.calM;
+  const y=S.calY,m=S.calM;
   document.getElementById('cal-month-lbl').textContent = `${y}年${m+1}月`;
-  const first = new Date(y,m,1).getDay();
-  const last = new Date(y,m+1,0).getDate();
-  const todayDate = new Date();
-  const grid = document.getElementById('cal-grid');
-  const days = ['日','月','火','水','木','金','土'];
-  grid.innerHTML = days.map(d=>`<div class="cal-hd">${d}</div>`).join('');
-  for(let i=0;i<first;i++) grid.innerHTML += `<div class="cal-day"></div>`;
+  const first=new Date(y,m,1).getDay(), last=new Date(y,m+1,0).getDate();
+  const todayDate=new Date(); const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  for(let i=0;i<first;i++) grid.innerHTML+=`<div class="cal-day"></div>`;
   for(let d=1;d<=last;d++){
-    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dow = (first+d-1)%7;
-    const isToday = todayDate.getFullYear()===y && todayDate.getMonth()===m && todayDate.getDate()===d;
-    const cls = ['cal-day', isToday?'today':'', S.lunchDates.has(ds)&&!isToday?'has-lunch':'', dow===0?'sun':dow===6?'sat':''].filter(Boolean).join(' ');
-    grid.innerHTML += `<div class="${cls}">${d}</div>`;
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow=(first+d-1)%7;
+    const isToday=todayDate.getFullYear()===y&&todayDate.getMonth()===m&&todayDate.getDate()===d;
+    const cls=['cal-day',isToday?'today':'',S.lunchDates.has(ds)&&!isToday?'has-lunch':'',dow===0?'sun':dow===6?'sat':''].filter(Boolean).join(' ');
+    grid.innerHTML+=`<div class="${cls}">${d}</div>`;
   }
 }
-function calPrev(){ if(S.calM===0){S.calM=11;S.calY--;}else S.calM--; renderCalendar(); }
-function calNext(){ if(S.calM===11){S.calM=0;S.calY++;}else S.calM++; renderCalendar(); }
+function calPrev(){if(S.calM===0){S.calM=11;S.calY--;}else S.calM--;renderCalendar();}
+function calNext(){if(S.calM===11){S.calM=0;S.calY++;}else S.calM++;renderCalendar();}
 
 // ─── ASSETS ───
 function renderAssets() {
-  const list = document.getElementById('asset-list');
-  const empty = document.getElementById('asset-empty');
-  if(S.assets.length === 0) {
-    list.innerHTML=''; list.classList.add('hide'); empty.classList.remove('hide');
-  } else {
-    empty.classList.add('hide'); list.classList.remove('hide');
-    list.innerHTML = S.assets.map(a => {
-      const ico = a.name.includes('ポケモン')||a.name.includes('ポケカ') ? '🃏'
-        : a.name.includes('PS5')||a.name.includes('プレステ') ? '🎮'
-        : a.name.includes('ゲーム') ? '🕹️' : '📦';
-      const acts = S.isParent ? `<div class="asset-acts">
-        <button class="txbtn edit" onclick="editAsset('${a.id}')">編集</button>
-        <button class="txbtn del" onclick="deleteAssetById('${a.id}')">削除</button>
-      </div>` : '';
-      return `<div class="asset-item">
-        <div class="asset-ico-wrap">${ico}</div>
-        <div class="asset-info">
-          <div class="asset-name">${a.name}</div>
-          <div class="asset-meta">${a.purchaseDate?fmtD(a.purchaseDate):''}${a.memo?' · '+a.memo:''}</div>
-        </div>
-        ${a.purchasePrice>0?`<span class="asset-price">¥${fmt(a.purchasePrice)}</span>`:''}
-        ${acts}
-      </div>`;
-    }).join('');
-  }
+  const list=document.getElementById('asset-list'),empty=document.getElementById('asset-empty');
+  if(S.assets.length===0){list.innerHTML='';list.style.display='none';empty.classList.remove('hide');return;}
+  empty.classList.add('hide');list.style.display='block';
+  list.innerHTML=S.assets.map(a=>{
+    const ico=a.name.includes('ポケモン')||a.name.includes('ポケカ')?'🃏':a.name.includes('PS5')?'🎮':a.name.includes('ゲーム')?'🕹️':'📦';
+    const acts=S.isParent?`<div class="asset-acts"><button class="txbtn edit" onclick="editAsset('${a.id}')">編集</button><button class="txbtn del" onclick="deleteAssetById('${a.id}')">削除</button></div>`:'';
+    return `<div class="asset-item">
+      <div class="asset-ico">${ico}</div>
+      <div class="asset-body"><div class="asset-name">${a.name}</div><div class="asset-meta">${a.purchaseDate?fmtD(a.purchaseDate):''}${a.memo?' · '+a.memo:''}</div></div>
+      ${a.purchasePrice>0?`<span class="asset-price">¥${fmt(a.purchasePrice)}</span>`:''}
+      ${acts}
+    </div>`;
+  }).join('');
 }
-
-function openAssetModal() {
-  if(!S.isParent){ showToast('親モードのみ操作できます'); return; }
-  S.editAssetId = null;
-  document.getElementById('asset-modal-title').textContent = '資産を追加';
-  document.getElementById('asset-name').value = '';
-  document.getElementById('asset-date').value = today();
-  document.getElementById('asset-price').value = '0';
-  document.getElementById('asset-memo').value = '';
+function openAssetModal(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  S.editAssetId=null;
+  document.getElementById('asset-modal-title').textContent='資産を追加';
+  ['asset-name','asset-memo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('asset-date').value=today();
+  document.getElementById('asset-price').value='0';
   document.getElementById('asset-del-btn').classList.add('hide');
-  openModal('asset-overlay');
-  resetParentTimer();
+  openModal('asset-overlay');resetParentTimer();
 }
-
-function editAsset(id) {
-  const a = S.assets.find(x=>x.id===id);
-  if(!a) return;
-  S.editAssetId = id;
-  document.getElementById('asset-modal-title').textContent = '資産を編集';
-  document.getElementById('asset-name').value = a.name;
-  document.getElementById('asset-date').value = a.purchaseDate || today();
-  document.getElementById('asset-price').value = a.purchasePrice || 0;
-  document.getElementById('asset-memo').value = a.memo || '';
+function editAsset(id){
+  const a=S.assets.find(x=>x.id===id);if(!a)return;
+  S.editAssetId=id;
+  document.getElementById('asset-modal-title').textContent='資産を編集';
+  document.getElementById('asset-name').value=a.name;
+  document.getElementById('asset-date').value=a.purchaseDate||today();
+  document.getElementById('asset-price').value=a.purchasePrice||0;
+  document.getElementById('asset-memo').value=a.memo||'';
   document.getElementById('asset-del-btn').classList.remove('hide');
-  document.getElementById('asset-del-btn').onclick = () => deleteAssetById(id);
+  document.getElementById('asset-del-btn').onclick=()=>deleteAssetById(id);
   openModal('asset-overlay');
 }
-
-async function saveAsset() {
-  const name = document.getElementById('asset-name').value.trim();
-  const date = document.getElementById('asset-date').value;
-  const price = parseInt(document.getElementById('asset-price').value) || 0;
-  const memo = document.getElementById('asset-memo').value.trim();
-  if(!name){ showToast('品目名を入力してください'); return; }
-  const data = {name, purchaseDate:date, purchasePrice:price, memo};
-  if(S.editAssetId) {
-    await updAssetDoc(S.editAssetId, data);
-    showToast('✅ 資産を更新しました');
-  } else {
-    await addAssetDoc(data);
-    showToast('✅ 資産を追加しました');
-  }
-  closeModal('asset-overlay');
-  await loadAssets(); renderAssets();
+async function saveAsset(){
+  const name=document.getElementById('asset-name').value.trim();
+  const date=document.getElementById('asset-date').value;
+  const price=parseInt(document.getElementById('asset-price').value)||0;
+  const memo=document.getElementById('asset-memo').value.trim();
+  if(!name){showToast('品目名を入力してください');return;}
+  const data={name,purchaseDate:date,purchasePrice:price,memo};
+  if(S.editAssetId){await updAssetDoc(S.editAssetId,data);showToast('✅ 資産を更新しました');}
+  else{await addAssetDoc(data);showToast('✅ 資産を追加しました');}
+  closeModal('asset-overlay');await loadAssets();renderAssets();
 }
-
-async function deleteAssetById(id) {
-  const targetId = id || S.editAssetId;
-  if(!targetId) return;
-  if(!confirm('この資産を削除しますか？')) return;
-  closeModal('asset-overlay');
-  await delAssetDoc(targetId);
-  showToast('削除しました');
-  await loadAssets(); renderAssets();
+async function deleteAssetById(id){
+  const targetId=id||S.editAssetId;if(!targetId)return;
+  if(!confirm('この資産を削除しますか？'))return;
+  closeModal('asset-overlay');await delAssetDoc(targetId);showToast('削除しました');await loadAssets();renderAssets();
 }
 
 // ─── GRAPH ───
-function renderGraph() {
-  const wrap = document.querySelector('.graph-card') || document.getElementById('page-graph');
-  if(S.txs.length === 0) {
-    document.getElementById('balance-chart').style.display = 'none';
-    return;
-  }
-  const sorted = [...S.txs].sort((a,b)=>a.date.localeCompare(b.date));
-  let run = 0;
-  const byDate = {};
-  sorted.forEach(tx => {
-    run += tx.type==='expense' ? -tx.amount : tx.amount;
-    byDate[tx.date] = run;
-  });
-  const labels = Object.keys(byDate).map(d=>d.replace(/-/g,'/'));
-  const data = Object.values(byDate);
-
-  if(S.chart) S.chart.destroy();
-  const ctx = document.getElementById('balance-chart').getContext('2d');
-  document.getElementById('balance-chart').style.display = 'block';
-  S.chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets:[{
-        label:'残高',data,
-        borderColor:'#6366F1',
-        backgroundColor:'rgba(99,102,241,0.1)',
-        fill:true,tension:.35,
-        pointRadius:3,pointBackgroundColor:'#6366F1',
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{grid:{display:false},ticks:{font:{size:10},maxTicksLimit:6}},
-        y:{ticks:{callback:v=>`¥${fmt(v)}`,font:{size:10}}},
-      }
-    }
-  });
+function renderGraph(){
+  const canvas=document.getElementById('balance-chart'),empty=document.getElementById('graph-empty');
+  if(S.txs.length===0){canvas.style.display='none';empty.classList.remove('hide');return;}
+  empty.classList.add('hide');canvas.style.display='block';
+  const sorted=[...S.txs].sort((a,b)=>a.date.localeCompare(b.date));
+  let run=0;const byDate={};
+  sorted.forEach(tx=>{run+=tx.type==='expense'?-tx.amount:tx.amount;byDate[tx.date]=run;});
+  if(S.chart)S.chart.destroy();
+  const ctx=canvas.getContext('2d');
+  S.chart=new Chart(ctx,{type:'line',data:{labels:Object.keys(byDate).map(d=>d.replace(/-/g,'/')),datasets:[{label:'残高',data:Object.values(byDate),borderColor:'#FF6B00',backgroundColor:'rgba(255,107,0,0.1)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#FF6B00'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},maxTicksLimit:6}},y:{ticks:{callback:v=>`¥${fmt(v)}`,font:{size:10}}}}}});
 }
 
 // ─── SETTINGS ───
-function renderSettings() {
-  const cfg = S.cfg;
-  document.getElementById('set-lunch').textContent = `¥${fmt(cfg.lunchAmount||500)}`;
-  document.getElementById('set-day').textContent = `毎月${cfg.allowanceDay||1}日`;
-
-  document.getElementById('tier-table').innerHTML =
-    (cfg.tiers||DEFAULT_TIERS).map(t => `
-      <div class="tier-row">
-        <span class="tier-chip">${t.label}</span>
-        <div class="tier-info">
-          <div class="tier-amt">¥${fmt(t.amount)}/月</div>
-          <div class="tier-time">📱${fmtTime(t.phone)} 🎮${fmtTime(t.ps5)}</div>
-        </div>
-      </div>`).join('');
-
-  document.getElementById('at-tier-table').innerHTML =
-    (cfg.atTiers||DEFAULT_AT_TIERS).map(t => `
-      <div class="tier-row">
-        <span class="tier-chip orange">${t.label}</span>
-        <div class="tier-info">
-          <div class="tier-amt">${t.amount>0?`¥${fmt(t.amount)}`:'現金なし'}</div>
-          <div class="tier-time">${t.poke?'🃏 ポケカ1P自動追加':''}</div>
-        </div>
-      </div>`).join('');
+function renderSettings(){
+  const cfg=S.cfg;
+  document.getElementById('set-lunch').textContent=`¥${fmt(cfg.lunchAmount||500)}`;
+  document.getElementById('set-day').textContent=`毎月${cfg.allowanceDay||1}日`;
+  document.getElementById('tier-table').innerHTML=(cfg.tiers||DEFAULT_TIERS).map(t=>`
+    <div class="tier-row"><span class="tier-badge">${t.label}</span><div class="tier-info"><div class="tier-amt">¥${fmt(t.amount)}/月</div><div class="tier-time">📱${fmtTime(t.phone)} 🎮${fmtTime(t.ps5)}</div></div></div>`).join('');
+  document.getElementById('at-tier-table').innerHTML=(cfg.atTiers||DEFAULT_AT_TIERS).map(t=>`
+    <div class="tier-row"><span class="tier-badge at">${t.label}</span><div class="tier-info"><div class="tier-amt">${t.amount>0?`¥${fmt(t.amount)}`:'現金なし'}</div><div class="tier-time">${t.poke?'🃏 ポケカ1P自動追加':''}</div></div></div>`).join('');
 }
-
-let currentSetType = '';
-function openSetModal(type) {
-  if(!S.isParent){ showToast('親モードのみ変更できます'); return; }
-  currentSetType = type;
-  if(type==='lunch'){
-    document.getElementById('set-modal-title').textContent = '弁当代金額を変更';
-    document.getElementById('set-modal-lbl').textContent = '金額（円）';
-    document.getElementById('set-modal-val').value = S.cfg.lunchAmount||500;
-  } else {
-    document.getElementById('set-modal-title').textContent = 'お小遣い追加日を変更';
-    document.getElementById('set-modal-lbl').textContent = '日（1〜28）';
-    document.getElementById('set-modal-val').value = S.cfg.allowanceDay||1;
-  }
-  openModal('set-overlay');
-  resetParentTimer();
+let currentSetType='';
+function openSetModal(type){
+  if(!S.isParent){showToast('親モードのみ変更できます');return;}
+  currentSetType=type;
+  if(type==='lunch'){document.getElementById('set-modal-title').textContent='弁当代金額を変更';document.getElementById('set-modal-lbl').textContent='金額（円）';document.getElementById('set-modal-val').value=S.cfg.lunchAmount||500;}
+  else{document.getElementById('set-modal-title').textContent='お小遣い追加日を変更';document.getElementById('set-modal-lbl').textContent='日（1〜28）';document.getElementById('set-modal-val').value=S.cfg.allowanceDay||1;}
+  openModal('set-overlay');resetParentTimer();
 }
-
-async function saveSetModal() {
-  const val = parseInt(document.getElementById('set-modal-val').value);
-  if(isNaN(val)||val<1){ showToast('正しい値を入力してください'); return; }
-  if(currentSetType==='lunch'){
-    await saveCfg({lunchAmount:val});
-    showToast(`✅ 弁当代を ¥${fmt(val)} に変更しました`);
-  } else {
-    const day = Math.min(28,Math.max(1,val));
-    await saveCfg({allowanceDay:day});
-    showToast(`✅ お小遣い追加日を毎月${day}日に変更しました`);
-  }
-  closeModal('set-overlay');
-  renderSettings();
+async function saveSetModal(){
+  const val=parseInt(document.getElementById('set-modal-val').value);
+  if(isNaN(val)||val<1){showToast('正しい値を入力してください');return;}
+  if(currentSetType==='lunch'){await saveCfg({lunchAmount:val});showToast(`✅ 弁当代を ¥${fmt(val)} に変更しました`);}
+  else{const day=Math.min(28,Math.max(1,val));await saveCfg({allowanceDay:day});showToast(`✅ お小遣い追加日を毎月${day}日に変更しました`);}
+  closeModal('set-overlay');renderSettings();
 }
-
-let changeMode = '';
-function openChangePass(mode) {
-  if(!S.isParent){ showToast('親モードのみ変更できます'); return; }
-  changeMode = mode;
-  const isPc = mode==='passcode';
-  document.getElementById('chpass-title').textContent = isPc ? 'パスコードを変更（6桁）' : '親PINを変更（4桁）';
-  document.getElementById('chpass-lbl1').textContent = isPc ? '新しいパスコード（6桁）' : '新しいPIN（4桁）';
-  document.getElementById('chpass-new').maxLength = isPc ? 6 : 4;
-  document.getElementById('chpass-confirm').maxLength = isPc ? 6 : 4;
-  document.getElementById('chpass-new').value = '';
-  document.getElementById('chpass-confirm').value = '';
-  document.getElementById('chpass-err').textContent = '';
-  openModal('chpass-overlay');
-  resetParentTimer();
+let changeMode='';
+function openChangePass(mode){
+  if(!S.isParent){showToast('親モードのみ変更できます');return;}
+  changeMode=mode;const isPc=mode==='passcode';
+  document.getElementById('chpass-title').textContent=isPc?'パスコードを変更（6桁）':'親PINを変更（4桁）';
+  document.getElementById('chpass-lbl1').textContent=isPc?'新しいパスコード（6桁）':'新しいPIN（4桁）';
+  document.getElementById('chpass-new').maxLength=isPc?6:4;
+  document.getElementById('chpass-confirm').maxLength=isPc?6:4;
+  ['chpass-new','chpass-confirm'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('chpass-err').textContent='';
+  openModal('chpass-overlay');resetParentTimer();
 }
-
-async function savePasscode() {
-  const n = document.getElementById('chpass-new').value;
-  const c = document.getElementById('chpass-confirm').value;
-  const err = document.getElementById('chpass-err');
-  const len = changeMode==='passcode' ? 6 : 4;
-  if(n.length!==len||!/^\d+$/.test(n)){ err.textContent=`${len}桁の数字を入力してください`; return; }
-  if(n!==c){ err.textContent='確認と一致しません'; return; }
-  const h = await sha256(n);
-  if(changeMode==='passcode'){
-    await saveCfg({passcodeHash:h});
-    showToast('✅ パスコードを変更しました');
-  } else {
-    await saveCfg({pinHash:h});
-    showToast('✅ PINを変更しました');
-  }
+async function savePasscode(){
+  const n=document.getElementById('chpass-new').value,c=document.getElementById('chpass-confirm').value;
+  const err=document.getElementById('chpass-err'),len=changeMode==='passcode'?6:4;
+  if(n.length!==len||!/^\d+$/.test(n)){err.textContent=`${len}桁の数字を入力してください`;return;}
+  if(n!==c){err.textContent='確認と一致しません';return;}
+  const h=await sha256(n);
+  if(changeMode==='passcode'){await saveCfg({passcodeHash:h});showToast('✅ パスコードを変更しました');}
+  else{await saveCfg({pinHash:h});showToast('✅ PINを変更しました');}
   closeModal('chpass-overlay');
 }
 
+// ─── FAB ───
+function toggleFab(){
+  const open=document.getElementById('fab-items').classList.toggle('open');
+  document.getElementById('fab-main').classList.toggle('open',open);
+  document.getElementById('fab-overlay').classList.toggle('open',open);
+  resetParentTimer();
+}
+function closeFab(){
+  document.getElementById('fab-items').classList.remove('open');
+  document.getElementById('fab-main').classList.remove('open');
+  document.getElementById('fab-overlay').classList.remove('open');
+}
+function buildFab(){
+  const items=document.getElementById('fab-items');
+  const actions=[
+    {ico:'🍱',lbl:'弁当代 +500円',bg:'#FF6B00',fn:'doLunch()'},
+    {ico:'📝',lbl:'ATテスト結果',bg:'#F59E0B',fn:'openATModal()'},
+    {ico:'🏆',lbl:'テスト順位入力',bg:'#2196F3',fn:'openRankModal()'},
+    {ico:'💰',lbl:'収入を追加',bg:'#4CAF50',fn:"openTxModal('income')"},
+    {ico:'💸',lbl:'支出を追加',bg:'#E53E3E',fn:"openTxModal('expense')"},
+    {ico:'📦',lbl:'資産を追加',bg:'#9C27B0',fn:'openAssetModal()'},
+  ];
+  items.innerHTML=actions.map((a,i)=>
+    `<div class="fab-item" style="animation-delay:${i*.04}s">
+      <span class="fab-lbl">${a.lbl}</span>
+      <button class="fab-btn" style="background:${a.bg};color:#fff;" onclick="closeFab();${a.fn};">${a.ico}</button>
+    </div>`
+  ).join('');
+}
+function updateFab(){
+  const wrap=document.getElementById('fab-wrap');
+  if(S.isParent) wrap.classList.remove('hidden'); else { wrap.classList.add('hidden'); closeFab(); }
+}
+
 // ─── LOGOUT ───
-function doLogout() {
-  if(!confirm('ログアウトしますか？')) return;
-  S.isParent = false;
-  clearParentTimer();
-  document.getElementById('app').style.display = 'none';
+function doLogout(){
+  if(!confirm('ログアウトしますか？'))return;
+  S.isParent=false;clearParentTimer();
+  document.getElementById('app').style.display='none';
   showLock();
 }
 
 // ─── INIT ───
-window.addEventListener('DOMContentLoaded', async () => {
-  try {
+window.addEventListener('DOMContentLoaded',async()=>{
+  try{
     firebase.initializeApp(FIREBASE_CONFIG);
-    db = firebase.firestore();
+    db=firebase.firestore();
     db.enablePersistence().catch(()=>{});
-    buildFab();
-    S.cfg = await loadCfg();
-    if(!S.cfg){
-      startSetup();
-    } else {
-      showLock();
-    }
-  } catch(e){
-    alert('Firebase接続エラー\n' + e.message);
-  }
+    S.cfg=await loadCfg();
+    if(!S.cfg) startSetup(); else showLock();
+  }catch(e){alert('Firebase接続エラー\n'+e.message);}
 });
 </script>
 </body>
