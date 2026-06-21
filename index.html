@@ -255,6 +255,46 @@
     .empty-ico{margin-bottom:12px;opacity:.4;}
     .empty-txt{font-size:14px;}
     .hide{display:none!important;}
+
+    /* ── REWARDS PAGE ── */
+    --gold:#D97706; --gold-lt:#FFFBEB; --gold-dk:#B45309;
+
+    .rwd-hero{background:linear-gradient(135deg,#B45309 0%,#D97706 45%,#F59E0B 100%);padding:24px 20px 20px;position:relative;overflow:hidden;}
+    .rwd-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);}
+    .rwd-hero::after{content:'';position:absolute;bottom:-20px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.06);}
+    .rwd-hero-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;}
+    .rwd-hero-heading{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.2;margin-bottom:4px;}
+    .rwd-hero-sub{font-size:12px;color:rgba(255,255,255,.8);margin-bottom:16px;}
+    .rwd-hero-chips{display:flex;gap:8px;flex-wrap:wrap;}
+    .rwd-chip{background:rgba(255,255,255,.18);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:#fff;backdrop-filter:blur(4px);}
+    .rwd-chip.hi{background:rgba(255,255,255,.32);}
+
+    .rwd-sec{background:var(--surface);margin-top:8px;}
+    .rwd-sec-hdr{display:flex;align-items:center;gap:10px;padding:14px 20px 10px;border-bottom:1px solid var(--border);}
+    .rwd-sec-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .rwd-sec-title{flex:1;font-size:13px;font-weight:700;}
+    .rwd-sec-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#FFFBEB;color:#B45309;white-space:nowrap;}
+
+    .rwd-tier-row{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);}
+    .rwd-tier-row:last-child{border-bottom:none;}
+    .rwd-tier-row.current{background:#FFFBEB;}
+    .rwd-tier-lbl{flex:1;}
+    .rwd-tier-rank{font-size:13px;font-weight:700;color:var(--text);}
+    .rwd-tier-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    .rwd-tier-right{text-align:right;}
+    .rwd-tier-amt{font-size:16px;font-weight:800;color:#B45309;}
+    .rwd-tier-sub2{font-size:10px;color:var(--muted);margin-top:2px;}
+    .current-mark{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:#B45309;background:#FFFBEB;padding:2px 7px;border-radius:10px;border:1px solid #FDE68A;}
+
+    .rwd-item-row{display:flex;align-items:center;gap:12px;padding:13px 20px;border-bottom:1px solid var(--border);}
+    .rwd-item-row:last-child{border-bottom:none;}
+    .rwd-item-body{flex:1;}
+    .rwd-item-title{font-size:14px;font-weight:600;}
+    .rwd-item-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+    .rwd-item-amt{font-size:16px;font-weight:800;color:#B45309;text-align:right;flex-shrink:0;}
+    .rwd-item-amt.green{color:var(--inc);}
+    .rwd-record-btn{border:none;background:#FFFBEB;color:#B45309;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;flex-shrink:0;border:1px solid #FDE68A;}
+    .rwd-record-btn:active{background:#FDE68A;}
   </style>
 </head>
 <body>
@@ -287,6 +327,12 @@
   <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
   <symbol id="i-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2H7L2 7l15 15 5-5L17 2z"/><line x1="11" y1="8" x2="9" y2="10"/><line x1="14" y1="11" x2="12" y2="13"/><line x1="8" y1="14" x2="6" y2="16"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></symbol>
 </svg>
 
 <!-- ── LOCK ── -->
@@ -447,6 +493,184 @@
     </div>
   </div>
 
+  <!-- REWARDS 報奨金 -->
+  <div class="page pg" id="page-rewards">
+    <div class="rwd-hero">
+      <div class="rwd-hero-title">Rewards Guide</div>
+      <div class="rwd-hero-heading">報奨金ガイド</div>
+      <div class="rwd-hero-sub">頑張った分だけ増える、きみへのご褒美</div>
+      <div class="rwd-hero-chips" id="rwd-hero-chips">
+        <div class="rwd-chip">月次お小遣い</div>
+        <div class="rwd-chip">ATテスト</div>
+        <div class="rwd-chip">部活・大会</div>
+        <div class="rwd-chip">英検</div>
+        <div class="rwd-chip">成長祝い</div>
+      </div>
+    </div>
+
+    <!-- 月次お小遣い -->
+    <div class="rwd-sec">
+      <div class="rwd-sec-hdr">
+        <div class="rwd-sec-ico" style="background:#FFFBEB;">
+          <svg class="ico" width="18" height="18" color="#B45309"><use href="#i-trophy"/></svg>
+        </div>
+        <span class="rwd-sec-title">テスト順位 × 月次お小遣い</span>
+        <span class="rwd-sec-badge">毎月</span>
+      </div>
+      <div id="rwd-tier-list"></div>
+    </div>
+
+    <!-- ATテスト -->
+    <div class="rwd-sec">
+      <div class="rwd-sec-hdr">
+        <div class="rwd-sec-ico" style="background:#FFFBEB;">
+          <svg class="ico" width="18" height="18" color="#B45309"><use href="#i-file-text"/></svg>
+        </div>
+        <span class="rwd-sec-title">ATテスト 臨時お小遣い</span>
+        <span class="rwd-sec-badge">テストのたびに</span>
+      </div>
+      <div id="rwd-at-list"></div>
+    </div>
+
+    <!-- 日常ボーナス -->
+    <div class="rwd-sec">
+      <div class="rwd-sec-hdr">
+        <div class="rwd-sec-ico" style="background:#ECFDF5;">
+          <svg class="ico" width="18" height="18" color="#059669"><use href="#i-star"/></svg>
+        </div>
+        <span class="rwd-sec-title">日常ボーナス</span>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#FFF7ED;">
+          <svg class="ico" width="16" height="16" color="var(--brand)"><use href="#i-utensils"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">弁当代</div>
+          <div class="rwd-item-desc">弁当が必要な日に追加</div>
+        </div>
+        <div class="rwd-item-amt green" id="rwd-bento-amt">¥500</div>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#ECFDF5;">
+          <svg class="ico" width="16" height="16" color="#059669"><use href="#i-check-circle"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">小テスト満点</div>
+          <div class="rwd-item-desc">毎回ポケモンカード1P を資産追加</div>
+        </div>
+        <div class="rwd-item-amt green">ポケカ1P</div>
+      </div>
+    </div>
+
+    <!-- 部活・大会 -->
+    <div class="rwd-sec">
+      <div class="rwd-sec-hdr">
+        <div class="rwd-sec-ico" style="background:#EFF6FF;">
+          <svg class="ico" width="18" height="18" color="#2563EB"><use href="#i-zap"/></svg>
+        </div>
+        <span class="rwd-sec-title">部活・大会ボーナス</span>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#EFF6FF;">
+          <svg class="ico" width="16" height="16" color="#2563EB"><use href="#i-award"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">部長役職手当</div>
+          <div class="rwd-item-desc">部長に就いている間、毎月支給</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="rwd-item-amt">¥1,000<span style="font-size:11px;font-weight:400;color:var(--muted);">/月</span></div>
+          <button class="rwd-record-btn hide parent-only" onclick="recordSpecial('部長役職手当',1000,'部長役職手当')">記録</button>
+        </div>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#EFF6FF;">
+          <svg class="ico" width="16" height="16" color="#2563EB"><use href="#i-zap"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">バトミントン大会 1勝</div>
+          <div class="rwd-item-desc">練習試合を除く公式大会</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="rwd-item-amt">¥1,000<span style="font-size:11px;font-weight:400;color:var(--muted);">/勝</span></div>
+          <button class="rwd-record-btn hide parent-only" onclick="recordSpecial('バトミントン大会',1000,'大会1勝ボーナス')">記録</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 英検 -->
+    <div class="rwd-sec">
+      <div class="rwd-sec-hdr">
+        <div class="rwd-sec-ico" style="background:#F5F3FF;">
+          <svg class="ico" width="18" height="18" color="#7C3AED"><use href="#i-book-open"/></svg>
+        </div>
+        <span class="rwd-sec-title">資格手当（英検）</span>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#F5F3FF;">
+          <svg class="ico" width="16" height="16" color="#7C3AED"><use href="#i-award"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">英検準２級合格</div>
+          <div class="rwd-item-desc">夏休みまでに合格した場合</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="rwd-item-amt">¥10,000</div>
+          <button class="rwd-record-btn hide parent-only" onclick="recordSpecial('英検準２級合格',10000,'英検準２級 お祝い金（夏休みまで）')">記録</button>
+        </div>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#F5F3FF;">
+          <svg class="ico" width="16" height="16" color="#7C3AED"><use href="#i-award"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">英検準２級合格</div>
+          <div class="rwd-item-desc">秋〜冬に合格した場合</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="rwd-item-amt">¥5,000</div>
+          <button class="rwd-record-btn hide parent-only" onclick="recordSpecial('英検準２級合格',5000,'英検準２級 お祝い金（秋〜冬）')">記録</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成長祝い -->
+    <div class="rwd-sec" style="margin-bottom:0;">
+      <div class="rwd-sec-hdr">
+        <div class="rwd-sec-ico" style="background:#ECFDF5;">
+          <svg class="ico" width="18" height="18" color="#059669"><use href="#i-ruler"/></svg>
+        </div>
+        <span class="rwd-sec-title">成長祝い</span>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#ECFDF5;">
+          <svg class="ico" width="16" height="16" color="#059669"><use href="#i-gift"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">身長 170cm 達成</div>
+          <div class="rwd-item-desc">計測で達成が確認できたとき</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="rwd-item-amt green">¥5,000</div>
+          <button class="rwd-record-btn hide parent-only" onclick="recordSpecial('成長祝い',5000,'身長170cm達成 お祝い金')">記録</button>
+        </div>
+      </div>
+      <div class="rwd-item-row">
+        <div class="rwd-sec-ico" style="background:#ECFDF5;">
+          <svg class="ico" width="16" height="16" color="#059669"><use href="#i-gift"/></svg>
+        </div>
+        <div class="rwd-item-body">
+          <div class="rwd-item-title">身長 175cm 達成</div>
+          <div class="rwd-item-desc">計測で達成が確認できたとき</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="rwd-item-amt green">¥10,000</div>
+          <button class="rwd-record-btn hide parent-only" onclick="recordSpecial('成長祝い',10000,'身長175cm達成 お祝い金')">記録</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SETTINGS -->
   <div class="page pg" id="page-settings">
     <div class="set-profile">
@@ -503,8 +727,11 @@
     <div class="ni" data-tab="asset" onclick="go('asset')">
       <svg class="ico" width="22" height="22"><use href="#i-package"/></svg>資産
     </div>
+    <div class="ni" data-tab="rewards" onclick="go('rewards')">
+      <svg class="ico" width="22" height="22"><use href="#i-star"/></svg>報奨金
+    </div>
     <div class="ni hide" id="nav-settings" data-tab="settings" onclick="go('settings')">
-      <svg class="ico" width="22" height="22"><use href="#i-settings"/></svg>設定
+      <svg class="ico" width="20" height="20"><use href="#i-settings"/></svg>設定
     </div>
   </nav>
 </div>
@@ -833,6 +1060,7 @@ function updateModeUI(){
   if(S.isParent){chip.textContent='親モード';chip.className='mode-pill parent';icon.setAttribute('href','#i-unlock');qs.style.display='block';ns.classList.remove('hide');}
   else{chip.textContent='子どもモード';chip.className='mode-pill';icon.setAttribute('href','#i-lock');qs.style.display='none';ns.classList.add('hide');if(S.currentTab==='settings')go('home');}
   updateFab();renderHome();renderAssets();
+  if(S.currentTab==='rewards')renderRewards();
 }
 
 async function startApp(){
@@ -845,13 +1073,64 @@ async function startApp(){
 
 function go(tab){
   S.currentTab=tab;closeFab();
-  ['home','ledger','asset','settings'].forEach(t=>{document.getElementById(`page-${t}`).classList.toggle('on',t===tab);});
+  ['home','ledger','asset','rewards','settings'].forEach(t=>{document.getElementById(`page-${t}`).classList.toggle('on',t===tab);});
   document.querySelectorAll('#nav .ni').forEach(el=>el.classList.toggle('on',el.dataset.tab===tab));
-  const titles={home:'こづかい管理',ledger:'預り金出納帳',asset:'モノ資産',settings:'設定'};
+  const titles={home:'こづかい管理',ledger:'預り金出納帳',asset:'モノ資産',rewards:'報奨金ガイド',settings:'設定'};
   document.getElementById('hdr-title').textContent=titles[tab]||'こづかい管理';
   if(tab==='ledger')renderLedger();
   if(tab==='asset')renderAssets();
+  if(tab==='rewards')renderRewards();
   if(tab==='settings')renderSettings();
+  resetParentTimer();
+}
+
+function renderRewards(){
+  const cfg=S.cfg||{};
+  const tiers=cfg.tiers||DEFAULT_TIERS;
+  const atTiers=cfg.atTiers||DEFAULT_AT_TIERS;
+  const currentRank=cfg.currentRank||null;
+
+  // Tier list
+  document.getElementById('rwd-tier-list').innerHTML=tiers.map(t=>{
+    const isCurrent=currentRank&&currentRank>=t.min&&currentRank<=t.max;
+    return `<div class="rwd-tier-row${isCurrent?' current':''}">
+      <div class="rwd-tier-lbl">
+        <div class="rwd-tier-rank">${t.label} ${isCurrent?'<span class="current-mark">★ いまここ</span>':''}</div>
+        <div class="rwd-tier-sub">スマホ ${fmtTime(t.phone)}・PS5 ${fmtTime(t.ps5)}</div>
+      </div>
+      <div class="rwd-tier-right">
+        <div class="rwd-tier-amt">¥${fmt(t.amount)}</div>
+        <div class="rwd-tier-sub2">/月</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // AT tier list
+  document.getElementById('rwd-at-list').innerHTML=atTiers.map(t=>
+    `<div class="rwd-tier-row">
+      <div class="rwd-tier-lbl">
+        <div class="rwd-tier-rank">${t.label}</div>
+        ${t.poke?'<div class="rwd-tier-sub">ポケモンカード1P も追加</div>':''}
+      </div>
+      <div class="rwd-tier-right">
+        <div class="rwd-tier-amt">${t.amount>0?`¥${fmt(t.amount)}`:'—'}</div>
+      </div>
+    </div>`
+  ).join('');
+
+  // Bento amount
+  document.getElementById('rwd-bento-amt').textContent=`¥${fmt(cfg.bentoAmount||500)}`;
+
+  // Show record buttons only in parent mode
+  document.querySelectorAll('.parent-only').forEach(el=>el.classList.toggle('hide',!S.isParent));
+}
+
+async function recordSpecial(title, amount, memo){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  if(!confirm(`「${title}」¥${fmt(amount)} を預り金に追加しますか？`))return;
+  await addEntry({date:today(),type:'in',amount,memo});
+  showToast(`¥${fmt(amount)} を追加しました`);
+  await loadEntries();renderHome();
   resetParentTimer();
 }
 
