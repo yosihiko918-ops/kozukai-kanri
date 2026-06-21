@@ -631,7 +631,7 @@ const closeModal=id=>document.getElementById(id).classList.add('hide');
 const TS=()=>firebase.firestore.FieldValue.serverTimestamp();
 async function loadCfg(){const s=await db.collection('app').doc('config').get();return s.exists?s.data():null;}
 async function saveCfg(c){await db.collection('app').doc('config').set(c,{merge:true});S.cfg={...S.cfg,...c};}
-async function loadEntries(){const s=await db.collection('ledger').orderBy('date','desc').orderBy('createdAt','desc').get();S.entries=s.docs.map(d=>({id:d.id,...d.data()}));}
+async function loadEntries(){const s=await db.collection('ledger').orderBy('date','desc').get();S.entries=s.docs.map(d=>({id:d.id,...d.data()}));}
 async function loadAssets(){const s=await db.collection('assets').orderBy('createdAt','desc').get();S.assets=s.docs.map(d=>({id:d.id,...d.data()}));}
 
 async function addEntry(e){await db.collection('ledger').add({...e,createdAt:TS()});}
@@ -779,8 +779,10 @@ function updateModeUI(){
 
 // ─── START ───
 async function startApp(){
-  await Promise.all([loadEntries(),loadAssets()]);
-  await checkMonthly();await loadEntries();
+  try{
+    await Promise.all([loadEntries(),loadAssets()]);
+    await checkMonthly();await loadEntries();
+  }catch(e){console.warn('load error',e);}
   document.getElementById('app').style.display='block';
   document.getElementById('mode-btn').onclick=toggleMode;
   buildFab();S.isParent=false;updateModeUI();go('home');
