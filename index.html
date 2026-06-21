@@ -232,6 +232,10 @@
     .pin-dot.on{background:var(--brand);}
     .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;}
     .pin-err{color:var(--dec);font-size:13px;text-align:center;margin-top:12px;min-height:18px;}
+    .bio-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:16px;padding:14px;border:1.5px solid var(--border);background:var(--surface);border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;color:var(--text);}
+    .bio-btn:active{background:var(--bg);}
+    .bio-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff;}
+    .bio-btn.primary:active{background:var(--brand-dk);}
 
     /* FAB */
     .fab-overlay{position:fixed;inset:0;z-index:80;background:rgba(15,23,42,.3);display:none;}
@@ -333,6 +337,7 @@
   <symbol id="i-ruler" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2H7L2 7l15 15 5-5L17 2z"/><line x1="11" y1="8" x2="9" y2="10"/><line x1="14" y1="11" x2="12" y2="13"/><line x1="8" y1="14" x2="6" y2="16"/></symbol>
   <symbol id="i-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></symbol>
   <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></symbol>
+  <symbol id="i-fingerprint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 17c1 .5 2.3 1 4 1"/><path d="M20.56 16.17c.22-.87.44-2.1.44-3.17"/><path d="M6.003 16.75A10 10 0 0 1 6 12a6 6 0 0 1 .21-1.603"/><path d="M7 19c-.5-2.5-.5-3.77-.5-6"/><path d="M7.9 4.7a6.003 6.003 0 0 1 9.1 5.3c0 .96-.15 1.88-.43 2.75"/></symbol>
 </svg>
 
 <!-- ── LOCK ── -->
@@ -700,6 +705,14 @@
     </div>
     <div class="set-sec">
       <div class="set-sec-title">セキュリティ</div>
+      <div class="set-row" id="bio-setting-row">
+        <div class="set-row-ico" style="background:#ECFDF5;"><svg class="ico" width="16" height="16" color="#059669"><use href="#i-fingerprint"/></svg></div>
+        <div class="set-row-body">
+          <div class="set-row-lbl">生体認証（親モード即時起動）</div>
+          <div class="set-row-sub" id="bio-setting-sub">Face ID / Touch ID で親モードをワンタップ起動</div>
+        </div>
+        <div class="set-right"><button class="set-btn" id="bio-setting-btn" onclick="toggleBiometric()">登録</button></div>
+      </div>
       <div class="set-row">
         <div class="set-row-ico" style="background:#F5F3FF;"><svg class="ico" width="16" height="16" color="#7C3AED"><use href="#i-key"/></svg></div>
         <div class="set-row-body"><div class="set-row-lbl">アプリパスコード変更</div></div>
@@ -744,8 +757,15 @@
     <div class="modal-handle"></div>
     <button class="modal-close-btn" onclick="closeModal('pin-overlay')">✕</button>
     <div class="modal-title">親モードに切り替え</div>
-    <div class="pin-dots" id="pin-dots"></div>
-    <div class="pin-pad" id="pin-pad"></div>
+    <button class="bio-btn primary hide" id="bio-auth-btn" onclick="doBiometricAuth()">
+      <svg class="ico" width="22" height="22" color="#fff"><use href="#i-fingerprint"/></svg>
+      Face ID / Touch ID で認証
+    </button>
+    <div id="pin-fallback-wrap">
+      <p id="pin-fallback-lbl" style="font-size:12px;color:var(--muted);text-align:center;margin:14px 0 0;display:none;">または PIN で認証</p>
+      <div class="pin-dots" id="pin-dots" style="margin-top:18px;"></div>
+      <div class="pin-pad" id="pin-pad"></div>
+    </div>
     <div class="pin-err" id="pin-err"></div>
   </div>
 </div>
@@ -1026,18 +1046,105 @@ async function finishSetup(){
   document.getElementById('lock-screen').style.display='none';await startApp();
 }
 
+// ─── BIOMETRIC (WebAuthn) ───
+const BIO_RP_ID = location.hostname || 'localhost';
+function bioSupported(){return!!window.PublicKeyCredential;}
+
+async function registerBiometric(){
+  try{
+    const challenge=crypto.getRandomValues(new Uint8Array(32));
+    const cred=await navigator.credentials.create({publicKey:{
+      challenge,
+      rp:{name:'こづかい管理',id:BIO_RP_ID},
+      user:{id:new Uint8Array(16),name:'parent',displayName:'パパ'},
+      pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
+      timeout:60000
+    }});
+    const credId=btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
+    await saveCfg({biometricCredId:credId});
+    showToast('生体認証を登録しました');
+    updateBioSettingUI();
+    return true;
+  }catch(e){
+    if(e.name!=='NotAllowedError')showToast('生体認証に非対応のデバイスです');
+    return false;
+  }
+}
+
+async function biometricAuth(){
+  const credId=S.cfg?.biometricCredId;
+  if(!credId||!bioSupported())return false;
+  try{
+    const challenge=crypto.getRandomValues(new Uint8Array(32));
+    const credIdBytes=Uint8Array.from(atob(credId),c=>c.charCodeAt(0));
+    const assertion=await navigator.credentials.get({publicKey:{
+      challenge,
+      allowCredentials:[{type:'public-key',id:credIdBytes}],
+      userVerification:'required',
+      timeout:30000
+    }});
+    return!!assertion;
+  }catch(e){return false;}
+}
+
+async function toggleBiometric(){
+  if(!S.isParent)return;
+  if(S.cfg?.biometricCredId){
+    if(!confirm('生体認証の登録を解除しますか？'))return;
+    await saveCfg({biometricCredId:null});
+    showToast('生体認証を解除しました');updateBioSettingUI();
+  }else{
+    if(!bioSupported()){showToast('このデバイスは生体認証に非対応です');return;}
+    await registerBiometric();
+  }
+}
+
+function updateBioSettingUI(){
+  const row=document.getElementById('bio-setting-row');if(!row)return;
+  const has=!!S.cfg?.biometricCredId;
+  document.getElementById('bio-setting-sub').textContent=has
+    ?'登録済み — 親モードをワンタップ起動できます'
+    :'Face ID / Touch ID で親モードをワンタップ起動';
+  document.getElementById('bio-setting-btn').textContent=has?'解除':'登録';
+  document.getElementById('bio-setting-btn').style.background=has?'var(--dec-bg)':'';
+  document.getElementById('bio-setting-btn').style.color=has?'var(--dec)':'';
+}
+
+// ─── PIN MODAL ───
 let pinBuf='';
-function openPinModal(){pinBuf='';buildNumpad('pin-pad',onPinKey,4,'pin-dots','pin-dot');document.getElementById('pin-err').textContent='';openModal('pin-overlay');}
+function openPinModal(){
+  pinBuf='';
+  const hasBio=!!S.cfg?.biometricCredId&&bioSupported();
+  const bioBtn=document.getElementById('bio-auth-btn');
+  const fallbackLbl=document.getElementById('pin-fallback-lbl');
+  bioBtn.classList.toggle('hide',!hasBio);
+  fallbackLbl.style.display=hasBio?'block':'none';
+  buildNumpad('pin-pad',onPinKey,4,'pin-dots','pin-dot');
+  document.getElementById('pin-err').textContent='';
+  openModal('pin-overlay');
+  // Auto-trigger biometric if registered
+  if(hasBio)setTimeout(doBiometricAuth,200);
+}
+
+async function doBiometricAuth(){
+  const ok=await biometricAuth();
+  if(ok){closeModal('pin-overlay');activateParent();}
+  else document.getElementById('pin-err').textContent='生体認証に失敗しました。PINをお試しください。';
+}
+
 async function onPinKey(k){
   if(k==='⌫')pinBuf=pinBuf.slice(0,-1);else pinBuf+=String(k);
   renderDots('pin-dots',pinBuf,4,'pin-dot');
   document.getElementById('pin-err').textContent='';
   if(pinBuf.length===4){
     const h=await sha256(pinBuf);pinBuf='';renderDots('pin-dots','',4,'pin-dot');
-    if(h===S.cfg.pinHash){S.isParent=true;closeModal('pin-overlay');startParentTimer();updateModeUI();showToast('親モードに切り替えました');}
+    if(h===S.cfg.pinHash){closeModal('pin-overlay');activateParent();}
     else document.getElementById('pin-err').textContent='PINが違います';
   }
 }
+
+function activateParent(){S.isParent=true;startParentTimer();updateModeUI();showToast('親モードに切り替えました');}
 function toggleMode(){S.isParent?exitParent():openPinModal();}
 function exitParent(){S.isParent=false;clearParentTimer();updateModeUI();showToast('子どもモードに切り替えました');}
 
@@ -1068,6 +1175,16 @@ async function startApp(){
   catch(e){console.warn('load error',e);}
   document.getElementById('app').style.display='block';
   document.getElementById('mode-btn').onclick=toggleMode;
+
+  // Triple-tap on header badge → parent mode (hidden gesture)
+  let tapC=0,tapT=null;
+  document.getElementById('hdr-badge').addEventListener('click',()=>{
+    if(S.isParent)return;
+    tapC++;clearTimeout(tapT);
+    tapT=setTimeout(()=>tapC=0,500);
+    if(tapC>=3){tapC=0;openPinModal();}
+  });
+
   buildFab();S.isParent=false;updateModeUI();go('home');
 }
 
@@ -1397,6 +1514,7 @@ function renderSettings(){
   const cfg=S.cfg;
   document.getElementById('set-bento').textContent=`¥${fmt(cfg.bentoAmount||500)}`;
   document.getElementById('set-day').textContent=`毎月${cfg.allowanceDay||1}日`;
+  updateBioSettingUI();
   document.getElementById('tier-table').innerHTML=(cfg.tiers||DEFAULT_TIERS).map(t=>
     `<div class="tier-row"><span class="tier-badge">${t.label}</span><div class="tier-body"><div class="tier-amt">¥${fmt(t.amount)}/月</div><div class="tier-time">スマホ ${fmtTime(t.phone)} ／ PS5 ${fmtTime(t.ps5)}</div></div></div>`).join('');
   document.getElementById('at-tier-table').innerHTML=(cfg.atTiers||DEFAULT_AT_TIERS).map(t=>
