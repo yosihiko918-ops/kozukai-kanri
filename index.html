@@ -904,7 +904,7 @@
     <div class="modal-handle"></div>
     <button class="modal-close-btn" onclick="closeModal('chpass-overlay')">✕</button>
     <div class="modal-title" id="chpass-title">パスコード変更</div>
-    <div class="fg"><label class="fl" id="chpass-lbl1">新しいパスコード（6桁）</label><input class="fi" type="password" id="chpass-new" maxlength="6" inputmode="numeric"></div>
+    <div class="fg"><label class="fl" id="chpass-lbl1">新しいパスコード（4桁）</label><input class="fi" type="password" id="chpass-new" maxlength="4" inputmode="numeric"></div>
     <div class="fg"><label class="fl">確認（もう一度）</label><input class="fi" type="password" id="chpass-confirm" maxlength="6" inputmode="numeric"></div>
     <div class="lock-err" id="chpass-err"></div>
     <button class="btn-p" onclick="savePasscode()">保存する</button>
@@ -1025,37 +1025,37 @@ let lockBuf='',setupBuf='',setupHash='',setupPinHash='',setupStep='passcode';
 
 function showLock(){
   document.getElementById('lock-screen').style.display='flex';
-  lockBuf='';buildNumpad('lock-pad',onLockKey,6,'lock-dots');
+  lockBuf='';buildNumpad('lock-pad',onLockKey,4,'lock-dots');
   document.getElementById('lock-err').textContent='';
   document.getElementById('lock-label').textContent='パスコードを入力';
 }
 function startSetup(){
   setupStep='passcode';setupBuf='';setupHash='';
-  document.getElementById('lock-label').textContent='パスコードを設定してください（6桁）';
+  document.getElementById('lock-label').textContent='パスコードを設定してください（4桁）';
   document.getElementById('lock-err').textContent='';
-  buildNumpad('lock-pad',onSetupKey,6,'lock-dots');
+  buildNumpad('lock-pad',onSetupKey,4,'lock-dots');
 }
 async function onLockKey(k){
   if(k==='⌫')lockBuf=lockBuf.slice(0,-1);else lockBuf+=String(k);
   renderDots('lock-dots',lockBuf,6);
   document.getElementById('lock-err').textContent='';
-  if(lockBuf.length===6){
+  if(lockBuf.length===4){
     const h=await sha256(lockBuf);lockBuf='';renderDots('lock-dots','',6);
     if(h===S.cfg.passcodeHash){document.getElementById('lock-screen').style.display='none';await startApp();}
     else document.getElementById('lock-err').textContent='パスコードが違います';
   }
 }
 async function onSetupKey(k){
-  const digits=setupStep==='pin'?4:6;
+  const digits=4;
   if(k==='⌫')setupBuf=setupBuf.slice(0,-1);else setupBuf+=String(k);
   renderDots('lock-dots',setupBuf,digits);
   document.getElementById('lock-err').textContent='';
-  if(setupStep==='passcode'&&setupBuf.length===6){
+  if(setupStep==='passcode'&&setupBuf.length===4){
     setupHash=await sha256(setupBuf);setupBuf='';setupStep='passcode2';
-    document.getElementById('lock-label').textContent='確認のため、もう一度入力してください';renderDots('lock-dots','',6);
-  }else if(setupStep==='passcode2'&&setupBuf.length===6){
+    document.getElementById('lock-label').textContent='確認のため、もう一度入力してください';renderDots('lock-dots','',4);
+  }else if(setupStep==='passcode2'&&setupBuf.length===4){
     const h=await sha256(setupBuf);
-    if(h!==setupHash){document.getElementById('lock-err').textContent='一致しません。最初からやり直してください';setupBuf='';setupHash='';setupStep='passcode';document.getElementById('lock-label').textContent='パスコードを設定してください（6桁）';renderDots('lock-dots','',6);return;}
+    if(h!==setupHash){document.getElementById('lock-err').textContent='一致しません。最初からやり直してください';setupBuf='';setupHash='';setupStep='passcode';document.getElementById('lock-label').textContent='パスコードを設定してください（4桁）';renderDots('lock-dots','',4);return;}
     setupBuf='';setupStep='pin';
     document.getElementById('lock-label').textContent='親用PIN（4桁）を設定してください';
     buildNumpad('lock-pad',onSetupKey,4,'lock-dots');
@@ -1579,15 +1579,15 @@ async function saveSetModal(){
 let changeMode='';
 function openChangePass(mode){
   if(!S.isParent)return;changeMode=mode;const isPc=mode==='passcode';
-  document.getElementById('chpass-title').textContent=isPc?'パスコードを変更（6桁）':'親PINを変更（4桁）';
-  document.getElementById('chpass-lbl1').textContent=isPc?'新しいパスコード（6桁）':'新しいPIN（4桁）';
+  document.getElementById('chpass-title').textContent=isPc?'パスコードを変更（4桁）':'親PINを変更（4桁）';
+  document.getElementById('chpass-lbl1').textContent=isPc?'新しいパスコード（4桁）':'新しいPIN（4桁）';
   document.getElementById('chpass-new').maxLength=isPc?6:4;document.getElementById('chpass-confirm').maxLength=isPc?6:4;
   ['chpass-new','chpass-confirm'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('chpass-err').textContent='';openModal('chpass-overlay');
 }
 async function savePasscode(){
   const n=document.getElementById('chpass-new').value,c=document.getElementById('chpass-confirm').value;
-  const err=document.getElementById('chpass-err'),len=changeMode==='passcode'?6:4;
+  const err=document.getElementById('chpass-err'),len=4;
   if(n.length!==len||!/^\d+$/.test(n)){err.textContent=`${len}桁の数字を入力してください`;return;}
   if(n!==c){err.textContent='確認と一致しません';return;}
   const h=await sha256(n);
