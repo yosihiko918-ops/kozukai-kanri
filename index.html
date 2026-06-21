@@ -439,6 +439,10 @@
           <div class="qa-ico bl"><svg class="ico" width="18" height="18" color="#2563EB"><use href="#i-trophy"/></svg></div>
           <div><div class="qa-lbl">テスト順位を入力</div><div class="qa-sub">月次お小遣い額を更新</div></div>
         </div>
+        <div class="qa-item" onclick="openExtraModal()">
+          <div class="qa-ico gr"><svg class="ico" width="18" height="18" color="var(--inc)"><use href="#i-gift"/></svg></div>
+          <div><div class="qa-lbl">臨時おこづかいを追加</div><div class="qa-sub">金額・理由を自由に入力</div></div>
+        </div>
         <div class="qa-item" onclick="openPayModal()">
           <div class="qa-ico rd"><svg class="ico" width="18" height="18" color="var(--dec)"><use href="#i-banknote"/></svg></div>
           <div><div class="qa-lbl">現金を渡した</div><div class="qa-sub">預り金から支払い記録</div></div>
@@ -783,6 +787,20 @@
     <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;" id="bento-date-disp"></p>
     <button class="btn-p" onclick="confirmBento()">追加する</button>
     <button class="btn-s" onclick="closeModal('bento-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- 臨時おこづかい -->
+<div class="overlay hide" id="extra-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close-btn" onclick="closeModal('extra-overlay')">✕</button>
+    <div class="modal-title">臨時おこづかいを追加</div>
+    <div class="fg"><label class="fl">日付</label><input class="fi" type="date" id="extra-date"></div>
+    <div class="fg"><label class="fl">金額（円）</label><input class="fi" type="number" id="extra-amount" inputmode="numeric" placeholder="例：1000"></div>
+    <div class="fg"><label class="fl">理由・メモ</label><input class="fi" type="text" id="extra-memo" placeholder="例：お手伝い、誕生日プレゼント"></div>
+    <button class="btn-p" onclick="saveExtra()">追加する</button>
+    <button class="btn-s" onclick="closeModal('extra-overlay')">キャンセル</button>
   </div>
 </div>
 
@@ -1452,6 +1470,24 @@ function openPayModal(){
   document.getElementById('pay-amount').value='';document.getElementById('pay-memo').value='';
   openModal('pay-overlay');resetParentTimer();
 }
+function openExtraModal(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  document.getElementById('extra-date').value=today();
+  document.getElementById('extra-amount').value='';
+  document.getElementById('extra-memo').value='';
+  openModal('extra-overlay');resetParentTimer();
+}
+async function saveExtra(){
+  const date=document.getElementById('extra-date').value;
+  const amount=parseInt(document.getElementById('extra-amount').value)||0;
+  const memo=document.getElementById('extra-memo').value.trim()||'臨時おこづかい';
+  if(!date||!amount){showToast('日付と金額を入力してください');return;}
+  await addEntry({date,type:'in',amount,memo:`臨時おこづかい（${memo}）`});
+  closeModal('extra-overlay');
+  showToast(`¥${fmt(amount)} を追加しました`);
+  await loadEntries();renderHome();if(S.currentTab==='ledger')renderLedger();
+}
+
 async function savePay(){
   const date=document.getElementById('pay-date').value;
   const amount=parseInt(document.getElementById('pay-amount').value)||0;
