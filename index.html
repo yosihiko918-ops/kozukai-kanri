@@ -1023,11 +1023,13 @@ function renderDots(id,buf,total,cls='lock-dot'){
 
 let lockBuf='',setupBuf='',setupHash='',setupPinHash='',setupStep='passcode';
 
+function pcLen(){return S.cfg?.passcodeLength||6;} // 既存ユーザーは6桁のまま動く
 function showLock(){
   document.getElementById('lock-screen').style.display='flex';
-  lockBuf='';buildNumpad('lock-pad',onLockKey,4,'lock-dots');
+  const len=pcLen();
+  lockBuf='';buildNumpad('lock-pad',onLockKey,len,'lock-dots');
   document.getElementById('lock-err').textContent='';
-  document.getElementById('lock-label').textContent='パスコードを入力';
+  document.getElementById('lock-label').textContent=`パスコードを入力（${len}桁）`;
 }
 function startSetup(){
   setupStep='passcode';setupBuf='';setupHash='';
@@ -1036,11 +1038,12 @@ function startSetup(){
   buildNumpad('lock-pad',onSetupKey,4,'lock-dots');
 }
 async function onLockKey(k){
+  const len=pcLen();
   if(k==='⌫')lockBuf=lockBuf.slice(0,-1);else lockBuf+=String(k);
-  renderDots('lock-dots',lockBuf,6);
+  renderDots('lock-dots',lockBuf,len);
   document.getElementById('lock-err').textContent='';
-  if(lockBuf.length===4){
-    const h=await sha256(lockBuf);lockBuf='';renderDots('lock-dots','',6);
+  if(lockBuf.length===len){
+    const h=await sha256(lockBuf);lockBuf='';renderDots('lock-dots','',len);
     if(h===S.cfg.passcodeHash){document.getElementById('lock-screen').style.display='none';await startApp();}
     else document.getElementById('lock-err').textContent='パスコードが違います';
   }
@@ -1067,7 +1070,7 @@ async function onSetupKey(k){
 async function finishSetup(){
   const day=Math.min(28,Math.max(1,parseInt(document.getElementById('setup-day-val').value)||1));
   closeModal('setup-day-overlay');
-  const cfg={passcodeHash:setupHash,pinHash:setupPinHash,bentoAmount:500,allowanceDay:day,tiers:DEFAULT_TIERS,atTiers:DEFAULT_AT_TIERS,currentRank:null,currentTier:null,lastAllowanceMonth:null};
+  const cfg={passcodeHash:setupHash,passcodeLength:4,pinHash:setupPinHash,bentoAmount:500,allowanceDay:day,tiers:DEFAULT_TIERS,atTiers:DEFAULT_AT_TIERS,currentRank:null,currentTier:null,lastAllowanceMonth:null};
   await db.collection('app').doc('config').set(cfg);S.cfg=cfg;
   document.getElementById('lock-screen').style.display='none';await startApp();
 }
@@ -1591,7 +1594,7 @@ async function savePasscode(){
   if(n.length!==len||!/^\d+$/.test(n)){err.textContent=`${len}桁の数字を入力してください`;return;}
   if(n!==c){err.textContent='確認と一致しません';return;}
   const h=await sha256(n);
-  if(changeMode==='passcode'){await saveCfg({passcodeHash:h});showToast('パスコードを変更しました');}
+  if(changeMode==='passcode'){await saveCfg({passcodeHash:h,passcodeLength:4});showToast('パスコードを変更しました');}
   else{await saveCfg({pinHash:h});showToast('PINを変更しました');}
   closeModal('chpass-overlay');
 }
