@@ -705,13 +705,16 @@
     </div>
     <div class="set-sec">
       <div class="set-sec-title">セキュリティ</div>
-      <div class="set-row" id="bio-setting-row">
-        <div class="set-row-ico" style="background:#ECFDF5;"><svg class="ico" width="16" height="16" color="#059669"><use href="#i-fingerprint"/></svg></div>
-        <div class="set-row-body">
-          <div class="set-row-lbl">生体認証（親モード即時起動）</div>
-          <div class="set-row-sub" id="bio-setting-sub">Face ID / Touch ID で親モードをワンタップ起動</div>
+      <div class="set-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="set-row-ico" style="background:#ECFDF5;"><svg class="ico" width="16" height="16" color="#059669"><use href="#i-fingerprint"/></svg></div>
+          <div class="set-row-body">
+            <div class="set-row-lbl">生体認証（親モード即時起動）</div>
+            <div class="set-row-sub">指紋・顔認証で親モードをワンタップ起動。パパ・ママ各自のスマホで登録できます</div>
+          </div>
+          <button class="set-btn" onclick="addBiometric()">追加</button>
         </div>
-        <div class="set-right"><button class="set-btn" id="bio-setting-btn" onclick="toggleBiometric()">登録</button></div>
+        <div id="bio-creds-list" style="padding:0 0 4px 44px;"></div>
       </div>
       <div class="set-row">
         <div class="set-row-ico" style="background:#F5F3FF;"><svg class="ico" width="16" height="16" color="#7C3AED"><use href="#i-key"/></svg></div>
@@ -759,7 +762,7 @@
     <div class="modal-title">親モードに切り替え</div>
     <button class="bio-btn primary hide" id="bio-auth-btn" onclick="doBiometricAuth()">
       <svg class="ico" width="22" height="22" color="#fff"><use href="#i-fingerprint"/></svg>
-      Face ID / Touch ID で認証
+      指紋・顔認証で親モードを起動
     </button>
     <div id="pin-fallback-wrap">
       <p id="pin-fallback-lbl" style="font-size:12px;color:var(--muted);text-align:center;margin:14px 0 0;display:none;">または PIN で認証</p>
@@ -869,6 +872,29 @@
     <div class="fg"><label class="fl" id="set-modal-lbl">値</label><input class="fi" type="number" id="set-modal-val" inputmode="numeric"></div>
     <button class="btn-p" onclick="saveSetModal()">保存する</button>
     <button class="btn-s" onclick="closeModal('set-overlay')">キャンセル</button>
+  </div>
+</div>
+
+<!-- 生体認証 登録 -->
+<div class="overlay hide" id="bio-reg-overlay">
+  <div class="modal modal-wrap">
+    <div class="modal-handle"></div>
+    <button class="modal-close-btn" onclick="closeModal('bio-reg-overlay')">✕</button>
+    <div class="modal-title">生体認証を追加</div>
+    <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;">誰の認証情報を登録しますか？<br>登録後は指紋・顔認証で親モードを即起動できます。</p>
+    <div class="fg">
+      <label class="fl">名前</label>
+      <div style="display:flex;gap:8px;margin-bottom:4px;">
+        <button class="btn-s" style="flex:1;padding:10px;font-size:14px;" onclick="document.getElementById('bio-reg-name').value='パパ'">パパ</button>
+        <button class="btn-s" style="flex:1;padding:10px;font-size:14px;" onclick="document.getElementById('bio-reg-name').value='ママ'">ママ</button>
+      </div>
+      <input class="fi" type="text" id="bio-reg-name" placeholder="パパ / ママ など">
+    </div>
+    <button class="btn-p" onclick="confirmAddBiometric()">
+      <svg class="ico" width="18" height="18" color="#fff" style="margin-right:6px;"><use href="#i-fingerprint"/></svg>
+      指紋・顔認証を登録する
+    </button>
+    <button class="btn-s" onclick="closeModal('bio-reg-overlay')">キャンセル</button>
   </div>
 </div>
 
@@ -1047,75 +1073,92 @@ async function finishSetup(){
 }
 
 // ─── BIOMETRIC (WebAuthn) ───
-const BIO_RP_ID = location.hostname || 'localhost';
+// biometricCreds: [{id: string(base64), label: string}]  stored in Firestore cfg
+const BIO_RP_ID = location.hostname||'localhost';
 function bioSupported(){return!!window.PublicKeyCredential;}
+function getBioCreds(){return Array.isArray(S.cfg?.biometricCreds)?S.cfg.biometricCreds:[];}
 
-async function registerBiometric(){
+function addBiometric(){
+  if(!S.isParent)return;
+  if(!bioSupported()){showToast('このデバイスは生体認証に非対応です');return;}
+  document.getElementById('bio-reg-name').value='';
+  openModal('bio-reg-overlay');
+}
+
+async function confirmAddBiometric(){
+  const label=document.getElementById('bio-reg-name').value.trim()||'親';
+  closeModal('bio-reg-overlay');
   try{
     const challenge=crypto.getRandomValues(new Uint8Array(32));
+    const userId=crypto.getRandomValues(new Uint8Array(16));
     const cred=await navigator.credentials.create({publicKey:{
       challenge,
       rp:{name:'こづかい管理',id:BIO_RP_ID},
-      user:{id:new Uint8Array(16),name:'parent',displayName:'パパ'},
+      user:{id:userId,name:label,displayName:label},
       pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
       authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},
       timeout:60000
     }});
     const credId=btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
-    await saveCfg({biometricCredId:credId});
-    showToast('生体認証を登録しました');
+    const creds=[...getBioCreds(),{id:credId,label}];
+    await saveCfg({biometricCreds:creds});
+    showToast(`${label} の生体認証を登録しました`);
     updateBioSettingUI();
-    return true;
   }catch(e){
-    if(e.name!=='NotAllowedError')showToast('生体認証に非対応のデバイスです');
-    return false;
+    if(e.name==='NotAllowedError')showToast('キャンセルしました');
+    else showToast('登録に失敗しました: '+e.message);
   }
 }
 
+async function removeBiometric(idx){
+  if(!S.isParent)return;
+  const creds=getBioCreds();
+  const lbl=creds[idx]?.label||'この認証';
+  if(!confirm(`「${lbl}」の生体認証を削除しますか？`))return;
+  creds.splice(idx,1);
+  await saveCfg({biometricCreds:creds});
+  showToast('削除しました');updateBioSettingUI();
+}
+
 async function biometricAuth(){
-  const credId=S.cfg?.biometricCredId;
-  if(!credId||!bioSupported())return false;
+  const creds=getBioCreds();
+  if(!creds.length||!bioSupported())return false;
   try{
     const challenge=crypto.getRandomValues(new Uint8Array(32));
-    const credIdBytes=Uint8Array.from(atob(credId),c=>c.charCodeAt(0));
+    const allowCreds=creds.map(c=>({
+      type:'public-key',
+      id:Uint8Array.from(atob(c.id),x=>x.charCodeAt(0))
+    }));
     const assertion=await navigator.credentials.get({publicKey:{
-      challenge,
-      allowCredentials:[{type:'public-key',id:credIdBytes}],
-      userVerification:'required',
-      timeout:30000
+      challenge,allowCredentials:allowCreds,
+      userVerification:'required',timeout:30000
     }});
     return!!assertion;
   }catch(e){return false;}
 }
 
-async function toggleBiometric(){
-  if(!S.isParent)return;
-  if(S.cfg?.biometricCredId){
-    if(!confirm('生体認証の登録を解除しますか？'))return;
-    await saveCfg({biometricCredId:null});
-    showToast('生体認証を解除しました');updateBioSettingUI();
-  }else{
-    if(!bioSupported()){showToast('このデバイスは生体認証に非対応です');return;}
-    await registerBiometric();
-  }
-}
-
 function updateBioSettingUI(){
-  const row=document.getElementById('bio-setting-row');if(!row)return;
-  const has=!!S.cfg?.biometricCredId;
-  document.getElementById('bio-setting-sub').textContent=has
-    ?'登録済み — 親モードをワンタップ起動できます'
-    :'Face ID / Touch ID で親モードをワンタップ起動';
-  document.getElementById('bio-setting-btn').textContent=has?'解除':'登録';
-  document.getElementById('bio-setting-btn').style.background=has?'var(--dec-bg)':'';
-  document.getElementById('bio-setting-btn').style.color=has?'var(--dec)':'';
+  const list=document.getElementById('bio-creds-list');if(!list)return;
+  const creds=getBioCreds();
+  if(!creds.length){
+    list.innerHTML='<span style="font-size:12px;color:var(--muted);">まだ登録がありません</span>';return;
+  }
+  list.innerHTML=creds.map((c,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg class="ico" width="14" height="14" color="var(--inc)"><use href="#i-fingerprint"/></svg>
+        <span style="font-size:13px;font-weight:600;">${c.label}</span>
+        <span style="font-size:11px;color:var(--muted);">登録済み</span>
+      </div>
+      <button onclick="removeBiometric(${i})" style="border:none;background:none;color:var(--dec);font-size:12px;font-weight:600;cursor:pointer;padding:2px 6px;">削除</button>
+    </div>`).join('');
 }
 
 // ─── PIN MODAL ───
 let pinBuf='';
 function openPinModal(){
   pinBuf='';
-  const hasBio=!!S.cfg?.biometricCredId&&bioSupported();
+  const hasBio=getBioCreds().length>0&&bioSupported();
   const bioBtn=document.getElementById('bio-auth-btn');
   const fallbackLbl=document.getElementById('pin-fallback-lbl');
   bioBtn.classList.toggle('hide',!hasBio);
@@ -1123,7 +1166,6 @@ function openPinModal(){
   buildNumpad('pin-pad',onPinKey,4,'pin-dots','pin-dot');
   document.getElementById('pin-err').textContent='';
   openModal('pin-overlay');
-  // Auto-trigger biometric if registered
   if(hasBio)setTimeout(doBiometricAuth,200);
 }
 
