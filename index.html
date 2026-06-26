@@ -735,6 +735,10 @@
       <svg class="ico" width="16" height="16" color="var(--dec)" style="margin-right:6px;"><use href="#i-log-out"/></svg>
       ログアウト
     </button>
+    <button class="logout-btn" style="margin-top:0;border-color:#FCA5A5;background:#FEF2F2;" onclick="doFullReset()">
+      <svg class="ico" width="16" height="16" color="var(--dec)" style="margin-right:6px;"><use href="#i-trash"/></svg>
+      全データをリセット（初期化）
+    </button>
   </div>
 
   <nav id="nav">
@@ -1635,6 +1639,28 @@ async function savePasscode(){
   closeModal('chpass-overlay');
 }
 function doLogout(){if(!confirm('ログアウトしますか？'))return;S.isParent=false;clearParentTimer();document.getElementById('app').style.display='none';showLock();}
+
+async function doFullReset(){
+  if(!S.isParent){showToast('親モードのみ操作できます');return;}
+  if(!confirm('⚠️ 全データを削除して初期化します。\n出納帳・資産・設定がすべて消えます。\n本当によろしいですか？'))return;
+  if(!confirm('もう一度確認します。\nこの操作は元に戻せません。\n削除しますか？'))return;
+  try{
+    // Delete all ledger entries
+    const ledger=await db.collection('ledger').get();
+    await Promise.all(ledger.docs.map(d=>d.ref.delete()));
+    // Delete all assets
+    const assets=await db.collection('assets').get();
+    await Promise.all(assets.docs.map(d=>d.ref.delete()));
+    // Delete config
+    await db.collection('app').doc('config').delete();
+    S.cfg=null;S.entries=[];S.assets=[];S.isParent=false;
+    clearParentTimer();
+    document.getElementById('app').style.display='none';
+    document.getElementById('lock-screen').style.display='flex';
+    startSetup();
+    showToast('リセットしました');
+  }catch(e){showToast('エラーが発生しました: '+e.message);}
+}
 
 window.addEventListener('DOMContentLoaded',async()=>{
   try{
