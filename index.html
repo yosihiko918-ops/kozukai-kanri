@@ -984,6 +984,8 @@ const S={isParent:false,cfg:null,entries:[],assets:[],currentTab:'home',parentTi
 
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
 const fmt=n=>Math.abs(n).toLocaleString('ja-JP');
+const fmtBal=n=>(n<0?'-':'')+'¥'+Math.abs(n).toLocaleString('ja-JP');
+const balCls=n=>n<0?'color:var(--dec);font-weight:700;':'';
 const fmtD=d=>{const[y,m,day]=d.split('-');return`${parseInt(m)}/${parseInt(day)}`;};
 function today(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function thisMonth(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
@@ -1348,7 +1350,11 @@ function homeMonthShift(d){if(d<0){homeM===0?(homeM=11,homeY--):homeM--;}else{ho
 function renderHome(){
   document.getElementById('home-month-lbl').textContent=`${homeY}年${homeM+1}月`;
   const bal=calcBalance(S.entries);
-  document.getElementById('home-held').textContent=fmt(bal);
+  const heldEl=document.getElementById('home-held');
+  heldEl.textContent=fmt(bal);
+  const kpiMain=heldEl.closest('.kpi-card');
+  if(kpiMain){kpiMain.style.background=bal<0?'var(--dec-bg)':'';const amt=kpiMain.querySelector('.kpi-amt');if(amt)amt.style.color=bal<0?'var(--dec)':'var(--brand)';}
+
   const assetTotal=S.assets.reduce((s,a)=>s+(a.purchasePrice||0),0);
   document.getElementById('home-asset-total').textContent=fmt(assetTotal);
   const cfg=S.cfg;
@@ -1382,7 +1388,7 @@ function renderHome(){
       </div>
       <div class="entry-right">
         <div class="entry-amt ${e.type}">${e.type==='in'?'+':'-'}¥${fmt(e.amount)}</div>
-        <div class="entry-bal">残高 ¥${fmt(balMap[e.id]||0)}</div>
+        <div class="entry-bal" style="${balCls(balMap[e.id]||0)}">残高 ${fmtBal(balMap[e.id]||0)}</div>
       </div>
     </div>`).join('');
 }
@@ -1400,7 +1406,9 @@ function renderLedger(){
   const balAtEnd=calcBalance(S.entries.filter(e=>e.date<=monthEnd));
   document.getElementById('led-inc').textContent=`+¥${fmt(inc)}`;
   document.getElementById('led-dec').textContent=`-¥${fmt(dec)}`;
-  document.getElementById('led-bal').textContent=`¥${fmt(balAtEnd)}`;
+  const balEl=document.getElementById('led-bal');
+  balEl.textContent=fmtBal(balAtEnd);
+  balEl.style.color=balAtEnd<0?'var(--dec)':'';
   const body=document.getElementById('ledger-body'),empty=document.getElementById('ledger-empty');
   if(!monthEntries.length){body.innerHTML='';empty.classList.remove('hide');return;}
   empty.classList.add('hide');
@@ -1410,7 +1418,7 @@ function renderLedger(){
   let run=prevBal;
   // Group by date
   const byDate={};asc.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e);});
-  let html=`<div class="prev-row"><span class="prev-lbl">前月繰越</span><span class="prev-val">¥${fmt(prevBal)}</span></div>`;
+  let html=`<div class="prev-row"><span class="prev-lbl">前月繰越</span><span class="prev-val" style="${balCls(prevBal)}">${fmtBal(prevBal)}</span></div>`;
   Object.entries(byDate).forEach(([date,rows])=>{
     const[y,m,d]=date.split('-');
     html+=`<div class="led-day-hdr"><span class="led-day-txt">${parseInt(m)}月${parseInt(d)}日</span></div>`;
@@ -1422,7 +1430,7 @@ function renderLedger(){
         <div class="led-row-body"><div class="led-row-memo">${e.memo}</div>${acts}</div>
         <div class="led-row-right">
           <div class="led-row-amt ${e.type}">${e.type==='in'?'+':'-'}¥${fmt(e.amount)}</div>
-          <div class="led-row-bal">残高 ¥${fmt(run)}</div>
+          <div class="led-row-bal" style="${balCls(run)}">残高 ${fmtBal(run)}</div>
         </div>
       </div>`;
     });
