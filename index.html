@@ -7,6 +7,7 @@
   <title>こづかい管理</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     :root{
@@ -44,6 +45,13 @@
     .nk{aspect-ratio:1;border:none;border-radius:50%;background:#F8FAFC;color:var(--text);font-size:22px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;letter-spacing:0;}
     .nk:active{background:#E2E8F0;}
     .lock-err{color:var(--dec);font-size:13px;margin-top:16px;text-align:center;min-height:18px;}
+    /* ── ACCOUNT LOGIN ── */
+    .auth-form{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px;margin-top:8px;}
+    .auth-input{width:100%;height:48px;padding:0 16px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:var(--surface);color:var(--text);outline:none;}
+    .auth-input:focus{border-color:var(--brand);}
+    .auth-btn{width:100%;height:48px;border:none;border-radius:12px;background:var(--brand);color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;}
+    .auth-btn:disabled{opacity:.6;cursor:default;}
+    .lock-signout{margin-top:28px;background:none;border:none;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer;}
 
     /* ── HEADER ── */
     .hdr{background:var(--surface);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border);}
@@ -340,6 +348,21 @@
   <symbol id="i-fingerprint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 17c1 .5 2.3 1 4 1"/><path d="M20.56 16.17c.22-.87.44-2.1.44-3.17"/><path d="M6.003 16.75A10 10 0 0 1 6 12a6 6 0 0 1 .21-1.603"/><path d="M7 19c-.5-2.5-.5-3.77-.5-6"/><path d="M7.9 4.7a6.003 6.003 0 0 1 9.1 5.3c0 .96-.15 1.88-.43 2.75"/></symbol>
 </svg>
 
+<!-- ── ACCOUNT LOGIN (Firebase Auth) ── -->
+<div id="auth-screen" class="lock" style="display:none;">
+  <div class="lock-logo">
+    <svg class="ico" width="32" height="32" color="#fff"><use href="#i-wallet"/></svg>
+  </div>
+  <div class="lock-name">こづかい管理</div>
+  <div class="lock-sub">続けるにはログインしてください</div>
+  <form class="auth-form" onsubmit="event.preventDefault();doAuthLogin();">
+    <input id="auth-email" class="auth-input" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="メールアドレス">
+    <input id="auth-pw" class="auth-input" type="password" autocomplete="current-password" placeholder="パスワード">
+    <button id="auth-btn" class="auth-btn" type="submit">ログイン</button>
+  </form>
+  <div class="lock-err" id="auth-err"></div>
+</div>
+
 <!-- ── LOCK ── -->
 <div id="lock-screen" class="lock">
   <div class="lock-logo">
@@ -351,6 +374,7 @@
   <div class="lock-dots" id="lock-dots"></div>
   <div class="numpad" id="lock-pad"></div>
   <div class="lock-err" id="lock-err"></div>
+  <button class="lock-signout" type="button" onclick="doAccountSignOut()">別のアカウントでログイン</button>
 </div>
 
 <!-- ── APP ── -->
@@ -1006,6 +1030,48 @@ async function delEntry(id){await db.collection('ledger').doc(id).delete();}
 async function addAssetDoc(a){await db.collection('assets').add({...a,createdAt:TS()});}
 async function updAssetDoc(id,a){await db.collection('assets').doc(id).update(a);}
 async function delAssetDoc(id){await db.collection('assets').doc(id).delete();}
+
+// ── Firebase Auth（データアクセスを守る認証層。パスコード/PINはアプリ内の親子ロール切替） ──
+function showAuthScreen(){
+  document.getElementById('lock-screen').style.display='none';
+  document.getElementById('app').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+}
+function authErrMsg(code){
+  switch(code){
+    case 'auth/invalid-email':return 'メールアドレスの形式が正しくありません';
+    case 'auth/user-disabled':return 'このアカウントは無効化されています';
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':return 'メールアドレスまたはパスワードが違います';
+    case 'auth/too-many-requests':return '試行回数が多すぎます。しばらく待ってからお試しください';
+    case 'auth/network-request-failed':return 'ネットワークに接続できません';
+    default:return 'ログインに失敗しました（'+code+'）';
+  }
+}
+async function doAuthLogin(){
+  const email=document.getElementById('auth-email').value.trim();
+  const pw=document.getElementById('auth-pw').value;
+  const err=document.getElementById('auth-err');
+  err.textContent='';
+  if(!email||!pw){err.textContent='メールとパスワードを入力してください';return;}
+  const btn=document.getElementById('auth-btn');btn.disabled=true;btn.textContent='ログイン中...';
+  try{
+    await firebase.auth().signInWithEmailAndPassword(email,pw);
+    // 成功後の画面遷移は onAuthStateChanged が担当
+  }catch(e){
+    err.textContent=authErrMsg(e.code);
+  }finally{
+    btn.disabled=false;btn.textContent='ログイン';
+  }
+}
+async function doAccountSignOut(){
+  if(!confirm('アカウントからログアウトします。\n再度使うにはメールとパスワードが必要です。\nよろしいですか？'))return;
+  S.isParent=false;clearParentTimer();
+  document.getElementById('auth-pw').value='';
+  try{await firebase.auth().signOut();}catch(e){}
+  // onAuthStateChanged が auth 画面を表示
+}
 
 function calcBalance(entries){return entries.reduce((s,e)=>e.type==='in'?s+e.amount:s-e.amount,0);}
 function filterMonth(entries,y,m){const k=`${y}-${String(m+1).padStart(2,'0')}`;return entries.filter(e=>e.date.startsWith(k));}
@@ -1669,8 +1735,16 @@ window.addEventListener('DOMContentLoaded',async()=>{
     firebase.initializeApp(FIREBASE_CONFIG);
     db=firebase.firestore();
     db.enablePersistence().catch(()=>{});
-    S.cfg=await loadCfg();
-    if(!S.cfg)startSetup();else showLock();
+    await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(()=>{});
+    firebase.auth().onAuthStateChanged(async user=>{
+      if(!user){showAuthScreen();return;}
+      // ログイン済み → データ読み込みへ（Firestoreルールは認証必須）
+      document.getElementById('auth-screen').style.display='none';
+      try{
+        S.cfg=await loadCfg();
+        if(!S.cfg)startSetup();else showLock();
+      }catch(e){alert('データ読み込みエラー\n'+e.message);}
+    });
   }catch(e){alert('Firebase接続エラー\n'+e.message);}
 });
 </script>
